@@ -66,7 +66,7 @@ insert into knots(knot_extra_data)
 values
   (default),
   (default),
-  (default),
+  ('{"a":"b"}'),
   (default),
   (default);
 

@@ -49,6 +49,7 @@ library:
   - containers
   - aeson
   - uuid
+  - tagged
   - unordered-containers
   - protolude
   source-dirs: library

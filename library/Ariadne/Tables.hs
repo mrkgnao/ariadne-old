@@ -1,4 +1,5 @@
 {-# LANGUAGE Arrows                     #-}
+{-# LANGUAGE OverloadedStrings #-}
 {-# LANGUAGE DataKinds                  #-}
 {-# LANGUAGE ExplicitNamespaces         #-}
 {-# LANGUAGE FlexibleContexts           #-}
@@ -18,13 +19,14 @@
 {-# LANGUAGE TypeFamilies               #-}
 {-# LANGUAGE TypeOperators              #-}
 
-module Example where
+module Ariadne.Tables where
 
 import           Control.Arrow              (returnA)
 import           Control.Monad.Catch        (MonadThrow)
 import           Control.Monad.IO.Class     (MonadIO, liftIO)
-import           Data.Aeson                 (FromJSON, ToJSON)
-import           Data.Int                   (Int32)
+import           Data.Aeson
+-- import           Data.Int                   (Int32)
+import           Data.Tagged
 import           Data.Text                  (Text)
 import           Data.Time.Clock            (UTCTime)
 import           Data.UUID
@@ -32,8 +34,9 @@ import qualified Database.PostgreSQL.Simple as PGS
 import           Tisch
 import           Tisch.Internal.Table
 
-import           Data.Kind                  (Type)
-import           Data.Proxy
+-- import           Data.Kind                  (Type)
+-- import           Data.Proxy
+import           GHC.TypeLits
 
 import           Lib.Prelude
 
@@ -115,7 +118,50 @@ type instance SchemaName Knot = "public"
 type instance Columns Knot =
   '[ 'Column "knot_id" 'WD 'R KnotId KnotId
    , 'Column "knot_created_at" 'WD 'R CreationTime CreationTime
+   , 'Column "knot_extra_data" 'WD 'R PGJsonb Value
    ]
+
+knot_id :: Knot !> KnotId
+knot_id = col (Proxy @"knot_id")
+
+knot_created_at :: Knot !> CreationTime
+knot_created_at = col (Proxy @"knot_created_at")
+
+knot_extra_data :: Knot !> Value
+knot_extra_data = col (Proxy @"knot_extra_data")
+
+-------------------
+-- The Path table.
+-------------------
+
+-- | An uninhabited type tag for the 'Path' table.
+data Path
+
+-- | A constructor for 'Table' 'Path'.
+data instance Table Path      = Path
+
+-- | Postgres table for 'Path'.
+type instance TableName Path  = "paths"
+
+type instance Database Path   = Db
+type instance SchemaName Path = "public"
+
+type instance Columns Path =
+  [ 'Column "path_id" 'W 'R KnotId KnotId
+  , 'Column "path_source" 'W 'R KnotId KnotId
+  , 'Column "path_target" 'W 'R KnotId KnotId
+  ]
+
+path_id :: Path !> KnotId
+path_id = col (Proxy @"path_id")
+
+path_source :: Path !> KnotId
+path_source = col (Proxy @"path_source")
+
+path_target :: Path !> KnotId
+path_target = col (Proxy @"path_target")
+
+---
 
 -- | A convenient type operator for queries.
 type (>->) = Query Db
@@ -126,12 +172,6 @@ type (!>) a b = Lens' (HsR a) b
 -- | Find all knots present in the database.
 q_Knot_all :: () >-> PgR Knot
 q_Knot_all = query Knot
-
-knot_id :: Knot !> KnotId
-knot_id = col (Proxy @"knot_id")
-
-knot_created_at :: Knot !> CreationTime
-knot_created_at = col (Proxy @"knot_created_at")
 
 fetchKnot
   :: forall m.
@@ -147,21 +187,34 @@ connInfo =
   , PGS.connectDatabase = "loldb"
   }
 
+hsi' :: forall (c :: Symbol) x. x -> Tagged c x
+hsi' = hsi (C @c)
+
 doInsert :: Conn' Db -> IO ()
 doInsert conn = runInsert1 conn Knot kt
-  where kt = mkHsI Knot (hsi (C @"knot_id") WDef) (hsi (C @"knot_created_at") WDef)
+  where
+    kt =
+      mkHsI
+        Knot
+        (hsi' @"knot_id" WDef)
+        (hsi' @"knot_created_at" WDef)
+        (hsi'
+           @"knot_extra_data"
+           (WVal (object [("foo" :: Text) .= ([3, 4 :: Int])])))
 
 runTisch :: IO ()
 runTisch = do
   conn <- connect connInfo
   fetchKnot conn q_Knot_all >>=
     traverse_
-      (((^. knot_id . to unKnotId) &&& (^. knot_created_at . to unCreationTime)) |>
+      (((^. knot_id . to unKnotId) &&&
+        (^. knot_created_at . to unCreationTime) &&& (^. knot_extra_data)) |>
        print)
   doInsert conn
   fetchKnot conn q_Knot_all >>=
     traverse_
-      (((^. knot_id . to unKnotId) &&& (^. knot_created_at . to unCreationTime)) |>
+      (((^. knot_id . to unKnotId) &&&
+        (^. knot_created_at . to unCreationTime) &&& (^. knot_extra_data)) |>
        print)
 
 main :: IO ()
