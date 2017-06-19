@@ -23,7 +23,8 @@ module Ariadne.Tables where
 
 import           Control.Arrow              (returnA)
 import           Control.Monad.Catch        (MonadThrow)
--- import           Control.Monad.IO.Class     (MonadIO, liftIO)
+import           Control.Monad.IO.Class     (MonadIO, liftIO)
+import           Control.Monad.Reader
 import           Data.Aeson
 -- import           Data.Int                   (Int32)
 import           Data.Tagged
@@ -39,6 +40,8 @@ import           Tisch.Internal.Table
 import           GHC.TypeLits
 
 import           Lib.Prelude
+
+import           Ariadne.Ambiguous
 
 -- | An uninhabited type-level database tag.
 data Db
@@ -121,17 +124,14 @@ type instance Columns Knot =
    , 'Column "knot_extra_data" 'WD 'R PGJsonb Value
    ]
 
-knot_id :: Knot !> KnotId
-knot_id = col (Proxy @"knot_id")
+knot_id :: ColLens "knot_id" a b b => Lens' a b
+knot_id = colLens @"knot_id"
 
-knot_idp :: Knot ?> KnotId
-knot_idp = col (Proxy @"knot_id")
+knot_created_at :: ColLens "knot_created_at" a b b => Lens' a b
+knot_created_at = colLens @"knot_created_at"
 
-knot_created_at :: Knot !> CreationTime
-knot_created_at = col (Proxy @"knot_created_at")
-
-knot_extra_data :: Knot !> Value
-knot_extra_data = col (Proxy @"knot_extra_data")
+knot_extra_data :: ColLens "knot_extra_data" a b b => Lens' a b
+knot_extra_data = colLens @"knot_extra_data"
 
 -------------------
 -- The Path table.
@@ -155,41 +155,52 @@ type instance Columns Path =
   , 'Column "path_target" 'W 'R KnotId KnotId
   ]
 
-path_id :: Path !> KnotId
-path_id = col (Proxy @"path_id")
+path_id :: ColLens "path_id" a b b => Lens' a b
+path_id = colLens @"path_id"
 
-path_source :: Path !> KnotId
-path_source = col (Proxy @"path_source")
+path_source :: ColLens "path_source" a b b => Lens' a b
+path_source = colLens @"path_source"
 
-path_target :: Path !> KnotId
-path_target = col (Proxy @"path_target")
+path_target :: ColLens "path_target" a b b => Lens' a b
+path_target = colLens @"path_target"
 
 ---
 
 -- | A convenient type operator for queries.
 type (>->) a b = a -> Query Db () b
 
--- | A type operator for lenses that read out of 'HsR' values.
-type (!>) a b = Lens' (HsR a) b
-
--- | A type operator for lenses that read out of 'PgR' values.
-type (?>) a b = Lens' (PgR a) (Kol b)
-
 -- | Find all knots present in the database.
-q_Knot_all :: Query Db () (PgR Knot)
+-- q_Knot_all :: Query Db () (PgR Knot)
 q_Knot_all = query Knot
 
 q_Knot_by_id :: KnotId >-> PgR Knot
 q_Knot_by_id kid = proc () -> do
   k <- query Knot -< ()
-  restrict -< eq (k ^. knot_idp) (kol kid)
+  restrict -< eq (k ^. knot_id) (kol kid)
   returnA -< k
+
+newtype AriadneState = AriadneState { conn :: Conn' Db }
+
+newtype AriadneT m a = AriadneT
+  { runAriadneT :: ReaderT AriadneState m a
+  } deriving ( Functor
+             , Applicative
+             , Monad
+             , MonadReader AriadneState
+             , MonadIO
+             , MonadThrow
+             )
+
+escapeLabyrinth :: AriadneState -> AriadneT m a -> m a
+escapeLabyrinth db a = runReaderT (runAriadneT a) db
 
 fetchKnot
   :: forall m.
-     (MonadIO m, MonadThrow m)
-  => Conn' Db -> Query Db () (PgR Knot) -> m [HsR Knot]
-fetchKnot = runQuery
+     (MonadIO m, MonadThrow m, MonadReader AriadneState m)
+  => Query Db () (PgR Knot) -> m [HsR Knot]
+fetchKnot q = do
+  c <- asks conn
+  runQuery c q
 
 connInfo :: PGS.ConnectInfo
 connInfo =
@@ -202,8 +213,12 @@ connInfo =
 hsi' :: forall (c :: Symbol) x. x -> Tagged c x
 hsi' = hsi (C @c)
 
-doInsert :: Conn' Db -> IO ()
-doInsert conn = runInsert1 conn Knot kt
+mkKnot
+  :: (MonadReader AriadneState m, MonadIO m, MonadThrow m)
+  => m KnotId
+mkKnot = do
+  c <- asks conn
+  runInsertReturning1 c Knot (^. knot_id) kt
   where
     kt =
       mkHsI
@@ -217,17 +232,9 @@ doInsert conn = runInsert1 conn Knot kt
 runTisch :: IO ()
 runTisch = do
   conn <- connect connInfo
-  fetchKnot conn q_Knot_all >>=
-    traverse_
-      (((^. knot_id . to unKnotId) &&&
-        (^. knot_created_at . to unCreationTime) &&& (^. knot_extra_data)) |>
-       print)
-  doInsert conn
-  fetchKnot conn q_Knot_all >>=
-    traverse_
-      (((^. knot_id . to unKnotId) &&&
-        (^. knot_created_at . to unCreationTime) &&& (^. knot_extra_data)) |>
-       print)
+  escapeLabyrinth (AriadneState conn) $ do
+    fetchKnot q_Knot_all >>= traverse_ print
+    replicateM_ 100 mkKnot *> pure ()
 
 main :: IO ()
 main = runTisch
