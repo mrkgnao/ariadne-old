@@ -1,5 +1,4 @@
 {-# LANGUAGE Arrows                     #-}
-{-# LANGUAGE OverloadedStrings #-}
 {-# LANGUAGE DataKinds                  #-}
 {-# LANGUAGE ExplicitNamespaces         #-}
 {-# LANGUAGE FlexibleContexts           #-}
@@ -10,6 +9,7 @@
 {-# LANGUAGE MultiParamTypeClasses      #-}
 {-# LANGUAGE NoImplicitPrelude          #-}
 {-# LANGUAGE OverloadedLabels           #-}
+{-# LANGUAGE OverloadedStrings          #-}
 {-# LANGUAGE PartialTypeSignatures      #-}
 {-# LANGUAGE PolyKinds                  #-}
 {-# LANGUAGE RankNTypes                 #-}
@@ -23,7 +23,7 @@ module Ariadne.Tables where
 
 import           Control.Arrow              (returnA)
 import           Control.Monad.Catch        (MonadThrow)
-import           Control.Monad.IO.Class     (MonadIO, liftIO)
+-- import           Control.Monad.IO.Class     (MonadIO, liftIO)
 import           Data.Aeson
 -- import           Data.Int                   (Int32)
 import           Data.Tagged
@@ -124,6 +124,9 @@ type instance Columns Knot =
 knot_id :: Knot !> KnotId
 knot_id = col (Proxy @"knot_id")
 
+knot_idp :: Knot ?> KnotId
+knot_idp = col (Proxy @"knot_id")
+
 knot_created_at :: Knot !> CreationTime
 knot_created_at = col (Proxy @"knot_created_at")
 
@@ -164,19 +167,28 @@ path_target = col (Proxy @"path_target")
 ---
 
 -- | A convenient type operator for queries.
-type (>->) = Query Db
+type (>->) a b = a -> Query Db () b
 
 -- | A type operator for lenses that read out of 'HsR' values.
 type (!>) a b = Lens' (HsR a) b
 
+-- | A type operator for lenses that read out of 'PgR' values.
+type (?>) a b = Lens' (PgR a) (Kol b)
+
 -- | Find all knots present in the database.
-q_Knot_all :: () >-> PgR Knot
+q_Knot_all :: Query Db () (PgR Knot)
 q_Knot_all = query Knot
+
+q_Knot_by_id :: KnotId >-> PgR Knot
+q_Knot_by_id kid = proc () -> do
+  k <- query Knot -< ()
+  restrict -< eq (k ^. knot_idp) (kol kid)
+  returnA -< k
 
 fetchKnot
   :: forall m.
      (MonadIO m, MonadThrow m)
-  => Conn' Db -> (() >-> PgR Knot) -> m [HsR Knot]
+  => Conn' Db -> Query Db () (PgR Knot) -> m [HsR Knot]
 fetchKnot = runQuery
 
 connInfo :: PGS.ConnectInfo
