@@ -1,0 +1,72 @@
+benchmarks:
+  ariadne-benchmarks:
+    dependencies:
+    - base
+    - ariadne
+    - criterion
+    ghc-options:
+    - -rtsopts
+    - -threaded
+    - -with-rtsopts=-N
+    main: Main.hs
+    source-dirs: benchmark
+category: Other
+description: ariadne is a new Haskeleton package.
+executables:
+  ariadne:
+    dependencies:
+    - base
+    - ariadne
+    ghc-options:
+    - -rtsopts
+    - -threaded
+    - -with-rtsopts=-N
+    main: Main.hs
+    source-dirs: executable
+extra-source-files:
+- CHANGELOG.md
+- LICENSE.md
+- package.yaml
+- README.md
+- stack.yaml
+ghc-options: -Wall
+github: mrkgnao/ariadne
+library:
+  dependencies:
+  - base
+  - opaleye
+  - tisch
+  - postgresql-simple
+  - lens
+  - lens-aeson
+  - time
+  - mtl
+  - transformers
+  - katip
+  - exceptions
+  - text
+  - vector
+  - containers
+  - aeson
+  - uuid
+  - unordered-containers
+  - protolude
+  source-dirs: library
+license: MIT
+maintainer: Soham Chowdhury
+name: ariadne
+synopsis: A new Haskeleton package.
+tests:
+  ariadne-test-suite:
+    dependencies:
+    - base
+    - ariadne
+    - tasty
+    - tasty-hspec
+    ghc-options:
+    - -rtsopts
+    - -threaded
+    - -with-rtsopts=-N
+    main: Main.hs
+    source-dirs: test-suite
+version: '0.0.0'
