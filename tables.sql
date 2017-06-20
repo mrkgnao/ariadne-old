@@ -70,6 +70,12 @@ values
   (default),
   (default);
 
+with rows as
+(insert into knots (knot_extra_data) values (default) returning knot_id)
+insert into paths(path_id, path_source, path_target)
+select knot_id, (select knot_id from knots limit 1), (select knot_id from knots limit 1)
+from rows;
+
 -- insert into persons (person_id, person_name)
 -- values
 --   (1, 'Nietzsche'),

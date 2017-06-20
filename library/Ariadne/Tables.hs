@@ -164,13 +164,65 @@ path_source = colLens @"path_source"
 path_target :: ColLens "path_target" a b b => Lens' a b
 path_target = colLens @"path_target"
 
+q_Path_all :: Query Db () (PgR Path)
+q_Path_all = query Path
+
+q_Path_by_id :: KnotId >-> PgR Path
+q_Path_by_id kid = proc () -> do
+  k <- query Path -< ()
+  restrict -< eq (k ^. path_id) (kol kid)
+  returnA -< k
+
+
+--
+-- The Link table.
+--
+
+-- | An uninhabited type tag for the 'Link' table.
+data Link
+
+-- | A constructor for 'Table' 'Link'.
+data instance Table Link      = Link
+
+-- | Postgres table for 'Link'.
+type instance TableName Link  = "links"
+
+type instance Database Link   = Db
+type instance SchemaName Link = "public"
+
+type instance Columns Link =
+  [ 'Column "link_id" 'W 'R KnotId KnotId
+  , 'Column "link_url" 'W 'R PGText Text
+  ]
+
+q_Link_all :: Query Db () (PgR Link)
+q_Link_all = query Link
+
+link_id :: ColLens "link_id" a b b => Lens' a b
+link_id = colLens @"link_id"
+
+mkLink
+  :: (MonadReader AriadneState m, MonadIO m, MonadThrow m)
+  => Text -> m KnotId
+mkLink url = do
+  s <- mkKnot
+  c <- asks conn
+  runInsertReturning1
+    c
+    Link
+    (^. link_id)
+    (mkHsI
+       Link
+       (hsi' @"link_id" s)
+       (hsi' @"link_url" url))
+
 ---
 
 -- | A convenient type operator for queries.
 type (>->) a b = a -> Query Db () b
 
 -- | Find all knots present in the database.
--- q_Knot_all :: Query Db () (PgR Knot)
+q_Knot_all :: Query Db () (PgR Knot)
 q_Knot_all = query Knot
 
 q_Knot_by_id :: KnotId >-> PgR Knot
@@ -202,6 +254,23 @@ fetchKnot q = do
   c <- asks conn
   runQuery c q
 
+fetchPath
+  :: forall m.
+     (MonadIO m, MonadThrow m, MonadReader AriadneState m)
+  => Query Db () (PgR Path) -> m [HsR Path]
+fetchPath q = do
+  c <- asks conn
+  runQuery c q
+
+fetchLink
+  :: forall m.
+     (MonadIO m, MonadThrow m, MonadReader AriadneState m)
+  => Query Db () (PgR Link) -> m [HsR Link]
+fetchLink q = do
+  c <- asks conn
+  runQuery c q
+
+
 connInfo :: PGS.ConnectInfo
 connInfo =
   PGS.defaultConnectInfo
@@ -221,20 +290,38 @@ mkKnot = do
   runInsertReturning1 c Knot (^. knot_id) kt
   where
     kt =
-      mkHsI
-        Knot
+      mkHsI Knot
         (hsi' @"knot_id" WDef)
         (hsi' @"knot_created_at" WDef)
-        (hsi'
-           @"knot_extra_data"
-           (WVal (object [("foo" :: Text) .= ([3, 4 :: Int])])))
+        (hsi' @"knot_extra_data" WDef)
+
+mkPath
+  :: (MonadReader AriadneState m, MonadIO m, MonadThrow m)
+  => m KnotId
+mkPath = do
+  s <- mkKnot
+  t <- mkKnot
+  d <- mkKnot
+  c <- asks conn
+  runInsertReturning1
+    c
+    Path
+    (^. path_id)
+    (mkHsI
+       Path
+       (hsi' @"path_id" d)
+       (hsi' @"path_source" s)
+       (hsi' @"path_target" t))
 
 runTisch :: IO ()
 runTisch = do
   conn <- connect connInfo
   escapeLabyrinth (AriadneState conn) $ do
-    fetchKnot q_Knot_all >>= traverse_ print
-    replicateM_ 100 mkKnot *> pure ()
+    mkPath >>= print
+    k <- mkLink "http://lol.lol"
+    fetchLink q_Link_all >>= (map (^. link_id) |> traverse_ print)
+    -- fetchKnot q_Knot_all >>= (length |> print)
+    -- fetchPath q_Path_all >>= (length |> print)
 
 main :: IO ()
 main = runTisch
