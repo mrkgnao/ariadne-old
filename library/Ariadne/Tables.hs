@@ -119,10 +119,10 @@ type instance Database Knot   = Db
 type instance SchemaName Knot = "public"
 
 type instance Columns Knot =
-  '[ 'Column "knot_id" 'WD 'R KnotId KnotId
-   , 'Column "knot_created_at" 'WD 'R CreationTime CreationTime
-   , 'Column "knot_extra_data" 'WD 'R PGJsonb Value
-   ]
+  [ 'Column "knot_id" 'WD 'R KnotId KnotId
+  , 'Column "knot_created_at" 'WD 'R CreationTime CreationTime
+  , 'Column "knot_extra_data" 'WD 'R PGJsonb Value
+  ]
 
 knot_id :: ColLens "knot_id" a b b => Lens' a b
 knot_id = colLens @"knot_id"
@@ -174,9 +174,9 @@ q_Path_by_id kid = proc () -> do
   returnA -< k
 
 
---
+-------------------
 -- The Link table.
---
+-------------------
 
 -- | An uninhabited type tag for the 'Link' table.
 data Link
@@ -193,18 +193,34 @@ type instance SchemaName Link = "public"
 type instance Columns Link =
   [ 'Column "link_id" 'W 'R KnotId KnotId
   , 'Column "link_url" 'W 'R PGText Text
+  , 'Column "link_title" 'W 'R PGText Text
   ]
 
 q_Link_all :: Query Db () (PgR Link)
 q_Link_all = query Link
 
+q_Link_by_id :: KnotId >-> PgR Link
+q_Link_by_id kid = proc () -> do
+  k <- query Link -< ()
+  restrict -< eq (k ^. link_id) (kol kid)
+  returnA -< k
+
+q_Link_by_url :: Text >-> PgR Link
+q_Link_by_url url = proc () -> do
+  l <- query Link -< ()
+  restrict -< reMatch (l ^. link_url) (kol (".*" <> url <> ".*"))
+  returnA -< l
+
 link_id :: ColLens "link_id" a b b => Lens' a b
 link_id = colLens @"link_id"
 
-mkLink
+link_url :: ColLens "link_url" a b b => Lens' a b
+link_url = colLens @"link_url"
+
+createLink
   :: (MonadReader AriadneState m, MonadIO m, MonadThrow m)
-  => Text -> m KnotId
-mkLink url = do
+  => Text -> Text -> m KnotId
+createLink url title = do
   s <- mkKnot
   c <- asks conn
   runInsertReturning1
@@ -214,7 +230,8 @@ mkLink url = do
     (mkHsI
        Link
        (hsi' @"link_id" s)
-       (hsi' @"link_url" url))
+       (hsi' @"link_url" url)
+       (hsi' @"link_title" title))
 
 ---
 
@@ -246,30 +263,13 @@ newtype AriadneT m a = AriadneT
 escapeLabyrinth :: AriadneState -> AriadneT m a -> m a
 escapeLabyrinth db a = runReaderT (runAriadneT a) db
 
-fetchKnot
-  :: forall m.
-     (MonadIO m, MonadThrow m, MonadReader AriadneState m)
-  => Query Db () (PgR Knot) -> m [HsR Knot]
-fetchKnot q = do
+fetch
+  :: forall a m.
+     (MonadIO m, MonadThrow m, MonadReader AriadneState m, _)
+  => Query Db () (PgR a) -> m [HsR a]
+fetch q = do
   c <- asks conn
   runQuery c q
-
-fetchPath
-  :: forall m.
-     (MonadIO m, MonadThrow m, MonadReader AriadneState m)
-  => Query Db () (PgR Path) -> m [HsR Path]
-fetchPath q = do
-  c <- asks conn
-  runQuery c q
-
-fetchLink
-  :: forall m.
-     (MonadIO m, MonadThrow m, MonadReader AriadneState m)
-  => Query Db () (PgR Link) -> m [HsR Link]
-fetchLink q = do
-  c <- asks conn
-  runQuery c q
-
 
 connInfo :: PGS.ConnectInfo
 connInfo =
@@ -297,11 +297,9 @@ mkKnot = do
 
 mkPath
   :: (MonadReader AriadneState m, MonadIO m, MonadThrow m)
-  => m KnotId
-mkPath = do
-  s <- mkKnot
+  => KnotId -> KnotId -> m KnotId
+mkPath s d = do
   t <- mkKnot
-  d <- mkKnot
   c <- asks conn
   runInsertReturning1
     c
@@ -317,9 +315,12 @@ runTisch :: IO ()
 runTisch = do
   conn <- connect connInfo
   escapeLabyrinth (AriadneState conn) $ do
-    mkPath >>= print
-    k <- mkLink "http://lol.lol"
-    fetchLink q_Link_all >>= (map (^. link_id) |> traverse_ print)
+    a <- createLink "http://pol" "Not very funny"
+    b <- mkKnot
+    mkPath a b >>= print
+    -- fetchLink q_Link_all >>= (map (^. link_id) |> traverse_ print)
+    -- fetchLink (q_Link_by_url "http://lol.kol") >>= traverse_ print
+    fetch @Link (q_Link_by_url "pol") >>= traverse_ print
     -- fetchKnot q_Knot_all >>= (length |> print)
     -- fetchPath q_Path_all >>= (length |> print)
 

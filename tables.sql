@@ -36,6 +36,8 @@ create table links
                 references knots
   , link_url    text
                 not null
+  , link_title  text
+                not null
   );
 
 create table persons
