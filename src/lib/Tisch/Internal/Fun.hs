@@ -72,6 +72,8 @@ module Tisch.Internal.Fun
  , reReplace
  , reReplaceg
  , reSplit
+ , like
+ , ilike
  ) where
 
 import Control.Lens ()
@@ -595,3 +597,27 @@ reSplit
   -> Kol (O.PGArray O.PGText)
 reSplit (Kol re) (Kol s) = Kol $ unsafeFunExpr "regexp_split_to_array"
    [AnyColumn s, AnyColumn re]
+
+--------------------------------------------------------------------------------
+-- LIKE clauses
+
+-- | Whether the given LIKE clause matches the given text (case insensitive).
+--
+-- Sql operator: @ILIKE@
+ilike
+  :: (O.PGText ~ regex, O.PGText ~ source)
+  => Kol regex
+  -> Kol source
+  -> Kol O.PGBool  -- ^ Is there a match?
+ilike = liftKol2 (OI.binOp (HDB.OpOther "ILIKE"))
+
+-- | Whether the given LIKE clause matches the given text.
+--
+-- Sql operator: @LIKE@
+like
+  :: (O.PGText ~ regex, O.PGText ~ source)
+  => Kol regex
+  -> Kol source
+  -> Kol O.PGBool  -- ^ Is there a match?
+like = liftKol2 (OI.binOp (HDB.OpOther "LIKE"))
+
