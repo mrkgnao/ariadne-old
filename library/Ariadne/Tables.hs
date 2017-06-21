@@ -33,13 +33,14 @@ import           Data.Time.Clock            (UTCTime)
 import           Data.UUID
 import qualified Database.PostgreSQL.Simple as PGS
 import           Tisch
+import           Tisch.Internal.Fun
 import           Tisch.Internal.Table
 
 -- import           Data.Kind                  (Type)
 -- import           Data.Proxy
 import           GHC.TypeLits
 
-import           Lib.Prelude
+import           Lib.Prelude                hiding (like)
 
 import           Ariadne.Ambiguous
 
@@ -174,6 +175,69 @@ q_Path_by_id kid = proc () -> do
   returnA -< k
 
 
+--
+-- The Fulltext table.
+--
+
+-- | An uninhabited type tag for the 'Fulltext' table.
+data Fulltext
+
+-- | A constructor for 'Table' 'Fulltext'.
+data instance Table Fulltext      = Fulltext
+
+-- | Postgres table for 'Fulltext'.
+type instance TableName Fulltext  = "fulltexts"
+
+type instance Database Fulltext   = Db
+type instance SchemaName Fulltext = "public"
+
+type instance Columns Fulltext =
+  [ 'Column "fulltext_id" 'W 'R KnotId KnotId
+  , 'Column "fulltext_contents" 'W 'R PGText Text
+  ]
+
+fulltext_id :: ColLens "fulltext_id" a b b => Lens' a b
+fulltext_id = colLens @"fulltext_id"
+
+contents :: ColLens "fulltext_contents" a b b => Lens' a b
+contents = colLens @"fulltext_contents"
+
+q_Fulltext_all :: Query Db () (PgR Fulltext)
+q_Fulltext_all = query Fulltext
+
+q_Fulltext_by_id :: KnotId >-> PgR Fulltext
+q_Fulltext_by_id kid = proc () -> do
+  k <- query Fulltext -< ()
+  restrict -< eq (k ^. fulltext_id) (kol kid)
+  returnA -< k
+
+q_Fulltext_by_contents :: Text >-> PgR Fulltext
+q_Fulltext_by_contents cts = proc () -> do
+  l <- query Fulltext -< ()
+  restrict -< reMatch (l ^. contents) (kol (".*" <> cts <> ".*"))
+  returnA -< l
+
+mkFulltext'
+  :: (MonadReader AriadneState m, MonadIO m, MonadThrow m)
+  => Text -> m KnotId
+mkFulltext' s = do
+  t <- mkKnot
+  mkFulltext t s
+
+mkFulltext
+  :: (MonadReader AriadneState m, MonadIO m, MonadThrow m)
+  => KnotId -> Text -> m KnotId
+mkFulltext t s = do
+  c <- asks conn
+  runInsertReturning1
+    c
+    Fulltext
+    (^. fulltext_id)
+    (mkHsI
+       Fulltext
+       (hsi' @"fulltext_id" t)
+       (hsi' @"fulltext_contents" s))
+
 -------------------
 -- The Link table.
 -------------------
@@ -202,13 +266,13 @@ q_Link_all = query Link
 q_Link_by_id :: KnotId >-> PgR Link
 q_Link_by_id kid = proc () -> do
   k <- query Link -< ()
-  restrict -< eq (k ^. link_id) (kol kid)
+  restrict -< (k ^. link_id) `eq` kol kid
   returnA -< k
 
 q_Link_by_url :: Text >-> PgR Link
 q_Link_by_url url = proc () -> do
   l <- query Link -< ()
-  restrict -< reMatch (l ^. link_url) (kol (".*" <> url <> ".*"))
+  restrict -< (l ^. link_url) `like` kol ("%" <> url)
   returnA -< l
 
 link_id :: ColLens "link_id" a b b => Lens' a b
@@ -315,12 +379,14 @@ runTisch :: IO ()
 runTisch = do
   conn <- connect connInfo
   escapeLabyrinth (AriadneState conn) $ do
-    a <- createLink "http://pol" "Not very funny"
+    a <- createLink "http://web.site" "Not very funny"
     b <- mkKnot
     mkPath a b >>= print
+    mkFulltext a "<html>Very funny website</html>" >>= print
+    fetch @Link (q_Link_by_url "site") >>= print
+    fetch @Fulltext (q_Fulltext_by_contents "html") >>= traverse_ print
     -- fetchLink q_Link_all >>= (map (^. link_id) |> traverse_ print)
     -- fetchLink (q_Link_by_url "http://lol.kol") >>= traverse_ print
-    fetch @Link (q_Link_by_url "pol") >>= traverse_ print
     -- fetchKnot q_Knot_all >>= (length |> print)
     -- fetchPath q_Path_all >>= (length |> print)
 

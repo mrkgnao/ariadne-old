@@ -40,6 +40,17 @@ create table links
                 not null
   );
 
+create table fulltexts
+  ( fulltext_id uuid
+                primary key
+                constraint link__knot
+                references knots
+  , fulltext_contents
+                text
+                not null
+  );
+
+
 create table persons
   ( person_id   uuid
                 primary key
