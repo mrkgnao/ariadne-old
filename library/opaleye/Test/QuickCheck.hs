@@ -3,7 +3,7 @@
 
 module QuickCheck where
 
-import qualified Opaleye as O
+import qualified Edible as O
 import qualified Database.PostgreSQL.Simple as PGS
 import qualified Test.QuickCheck as TQ
 import           Control.Applicative (Applicative, pure, (<$>), (<*>), liftA2)

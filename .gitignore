@@ -1,5 +1,5 @@
 .stack-work/
 *.cabal
 
-library/odbhut/.stack-work/
-library/odbhut/odbhut.cabal
+library/edible/.stack-work/
+library/edible/edible.cabal

@@ -19,7 +19,7 @@ infrastructure with the following goals in mind:
   @tisch@ is fully compatible with @opalaye@ and doesn't aim
   to replace it, just to complement it. @tisch@ is designed in
   such a way that we are expected to work with tools both from
-  "Opaleye" and "Tisch" at the same time. If anything, perhaps
+  "Edible" and "Tisch" at the same time. If anything, perhaps
   some of the ideas on @tisch@ can eventually be ported
   to the core @opaleye@ project.
 

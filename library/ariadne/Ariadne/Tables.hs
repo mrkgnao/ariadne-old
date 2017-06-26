@@ -32,7 +32,7 @@ import           Data.Text                  (Text)
 import           Data.Time.Clock            (UTCTime)
 import           Data.UUID
 import qualified Database.PostgreSQL.Simple as PGS
-import           Odbhut
+import           Edible
 import           Tisch.Internal.Fun
 import           Tisch.Internal.Table
 

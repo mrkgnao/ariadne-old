@@ -6,9 +6,9 @@ module Main where
 
 import qualified QuickCheck
 
-import           Opaleye (Column, Nullable, Query, QueryArr, (.==), (.>))
-import qualified Opaleye as O
-import qualified Opaleye.Internal.Aggregate as IA
+import           Edible (Column, Nullable, Query, QueryArr, (.==), (.>))
+import qualified Edible as O
+import qualified Edible.Internal.Aggregate as IA
 
 import qualified Database.PostgreSQL.Simple as PGS
 import qualified Database.PostgreSQL.Simple.Range as R
@@ -116,7 +116,7 @@ The overall approach to testing should probably go as follows.
 Note
 ----
 
-This seems to be equivalent to just reimplementing Opaleye in
+This seems to be equivalent to just reimplementing Edible in
 Haskell-side terms and comparing the results of queries run in both
 ways.
 
@@ -424,7 +424,7 @@ testDistinct = it "" $ O.distinct table1Q `queryShouldReturnSorted` (L.nub table
 
 -- FIXME: the unsafeCoerceColumn is currently needed because the type
 -- changes required for aggregation are not currently dealt with by
--- Opaleye.
+-- Edible.
 aggregateCoerceFIXME :: QueryArr (Column O.PGInt4) (Column O.PGInt8)
 aggregateCoerceFIXME = Arr.arr aggregateCoerceFIXME'
 

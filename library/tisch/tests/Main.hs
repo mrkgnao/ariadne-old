@@ -19,7 +19,7 @@ import           Control.Arrow
 import           Control.Lens
 import           Data.Int
 import           Data.Proxy
-import qualified Opaleye as O
+import qualified Edible as O
 
 import           Tisch
 

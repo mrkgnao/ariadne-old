@@ -1,7 +1,7 @@
 resolver: lts-8.20
 packages:
   - '.'
-  - location: './library/odbhut/'
+  - location: './library/edible/'
     extra-dep: yes
   - location: '../katip/katip/'
     extra-dep: yes
