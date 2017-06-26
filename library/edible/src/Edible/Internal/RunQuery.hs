@@ -1,7 +1,9 @@
 {-# LANGUAGE DataKinds             #-}
 {-# LANGUAGE FlexibleContexts      #-}
 {-# LANGUAGE FlexibleInstances     #-}
+{-# LANGUAGE GADTs                 #-}
 {-# LANGUAGE MultiParamTypeClasses #-}
+{-# LANGUAGE UndecidableInstances  #-}
 
 module Edible.Internal.RunQuery where
 
@@ -43,6 +45,8 @@ import           GHC.Int                              (Int32, Int64)
 -- { Only needed for annoying postgresql-simple patch below
 
 import           Control.Applicative                  ((<$>))
+import           Data.Fixed                           (Fixed (..))
+import qualified Data.Fixed                           as Fixed
 import           Data.Scientific                      (Scientific)
 import qualified Data.Scientific                      as Scientific
 import           Data.Typeable                        (Typeable)
@@ -50,6 +54,10 @@ import           Database.PostgreSQL.Simple.FromField (ResultError (Incompatible
                                                        returnError, typeInfo)
 import qualified Database.PostgreSQL.Simple.Range     as PGSR
 import qualified Database.PostgreSQL.Simple.TypeInfo  as TI
+
+import qualified Database.PostgreSQL.Simple.FromField as Pg
+import           GHC.TypeLits
+import qualified GHC.TypeLits                         as GHC
 
 -- }
 
@@ -166,6 +174,9 @@ instance QueryRunnerColumnDefault T.PGInt8 Int64 where
 instance QueryRunnerColumnDefault T.PGText String where
   queryRunnerColumnDefault = fieldQueryRunnerColumn
 
+instance QueryRunnerColumnDefault T.PGFloat4 Float where
+  queryRunnerColumnDefault = fieldQueryRunnerColumn
+
 instance QueryRunnerColumnDefault T.PGFloat8 Double where
   queryRunnerColumnDefault = fieldQueryRunnerColumn
 
@@ -228,6 +239,40 @@ instance QueryRunnerColumnDefault (T.PGNumeric s) Scientific where
 instance QueryRunnerColumnDefault (T.PGNumeric 0) Integer where
   queryRunnerColumnDefault = fieldQueryRunnerColumn
   {-# INLINE queryRunnerColumnDefault #-}
+
+newtype WrapFixed e = WrapFixed { unWrapFixed :: Fixed e }
+
+instance Fixed.HasResolution e => Pg.FromField (WrapFixed e) where
+  fromField = fmap (fmap (fmap (WrapFixed . fromRational))) Pg.fromField
+  {-# INLINE fromField #-}
+
+instance
+  ( Fixed.HasResolution e, GHC.CmpNat s (T.PGNumericScale e + 1) ~ 'LT
+  ) => QueryRunnerColumnDefault (T.PGNumeric s) (Fixed e) where
+    queryRunnerColumnDefault = fmap unWrapFixed fieldQueryRunnerColumn
+    {-# INLINE queryRunnerColumnDefault #-}
+
+
+-- | Conversions to 'Int' are explicitely disabled.
+instance {-# OVERLAPPING #-}
+  ( GHC.TypeError
+      ('GHC.Text "QueryRunnerColumnDefault conversions to Int are disabled because the size"
+       'GHC.:$$: 'GHC.Text "of Int is machine-dependent, which is likely to cause you maintenance"
+       'GHC.:$$: 'GHC.Text "problems in the future. Be explicit about the size of your integer,"
+       'GHC.:$$: 'GHC.Text "use one Int8, Int16, Int32, Int64 from Data.Int.")
+  ) => QueryRunnerColumnDefault a Int
+  where queryRunnerColumnDefault = undefined
+
+-- | Conversions to 'Word' are explicitely disabled.
+instance {-# OVERLAPPING #-}
+  ( GHC.TypeError
+      ('GHC.Text "QueryRunnerColumnDefault conversions to Word are disabled because the size"
+       'GHC.:$$: 'GHC.Text "of Word is machine-dependent, which is likely to cause you maintenance"
+       'GHC.:$$: 'GHC.Text "problems in the future. Be explicit about the size of your integer,"
+       'GHC.:$$: 'GHC.Text "use one of Word8, Word16, Word32 from Data.Word.")
+  ) => QueryRunnerColumnDefault a Word
+  where queryRunnerColumnDefault = undefined
+
 
 -- No CI String instance since postgresql-simple doesn't define FromField (CI String)
 

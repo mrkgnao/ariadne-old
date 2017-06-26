@@ -1,4 +1,4 @@
-{-# LANGUAGE FlexibleContexts #-}
+{-# LANGUAGE FlexibleContexts, ExistentialQuantification #-}
 
 module Edible.RunQuery (module Edible.RunQuery,
                          QueryRunner,
@@ -7,7 +7,10 @@ module Edible.RunQuery (module Edible.RunQuery,
                          IRQ.QueryRunnerColumnDefault (..),
                          -- * Creating now 'QueryRunnerColumn's
                          IRQ.fieldQueryRunnerColumn,
-                         IRQ.fieldParserQueryRunnerColumn) where
+                         IRQ.fieldParserQueryRunnerColumn,
+                         unsafeUnNullableColumn,
+                         unsafeFunExpr
+                         ) where
 
 import qualified Database.PostgreSQL.Simple as PGS
 import qualified Database.PostgreSQL.Simple.FromRow as FR
@@ -22,6 +25,29 @@ import qualified Edible.Internal.QueryArr as Q
 
 import qualified Data.Profunctor as P
 import qualified Data.Profunctor.Product.Default as D
+
+-- import qualified Control.Exception                    as Ex
+-- import           Data.Fixed                           (Fixed (..))
+-- import qualified Data.Fixed                           as Fixed
+-- import           Data.Int
+-- import           Data.Maybe
+-- import           Data.Proxy
+-- import           Data.Fixed                           (Fixed (..))
+-- import qualified Data.Fixed                           as Fixed
+-- import qualified Database.PostgreSQL.Simple.FromField as Pg
+-- import           GHC.Float                            (float2Double)
+-- import           GHC.Real                             (infinity, notANumber)
+-- import           GHC.TypeLits                         (type (+), KnownNat, Nat)
+-- import qualified GHC.TypeLits                         as GHC
+
+import qualified Edible.Column                        as O
+import qualified Edible.Order                         as O
+import qualified Edible.PGTypes                       as O
+
+import qualified Edible.Internal.Column               as OI
+import qualified Edible.Internal.HaskellDB.PrimQuery  as HDB
+import qualified Edible.Internal.PGTypes              as OI
+import qualified Edible.Internal.RunQuery             as OI
 
 -- * Running 'Query's
 
@@ -119,3 +145,15 @@ prepareQuery qr@(QueryRunner u _ _) q = (sql, parser)
         -- FIXME: We're doing work twice here
         (b, _, _) = Q.runSimpleQueryArrStart q ()
         parser = IRQ.prepareRowParser qr b
+
+
+data SomeColumn = forall a. SomeColumn (O.Column a)
+
+-- | 'unsafeFunExpr "f" xs' calls a function called @"f"@ with arguments @xs@.
+-- The return type must correctly be set by the caller.
+unsafeFunExpr :: HDB.Name -> [SomeColumn] -> O.Column b
+unsafeFunExpr fname =
+  OI.Column . HDB.FunExpr fname . map (\(SomeColumn (OI.Column x)) -> x)
+
+unsafeUnNullableColumn :: O.Column (O.Nullable a) -> O.Column a
+unsafeUnNullableColumn = O.unsafeCoerceColumn

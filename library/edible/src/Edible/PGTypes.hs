@@ -314,6 +314,16 @@ pgRational x
   | otherwise        = Just (pgScientific (fromRational x))
 
 
+pgFixed
+  :: forall e s
+  .  ( KnownNat s
+     , Fixed.HasResolution e, CmpNat s (PGNumericScale e + 1) ~ 'LT)
+  => Fixed e -> C.Column (PGNumeric s)
+pgFixed = case natVal (Proxy :: Proxy s) of
+  0 -> \(MkFixed x) -> literalColumn (HPQ.IntegerLit x)
+  _ -> literalColumn . HPQ.OtherLit . Fixed.showFixed False
+{-# INLINE pgFixed #-}
+
 pgScientific :: forall s. KnownNat s => Scientific -> Column (PGNumeric s)
 pgScientific = literalColumn . HPQ.OtherLit . formatScientific
   Scientific.Fixed (Just (fromInteger (natVal (Proxy :: Proxy s))))

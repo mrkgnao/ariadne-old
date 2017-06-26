@@ -13,7 +13,7 @@ module Tisch.Internal.Window
  , winNth
  ) where
 
-import           Tisch.Internal.Compat (AnyColumn (..), unsafeFunExpr)
+import           Edible.RunQuery (SomeColumn (..), unsafeFunExpr)
 import           Tisch.Internal.Kol    (Kol (..), PgTyped)
 import           Tisch.Internal.Koln   (Koln (..))
 
@@ -65,7 +65,7 @@ winRankCumDist = Kol (unsafeFunExpr "cume_dist" [])
 winBucket
   :: Kol O.PGInt4  -- ^ Total number of buckets.
   -> Kol O.PGInt4  -- ^ Bucket for the current row.
-winBucket (Kol x) = Kol (unsafeFunExpr "ntile" [AnyColumn x])
+winBucket (Kol x) = Kol (unsafeFunExpr "ntile" [SomeColumn x])
 
 -- | Window function. 'winLag' value offset@ returns @value@ evaluated
 -- at the row that is @offset@ rows /after/ the current row within the partition.
@@ -80,7 +80,7 @@ winLag
   -- row within the partition.
   -> Kol O.PGInt4 -- ^ Offset.
   -> Koln a
-winLag (Kol v) (Kol o) = Koln (unsafeFunExpr "lag" [AnyColumn v, AnyColumn o])
+winLag (Kol v) (Kol o) = Koln (unsafeFunExpr "lag" [SomeColumn v, SomeColumn o])
 
 -- | Window function. 'winLead' value offset@ returns @value@ evaluated
 -- at the row that is @offset@ rows /after/ the current row within the partition.
@@ -95,21 +95,21 @@ winLead
   -- row within the partition.
   -> Kol O.PGInt4 -- ^ Offset.
   -> Koln a
-winLead (Kol v) (Kol o) = Koln (unsafeFunExpr "lead" [AnyColumn v, AnyColumn o])
+winLead (Kol v) (Kol o) = Koln (unsafeFunExpr "lead" [SomeColumn v, SomeColumn o])
 
 -- | Window function. @'winFirst' x@ returns @x@ evaluated at the row that is
 -- the first row of the window frame.
 --
 -- Sql function name: @first_value@.
 winFirst :: Kol a -> Kol a
-winFirst (Kol a) = Kol (unsafeFunExpr "first_value" [AnyColumn a])
+winFirst (Kol a) = Kol (unsafeFunExpr "first_value" [SomeColumn a])
 
 -- | Window function. @'winLast' x@ returns @x@ evaluated at the row that is
 -- the last row of the window frame.
 --
 -- Sql function name: @last_value@.
 winLast :: Kol a -> Kol a
-winLast (Kol a) = Kol (unsafeFunExpr "last_value" [AnyColumn a])
+winLast (Kol a) = Kol (unsafeFunExpr "last_value" [SomeColumn a])
 
 -- | Window function. @'winNth' x nth@ returns @x@ evaluated at the row that is
 -- the @nth@ row of the window frame (counting from 1). If no such row exists,
@@ -118,5 +118,5 @@ winLast (Kol a) = Kol (unsafeFunExpr "last_value" [AnyColumn a])
 -- Sql function name: @last_value@.
 winNth :: Kol a -> Kol O.PGInt4 -> Koln a
 winNth (Kol a) (Kol nth) =
-  Koln (unsafeFunExpr "last_value" [AnyColumn a, AnyColumn nth])
+  Koln (unsafeFunExpr "last_value" [SomeColumn a, SomeColumn nth])
 

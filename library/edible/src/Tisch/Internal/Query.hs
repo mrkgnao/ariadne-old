@@ -53,7 +53,7 @@ import qualified Edible.Manipulation                 as O
 import qualified Edible.QueryArr                     as O
 import qualified Edible.Table                        as O
 
-import           Tisch.Internal.Compat               (unsafeUnNullableColumn)
+import           Edible.RunQuery (unsafeUnNullableColumn)
 import           Tisch.Internal.Fun                  (PgEq, PgOrd, eq, lnot)
 import           Tisch.Internal.Kol                  (Kol (..))
 import           Tisch.Internal.Koln                 (Koln (..), isNull)

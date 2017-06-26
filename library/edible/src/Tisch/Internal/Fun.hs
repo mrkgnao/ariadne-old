@@ -92,7 +92,7 @@ import           Edible.PGTypes                      (PGNumeric)
 import qualified Edible.PGTypes                      as O
 
 
-import           Tisch.Internal.Compat               (AnyColumn (..),
+import           Edible.RunQuery               (SomeColumn (..),
                                                       unsafeFunExpr)
 import           Tisch.Internal.Kol                  (CastKol, Kol (..),
                                                       PgTyped (..), ToKol (..),
@@ -132,7 +132,7 @@ instance Monoid (Kol O.PGBytea) where
 
 ---
 instance PgTyped a => Semigroup (Kol (O.PGArray a)) where
-  (<>) = liftKol2 (\x y -> unsafeFunExpr "array_cat" [AnyColumn x, AnyColumn y])
+  (<>) = liftKol2 (\x y -> unsafeFunExpr "array_cat" [SomeColumn x, SomeColumn y])
 
 instance forall a. PgTyped a => Monoid (Kol (O.PGArray a)) where
   mempty = kolArray ([] :: [Kol a])
@@ -175,16 +175,16 @@ instance PgIntegral O.PGInt8
 instance PgIntegral (PGNumeric 0)
 
 itruncate :: (PgFloating a, PgIntegral b) => Kol a -> Kol b
-itruncate = liftKol1 (unsafeFunExpr "trunc" . pure . AnyColumn)
+itruncate = liftKol1 (unsafeFunExpr "trunc" . pure . SomeColumn)
 
 iround :: (PgFloating a, PgIntegral b) => Kol a -> Kol b
-iround = liftKol1 (unsafeFunExpr "round" . pure . AnyColumn)
+iround = liftKol1 (unsafeFunExpr "round" . pure . SomeColumn)
 
 iceil :: (PgFloating a, PgIntegral b) => Kol a -> Kol b
-iceil = liftKol1 (unsafeFunExpr "ceil" . pure . AnyColumn)
+iceil = liftKol1 (unsafeFunExpr "ceil" . pure . SomeColumn)
 
 ifloor :: (PgFloating a, PgIntegral b) => Kol a -> Kol b
-ifloor = liftKol1 (unsafeFunExpr "floor" . pure . AnyColumn)
+ifloor = liftKol1 (unsafeFunExpr "floor" . pure . SomeColumn)
 
 -------------------------------------------------------------------------------
 
@@ -223,17 +223,17 @@ instance
     , PgFloating (Kol a)
     ) => Floating (Kol a) where
   pi = Kol (unsafeFunExpr "pi" [])
-  exp = liftKol1 (unsafeFunExpr "exp" . pure . AnyColumn)
-  log = liftKol1 (unsafeFunExpr "log" . pure . AnyColumn)
-  sqrt = liftKol1 (unsafeFunExpr "sqrt" . pure . AnyColumn)
-  (**) = liftKol2 (\base ex -> unsafeFunExpr "power" [AnyColumn base, AnyColumn ex])
-  logBase = liftKol2 (\base n -> unsafeFunExpr "log" [AnyColumn base, AnyColumn n])
-  sin = liftKol1 (unsafeFunExpr "sin" . pure . AnyColumn)
-  cos = liftKol1 (unsafeFunExpr "cos" . pure . AnyColumn)
-  tan = liftKol1 (unsafeFunExpr "tan" . pure . AnyColumn)
-  asin = liftKol1 (unsafeFunExpr "asin" . pure . AnyColumn)
-  acos = liftKol1 (unsafeFunExpr "acos" . pure . AnyColumn)
-  atan = liftKol1 (unsafeFunExpr "atan" . pure . AnyColumn)
+  exp = liftKol1 (unsafeFunExpr "exp" . pure . SomeColumn)
+  log = liftKol1 (unsafeFunExpr "log" . pure . SomeColumn)
+  sqrt = liftKol1 (unsafeFunExpr "sqrt" . pure . SomeColumn)
+  (**) = liftKol2 (\base ex -> unsafeFunExpr "power" [SomeColumn base, SomeColumn ex])
+  logBase = liftKol2 (\base n -> unsafeFunExpr "log" [SomeColumn base, SomeColumn n])
+  sin = liftKol1 (unsafeFunExpr "sin" . pure . SomeColumn)
+  cos = liftKol1 (unsafeFunExpr "cos" . pure . SomeColumn)
+  tan = liftKol1 (unsafeFunExpr "tan" . pure . SomeColumn)
+  asin = liftKol1 (unsafeFunExpr "asin" . pure . SomeColumn)
+  acos = liftKol1 (unsafeFunExpr "acos" . pure . SomeColumn)
+  atan = liftKol1 (unsafeFunExpr "atan" . pure . SomeColumn)
   -- Not the most efficient implementations, but PostgreSQL doesn't provide
   -- builtin support for hyperbolic functions. We add these for completeness,
   -- so that we can implement the 'Floating' typeclass in full.
@@ -428,7 +428,7 @@ toTimestamptz
      , PgTyped b, PgType b ~ O.PGTimestamp )
   => Kol zone -> Kol a -> Kol b
 toTimestamptz = liftKol2
-  (\zone a -> unsafeFunExpr "timezone" [AnyColumn zone, AnyColumn a])
+  (\zone a -> unsafeFunExpr "timezone" [SomeColumn zone, SomeColumn a])
 
 -- Convert a PostgreSQL @timestamp@ to a @timestamptz@, making the assumption
 -- that the given @timestamp@ happens at the given timezone.
@@ -446,11 +446,11 @@ toTimestamp
      , PgTyped b, PgType b ~ O.PGTimestamptz )
   => Kol zone -> Kol a -> Kol b
 toTimestamp = liftKol2
-  (\zone a -> unsafeFunExpr "timezone" [AnyColumn zone, AnyColumn a])
+  (\zone a -> unsafeFunExpr "timezone" [SomeColumn zone, SomeColumn a])
 
 unsafeFunExpr__date_part :: (PgTyped tsy, PgTyped b) => HDB.Name -> Kol tsy -> Kol b
 unsafeFunExpr__date_part n = unsaferCastKol @O.PGFloat8 . liftKol1
-   (\x -> unsafeFunExpr "date_part" [AnyColumn (O.pgString n), AnyColumn x])
+   (\x -> unsafeFunExpr "date_part" [SomeColumn (O.pgString n), SomeColumn x])
 
 tstzEpoch :: Kol O.PGTimestamptz -> Kol O.PGFloat8
 tstzEpoch = unsafeFunExpr__date_part "epoch"
@@ -551,7 +551,7 @@ reSub
   -> Kol source
   -> Koln O.PGText -- ^ Possibly matched substring.
 reSub (Kol re) (Kol a) =
-  Koln (unsafeFunExpr "substring" [AnyColumn a, AnyColumn re])
+  Koln (unsafeFunExpr "substring" [SomeColumn a, SomeColumn re])
 
 -- | Replaces with @replacement@ in the given @source@ string the /first/
 -- substring matching the regular expression @regex@.
@@ -568,7 +568,7 @@ reReplace
   -> Kol source
   -> Kol O.PGText
 reReplace (Kol re) (Kol rep) (Kol s) = Kol $ unsafeFunExpr "regexp_replace"
-   [AnyColumn s, AnyColumn re, AnyColumn rep]
+   [SomeColumn s, SomeColumn re, SomeColumn rep]
 
 -- | Like 'reReplace', but replaces /all/ of the substrings matching the
 -- pattern, not just the first one.
@@ -585,7 +585,7 @@ reReplaceg
   -> Kol source
   -> Kol O.PGText
 reReplaceg (Kol re) (Kol rep) (Kol s) = Kol $ unsafeFunExpr "regexp_replace"
-   [AnyColumn s, AnyColumn re, AnyColumn rep, AnyColumn (O.pgString "g")]
+   [SomeColumn s, SomeColumn re, SomeColumn rep, SomeColumn (O.pgString "g")]
 
 -- | Split the @source@ string using the given Regular Expression as a
 -- delimiter.
@@ -606,7 +606,7 @@ reSplit
   -> Kol source
   -> Kol (O.PGArray O.PGText)
 reSplit (Kol re) (Kol s) = Kol $ unsafeFunExpr "regexp_split_to_array"
-   [AnyColumn s, AnyColumn re]
+   [SomeColumn s, SomeColumn re]
 
 --------------------------------------------------------------------------------
 -- LIKE clauses
