@@ -1,0 +1,14 @@
+.hg/
+_darcs/
+*~
+dist/
+*.prof
+*.hi
+*.o
+\#*\#
+.#*
+/CHANGELOG.md
+.cabal-sandbox/
+.stack-work/
+cabal.sandbox.config
+/dist-newstyle
