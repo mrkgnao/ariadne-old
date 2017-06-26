@@ -4,7 +4,7 @@
 
 -- | This module exports some tools that are not directly related to
 -- @tisch@, yet they complement it.
-module Tisch.Extra
+module Edible.Utils
   ( -- * Field parsers.
     pgFromFieldMap
   , pgFromFieldWrapped

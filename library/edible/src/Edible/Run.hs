@@ -15,7 +15,7 @@
 {-# LANGUAGE TypeOperators         #-}
 {-# LANGUAGE UndecidableInstances  #-}
 
-module Tisch.Run
+module Edible.Run
   ( -- * Connection
     Conn
   , Conn'
