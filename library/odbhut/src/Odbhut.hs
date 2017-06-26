@@ -236,6 +236,23 @@ import Tisch.Internal.Query
 import Tisch.Internal.Table
 import Tisch.Run
 
+-- import Opaleye.Aggregate
+-- import Opaleye.Binary
+-- import Opaleye.Column
+-- import Opaleye.Constant
+-- import Opaleye.Distinct
+-- import Opaleye.FunctionalJoin
+-- import Opaleye.Join
+-- import Opaleye.Label
+-- import Opaleye.Manipulation
+-- import Opaleye.Operators
+-- import Opaleye.Order
+-- import Opaleye.PGTypes
+-- import Opaleye.QueryArr
+-- import Opaleye.RunQuery
+-- import Opaleye.Sql
+-- import Opaleye.Table
+-- import Opaleye.Values
 
 -- $runningQueries
 --
