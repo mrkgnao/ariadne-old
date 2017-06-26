@@ -1,48 +1,55 @@
-{-# LANGUAGE FlexibleContexts, FlexibleInstances, MultiParamTypeClasses #-}
+{-# LANGUAGE DataKinds             #-}
+{-# LANGUAGE FlexibleContexts      #-}
+{-# LANGUAGE FlexibleInstances     #-}
+{-# LANGUAGE MultiParamTypeClasses #-}
 
 module Edible.Internal.RunQuery where
 
-import           Control.Applicative (Applicative, pure, (*>), (<*>), liftA2)
+import           Control.Applicative                  (Applicative, liftA2,
+                                                       pure, (*>), (<*>))
 
-import           Database.PostgreSQL.Simple.Internal (RowParser)
-import           Database.PostgreSQL.Simple.FromField
-  (FieldParser, FromField, fromField, pgArrayFieldParser)
-import           Database.PostgreSQL.Simple.FromRow (fromRow, fieldWith)
-import           Database.PostgreSQL.Simple.Types (fromPGArray, Only(..))
+import           Database.PostgreSQL.Simple.FromField (FieldParser, FromField,
+                                                       fromField,
+                                                       pgArrayFieldParser)
+import           Database.PostgreSQL.Simple.FromRow   (fieldWith, fromRow)
+import           Database.PostgreSQL.Simple.Internal  (RowParser)
+import           Database.PostgreSQL.Simple.Types     (Only (..), fromPGArray)
 
-import           Edible.Column (Column)
-import           Edible.Internal.Column (Nullable)
-import qualified Edible.Internal.PackMap as PackMap
-import qualified Edible.Column as C
-import qualified Edible.Internal.Unpackspec as U
-import qualified Edible.PGTypes as T
-import qualified Edible.Internal.PGTypes as IPT (strictDecodeUtf8)
+import           Edible.Column                        (Column)
+import qualified Edible.Column                        as C
+import           Edible.Internal.Column               (Nullable)
+import qualified Edible.Internal.PackMap              as PackMap
+import qualified Edible.Internal.PGTypes              as IPT (strictDecodeUtf8)
+import qualified Edible.Internal.Unpackspec           as U
+import qualified Edible.PGTypes                       as T
 
-import qualified Data.Profunctor as P
-import           Data.Profunctor (dimap)
-import qualified Data.Profunctor.Product as PP
-import           Data.Profunctor.Product (empty, (***!))
-import qualified Data.Profunctor.Product.Default as D
+import           Data.Profunctor                      (dimap)
+import qualified Data.Profunctor                      as P
+import           Data.Profunctor.Product              (empty, (***!))
+import qualified Data.Profunctor.Product              as PP
+import qualified Data.Profunctor.Product.Default      as D
 
-import qualified Data.Aeson as Ae
-import qualified Data.CaseInsensitive as CI
-import qualified Data.Text as ST
-import qualified Data.Text.Lazy as LT
-import qualified Data.ByteString as SBS
-import qualified Data.ByteString.Lazy as LBS
-import qualified Data.Time as Time
-import qualified Data.String as String
-import           Data.UUID (UUID)
-import           GHC.Int (Int32, Int64)
+import qualified Data.Aeson                           as Ae
+import qualified Data.ByteString                      as SBS
+import qualified Data.ByteString.Lazy                 as LBS
+import qualified Data.CaseInsensitive                 as CI
+import qualified Data.String                          as String
+import qualified Data.Text                            as ST
+import qualified Data.Text.Lazy                       as LT
+import qualified Data.Time                            as Time
+import           Data.UUID                            (UUID)
+import           GHC.Int                              (Int32, Int64)
 
 -- { Only needed for annoying postgresql-simple patch below
 
-import           Control.Applicative ((<$>))
-import           Database.PostgreSQL.Simple.FromField
-  (ResultError(UnexpectedNull, Incompatible), typeInfo, returnError)
-import qualified Database.PostgreSQL.Simple.TypeInfo as TI
-import qualified Database.PostgreSQL.Simple.Range as PGSR
-import           Data.Typeable (Typeable)
+import           Control.Applicative                  ((<$>))
+import           Data.Scientific                      (Scientific)
+import qualified Data.Scientific                      as Scientific
+import           Data.Typeable                        (Typeable)
+import           Database.PostgreSQL.Simple.FromField (ResultError (Incompatible, UnexpectedNull),
+                                                       returnError, typeInfo)
+import qualified Database.PostgreSQL.Simple.Range     as PGSR
+import qualified Database.PostgreSQL.Simple.TypeInfo  as TI
 
 -- }
 
@@ -106,7 +113,7 @@ queryRunnerColumnNullable qr =
   where QueryRunnerColumn u fp = qr
         fromField' :: FieldParser a -> FieldParser (Maybe a)
         fromField' _ _ Nothing = pure Nothing
-        fromField' fp' f bs = fmap Just (fp' f bs)
+        fromField' fp' f bs    = fmap Just (fp' f bs)
 
 -- { Instances for automatic derivation
 
@@ -209,6 +216,18 @@ instance QueryRunnerColumnDefault T.PGJsonb String where
 
 instance QueryRunnerColumnDefault T.PGJsonb Ae.Value where
   queryRunnerColumnDefault = fieldQueryRunnerColumn
+
+instance QueryRunnerColumnDefault (T.PGSNumeric s) Rational where
+  queryRunnerColumnDefault = fieldQueryRunnerColumn
+  {-# INLINE queryRunnerColumnDefault #-}
+
+instance QueryRunnerColumnDefault (T.PGSNumeric s) Scientific where
+  queryRunnerColumnDefault = fieldQueryRunnerColumn
+  {-# INLINE queryRunnerColumnDefault #-}
+
+instance QueryRunnerColumnDefault (T.PGSNumeric 0) Integer where
+  queryRunnerColumnDefault = fieldQueryRunnerColumn
+  {-# INLINE queryRunnerColumnDefault #-}
 
 -- No CI String instance since postgresql-simple doesn't define FromField (CI String)
 

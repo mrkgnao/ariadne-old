@@ -59,7 +59,7 @@ import           Data.Word
 import qualified Database.PostgreSQL.Simple.FromField as Pg
 import qualified Database.PostgreSQL.Simple.Types     as Pg
 import           GHC.Exts                             (Constraint)
-import qualified GHC.TypeLits                         as GHC
+import  GHC.TypeLits                         as GHC
 
 import qualified Edible.Internal.Column               as OI
 import qualified Edible.Internal.HaskellDB.PrimQuery  as HDB
@@ -68,11 +68,10 @@ import qualified Edible.RunQuery                      as O
 import qualified Edible.Column                        as O
 import qualified Edible.PGTypes                       as O
 import           Edible.PGTypes                       (pgFloat4, pgFloat8,
-                                                       pgInt2)
+                                                       pgInt2, PGNumeric, PGSNumeric,
+                                                       PGNumericScale, pgScientific)
 
-import           Tisch.Internal.Compat                (PGNumeric,
-                                                       PGNumericScale, pgFixed,
-                                                       pgScientific)
+import           Tisch.Internal.Compat                (pgFixed)
 
 -------------------------------------------------------------------------------
 
@@ -133,7 +132,7 @@ instance PgPrimType O.PGUuid where pgPrimTypeName _ = "uuid"
 
 -- | Notice: 'pgPrimTypeName' is always @"numeric"@ and the @scale@ argument is
 -- not rendered in SQL.This is good, don't worry too much. See 'PGNumeric'
-instance PgPrimType (PGNumeric scale) where pgPrimTypeName _ = "numeric"
+instance PgPrimType (O.PGSNumeric scale) where pgPrimTypeName _ = "numeric"
 
 instance
   ( GHC.TypeError
@@ -220,7 +219,7 @@ instance PgTyped O.PGTimestamptz where type PgType O.PGTimestamptz = O.PGTimesta
 instance PgTyped O.PGTimestamp where type PgType O.PGTimestamp = O.PGTimestamp
 instance PgTyped O.PGTime where type PgType O.PGTime = O.PGTime
 instance PgTyped O.PGUuid where type PgType O.PGUuid = O.PGUuid
-instance PgTyped (PGNumeric s) where type PgType (PGNumeric s) = PGNumeric s
+instance PgTyped (O.PGSNumeric s) where type PgType (O.PGSNumeric s) = O.PGSNumeric s
 
 instance PgTyped a => PgTyped (O.PGArray a) where type PgType (O.PGArray a) = O.PGArray (PgType a)
 instance PgTyped a => PgTyped (PGArrayn a) where type PgType (PGArrayn a) = PGArrayn (PgType a)
@@ -384,13 +383,13 @@ instance ToKol (Data.CaseInsensitive.CI Data.Text.Lazy.Text) O.PGCitext where ko
 instance ToKol Aeson.Value O.PGJson where kol = Kol . O.pgLazyJSON . Aeson.encode
 instance ToKol Aeson.Value O.PGJsonb where kol = Kol . O.pgLazyJSONB . Aeson.encode
 
-instance GHC.KnownNat s => ToKol Integer (PGNumeric s) where kol = Kol . fromInteger
-instance GHC.KnownNat s => ToKol Scientific (PGNumeric s) where kol = Kol . pgScientific
-instance GHC.KnownNat s => ToKol Rational (PGNumeric s) where kol = Kol . fromRational
+instance GHC.KnownNat s => ToKol Integer (O.PGSNumeric s) where kol = Kol . fromInteger
+instance GHC.KnownNat s => ToKol Scientific (O.PGSNumeric s) where kol = Kol . pgScientific
+instance GHC.KnownNat s => ToKol Rational (O.PGSNumeric s) where kol = Kol . fromRational
 instance
   ( GHC.KnownNat s
-  , Fixed.HasResolution e, GHC.CmpNat s (PGNumericScale e GHC.+ 1) ~ 'LT
-  ) => ToKol (Fixed e) (PGNumeric s) where kol = Kol . pgFixed
+  , Fixed.HasResolution e, GHC.CmpNat s (PGNumericScale e + 1) ~ 'LT
+  ) => ToKol (Fixed e) (O.PGSNumeric s) where kol = Kol . pgFixed
 
 instance {-# OVERLAPPABLE #-} forall a b. ToKol a b => ToKol [a] (O.PGArray b) where
   kol = kolArray . map (kol :: a -> Kol b)
@@ -448,14 +447,14 @@ instance CastKol O.PGInt2 O.PGText
 instance CastKol O.PGInt2 O.PGCitext
 instance CastKol O.PGInt2 O.PGInt4
 instance CastKol O.PGInt2 O.PGInt8
-instance CastKol O.PGInt2 (PGNumeric s)
+instance CastKol O.PGInt2 (O.PGSNumeric s)
 instance CastKol O.PGInt4 O.PGText
 instance CastKol O.PGInt4 O.PGCitext
 instance CastKol O.PGInt4 O.PGInt8
-instance CastKol O.PGInt4 (PGNumeric s)
-instance CastKol O.PGInt8 (PGNumeric s)
+instance CastKol O.PGInt4 (O.PGSNumeric s)
+instance CastKol O.PGInt8 (O.PGSNumeric s)
 
-instance (GHC.CmpNat s (s' GHC.+ 1) ~ 'LT) => CastKol (PGNumeric s) (PGNumeric s')
+instance (GHC.CmpNat s (t + 1) ~ 'LT) => CastKol (O.PGSNumeric s) (O.PGSNumeric t)
 
 -- Shooting yourself in the foot? I will help you.
 

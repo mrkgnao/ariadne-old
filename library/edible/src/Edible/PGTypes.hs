@@ -1,14 +1,16 @@
+{-# LANGUAGE TypeFamilies #-}
 {-# LANGUAGE DataKinds           #-}
+{-# LANGUAGE EmptyDataDecls      #-}
 {-# LANGUAGE KindSignatures      #-}
+{-# LANGUAGE PolyKinds           #-}
+{-# LANGUAGE ScopedTypeVariables #-}
+
 -- | Postgres types and functions to create 'Column's of those types.
 -- You may find it more convenient to use "Edible.Constant" instead.
 
-{-# LANGUAGE EmptyDataDecls      #-}
-{-# LANGUAGE ScopedTypeVariables #-}
-
 module Edible.PGTypes (module Edible.PGTypes) where
 
-import qualified Control.Exception                    as Ex
+import qualified Control.Exception                     as Ex
 
 import           Edible.Internal.Column                (Column)
 import qualified Edible.Internal.Column                as C
@@ -26,19 +28,21 @@ import qualified Data.Text.Lazy                        as LText
 import qualified Data.Time                             as Time
 import qualified Data.UUID                             as UUID
 
+import           Data.Fixed                            (Fixed (..))
+import qualified Data.Fixed                            as Fixed
 import           Data.Int
 import           GHC.Float                             (float2Double)
-import           GHC.Real                             (infinity, notANumber)
+import           GHC.Real                              (infinity, notANumber)
 
 import qualified Database.PostgreSQL.Simple.Range      as R
 
-import           Data.Scientific                      (Scientific,
-                                                       formatScientific)
-import qualified Data.Scientific                      as Scientific
+import           Data.Scientific                       (Scientific,
+                                                        formatScientific)
+import           Data.Scientific                       as Scientific
 
-import           GHC.TypeLits
+import           Data.Maybe                            (fromMaybe)
 import           Data.Proxy
-import Data.Maybe (fromMaybe)
+import           GHC.TypeLits
 
 instance C.PGNum PGFloat8 where
   pgFromInteger = pgDouble . fromInteger
@@ -224,7 +228,7 @@ instance IsSqlType PGCitext where
   showSqlType _ =  "citext"
 instance IsSqlType PGBytea where
   showSqlType _ = "bytea"
-instance IsSqlType a => IsSqlType (PGArray a) where
+instance (IsSqlType (a :: *)) => IsSqlType (PGArray a) where
   showSqlType _ = showSqlType ([] :: [a]) ++ "[]"
 instance IsSqlType a => IsSqlType (C.Nullable a) where
   showSqlType _ = showSqlType ([] :: [a])
@@ -232,7 +236,7 @@ instance IsSqlType PGJson where
   showSqlType _ = "json"
 instance IsSqlType PGJsonb where
   showSqlType _ = "jsonb"
-instance IsRangeType a => IsSqlType (PGRange a) where
+instance (IsRangeType (a :: *)) => IsSqlType (PGRange a) where
   showSqlType _ = showRangeType ([] :: [a])
 
 class IsSqlType pgType => IsRangeType pgType where
@@ -278,6 +282,15 @@ data PGBytea
 data PGJson
 data PGJsonb
 data PGRange a
+
+type family PGNumericScale (t :: k) :: Nat
+type instance PGNumericScale Fixed.E0  = 0
+type instance PGNumericScale Fixed.E1  = 1
+type instance PGNumericScale Fixed.E2  = 2
+type instance PGNumericScale Fixed.E3  = 3
+type instance PGNumericScale Fixed.E6  = 6
+type instance PGNumericScale Fixed.E9  = 9
+type instance PGNumericScale Fixed.E12 = 12
 
 instance KnownNat s => C.PGNum (PGSNumeric s) where
   pgFromInteger = pgScientific . fromInteger

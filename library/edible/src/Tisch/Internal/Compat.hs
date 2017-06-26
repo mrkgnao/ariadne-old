@@ -16,10 +16,6 @@ module Tisch.Internal.Compat
   ( AnyColumn(..)
   , unsafeFunExpr
   , unsafeUnNullableColumn
-  , PGNumeric
-  , PGNumericScale
-  , pgRational
-  , pgScientific
   , pgFixed
   ) where
 
@@ -97,41 +93,16 @@ instance {-# OVERLAPPING #-}
 -- 'PGNumeric' doesn't support specifying the “precision” of the PostgreSQL
 -- @numeric@ type, as there's no use for that precision on the Haskell side and
 -- we always support the full precision.
-data PGNumeric (scale :: Nat)
-
--- | Maximum numeric scale for a type.
-type family PGNumericScale (t :: k) :: Nat
-type instance PGNumericScale Fixed.E0  = 0
-type instance PGNumericScale Fixed.E1  = 1
-type instance PGNumericScale Fixed.E2  = 2
-type instance PGNumericScale Fixed.E3  = 3
-type instance PGNumericScale Fixed.E6  = 6
-type instance PGNumericScale Fixed.E9  = 9
-type instance PGNumericScale Fixed.E12 = 12
-
-instance O.PGOrd (PGNumeric s)
 
 pgFixed
   :: forall e s
   .  ( KnownNat s
-     , Fixed.HasResolution e, GHC.CmpNat s (PGNumericScale e + 1) ~ 'LT)
-  => Fixed e -> O.Column (PGNumeric s)
+     , Fixed.HasResolution e, GHC.CmpNat s (O.PGNumericScale e + 1) ~ 'LT)
+  => Fixed e -> O.Column (O.PGSNumeric s)
 pgFixed = case GHC.natVal (Proxy :: Proxy s) of
   0 -> \(MkFixed x) -> OI.literalColumn (HDB.IntegerLit x)
   _ -> OI.literalColumn . HDB.OtherLit . Fixed.showFixed False
 {-# INLINE pgFixed #-}
-
-instance OI.QueryRunnerColumnDefault (PGNumeric s) Rational where
-  queryRunnerColumnDefault = O.fieldQueryRunnerColumn
-  {-# INLINE queryRunnerColumnDefault #-}
-
-instance OI.QueryRunnerColumnDefault (PGNumeric s) Scientific where
-  queryRunnerColumnDefault = O.fieldQueryRunnerColumn
-  {-# INLINE queryRunnerColumnDefault #-}
-
-instance OI.QueryRunnerColumnDefault (PGNumeric 0) Integer where
-  queryRunnerColumnDefault = O.fieldQueryRunnerColumn
-  {-# INLINE queryRunnerColumnDefault #-}
 
 newtype WrapFixed e = WrapFixed { unWrapFixed :: Fixed e }
 
@@ -140,8 +111,8 @@ instance Fixed.HasResolution e => Pg.FromField (WrapFixed e) where
   {-# INLINE fromField #-}
 
 instance
-  ( Fixed.HasResolution e, GHC.CmpNat s (PGNumericScale e + 1) ~ 'LT
-  ) => OI.QueryRunnerColumnDefault (PGNumeric s) (Fixed e) where
+  ( Fixed.HasResolution e, GHC.CmpNat s (O.PGNumericScale e + 1) ~ 'LT
+  ) => OI.QueryRunnerColumnDefault (O.PGSNumeric s) (Fixed e) where
     queryRunnerColumnDefault = fmap unWrapFixed O.fieldQueryRunnerColumn
     {-# INLINE queryRunnerColumnDefault #-}
 

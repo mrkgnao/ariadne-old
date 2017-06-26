@@ -7,7 +7,7 @@
 {-# OPTIONS_GHC -Wno-redundant-constraints #-}
 
 module Tisch.Internal.Aggregation
-  ( O.Aggregator
+  ( E.Aggregator
   , orderAggregator
   , aggregate
   , groupBy
@@ -40,15 +40,14 @@ module Tisch.Internal.Aggregation
 import qualified Data.Profunctor                     as P
 import           GHC.TypeLits                        (type (+), CmpNat,
                                                       KnownNat)
-import qualified Edible.Aggregate                    as O
+import qualified Edible.Aggregate                    as E
 import qualified Edible.Internal.Aggregate           as OI
 import qualified Edible.Internal.Column              as OI
 import qualified Edible.Internal.HaskellDB.PrimQuery as HDB
-import qualified Edible.Order                        as O
-import qualified Edible.PGTypes                      as O
+import qualified Edible.Order                        as E
+import qualified Edible.PGTypes                      as E
 
 
-import           Tisch.Internal.Compat               (PGNumeric)
 import           Tisch.Internal.Fun                  (PgEq, PgIntegral, PgNum,
                                                       PgOrd)
 import           Tisch.Internal.Kol                  (Kol (..), PGArrayn,
@@ -67,7 +66,7 @@ import           Tisch.Internal.Query                (Query (..))
 -- single column, and then compose the aggregations afterwards. Examples:
 --
 -- @
--- x :: 'O.Aggregator' ('Kol' a, 'Kol' b) ('Kol' ('O.PGArray' a), 'Kol' ('O.PGArray' a))
+-- x :: 'E.Aggregator' ('Kol' a, 'Kol' b) ('Kol' ('E.PGArray' a), 'Kol' ('E.PGArray' a))
 -- x = (,) <$> 'orderAggregator' ('Tisch.asc' 'snd')  ('P.lmap' 'fst' 'arraygg')
 --         <*> 'orderAggregator' ('Tisch.descl 'snd') ('P.lmap' 'fst' 'arraygg')
 -- @
@@ -83,7 +82,7 @@ import           Tisch.Internal.Query                (Query (..))
 -- Or:
 --
 -- @
--- x :: 'O.Aggregator' ('Kol' a, 'Kol' b) ('Kol' ('O.PGArray' a), 'Kol' ('O.PGArray' a))
+-- x :: 'E.Aggregator' ('Kol' a, 'Kol' b) ('Kol' ('E.PGArray' a), 'Kol' ('E.PGArray' a))
 -- x = 'orderAggregator' ('Tisch.asc' 'snd') $ 'Tisch.Internal.Profunctors.ppa' ('arraygg', 'arraygg')
 -- @
 --
@@ -92,7 +91,7 @@ import           Tisch.Internal.Query                (Query (..))
 -- > SELECT array_agg(a ORDER BY b ASC),
 -- >        array_agg(b ORDER BY b ASC)
 -- > FROM (SELECT a, b FROM ...)
-orderAggregator :: PgOrd a => O.Order a -> O.Aggregator a b -> O.Aggregator a b
+orderAggregator :: PgOrd a => E.Order a -> E.Aggregator a b -> E.Aggregator a b
 orderAggregator = OI.orderAggregate
 
 --------------------------------------------------------------------------------
@@ -113,41 +112,41 @@ orderAggregator = OI.orderAggregate
 -- By design there is no aggregation function of type @Aggregator a b ->
 -- Query d x a -> QueryArr d x b@, as such a function would allow violation of
 -- SQL's scoping rules and lead to invalid queries.
-aggregate :: O.Aggregator a b -> Query d () a -> Query d () b
-aggregate f = Query . O.aggregate f . unQuery
+aggregate :: E.Aggregator a b -> Query d () a -> Query d () b
+aggregate f = Query . E.aggregate f . unQuery
 
 --------------------------------------------------------------------------------
 
 -- | Group the aggregation by equality.
-groupBy :: PgEq a => O.Aggregator (Kol a) (Kol a)
-groupBy = P.dimap unKol Kol O.groupBy
+groupBy :: PgEq a => E.Aggregator (Kol a) (Kol a)
+groupBy = P.dimap unKol Kol E.groupBy
 
 -- | Instances of 'AggSum' can be used with 'sumgg'.
 --
 -- TODO: Support all possible inputs and ouputs. See PostgreSQL docs.
 class (PgNum a, PgNum b) => AggSum a b
 instance {-# OVERLAPPABLE #-} PgNum a => AggSum a a
-instance AggSum O.PGInt2 O.PGInt8
-instance AggSum O.PGInt4 O.PGInt8
-instance KnownNat s => AggSum O.PGInt8 (PGNumeric s)
-instance AggSum O.PGFloat4 O.PGFloat8
-instance AggSum O.PGInt8 (PGNumeric 0)
+instance AggSum E.PGInt2 E.PGInt8
+instance AggSum E.PGInt4 E.PGInt8
+instance KnownNat s => AggSum E.PGInt8 (E.PGSNumeric s)
+instance AggSum E.PGFloat4 E.PGFloat8
+instance AggSum E.PGInt8 (E.PGSNumeric 0)
 
 -- | Add the values in input columns.
-sumgg :: AggSum a b => O.Aggregator (Kol a) (Kol b)
+sumgg :: AggSum a b => E.Aggregator (Kol a) (Kol b)
 sumgg = unsafeMakeAggr HDB.AggrSum
 
 -- | Count the number of non-@NULL@ input values.
 --
 -- See also: 'countRows', 'countngg'.
-countgg :: O.Aggregator (Kol a) (Kol O.PGInt8)
-countgg = P.dimap unKol Kol O.count
+countgg :: E.Aggregator (Kol a) (Kol E.PGInt8)
+countgg = P.dimap unKol Kol E.count
 
 -- | Count the number of input values, whether they are @NULL@ or not.
 --
 -- See also: 'countRows', 'countgg'.
-countngg :: O.Aggregator (Koln a) (Kol O.PGInt8)
-countngg = P.rmap Kol O.countStar
+countngg :: E.Aggregator (Koln a) (Kol E.PGInt8)
+countngg = P.rmap Kol E.countStar
 
 -- | Count the number of rows in a 'Query'.
 --
@@ -155,120 +154,120 @@ countngg = P.rmap Kol O.countStar
 -- returns exactly one row, even when the input 'Query' is empty.
 --
 -- See also: 'countgg', 'countngg'.
-countRows :: Query d () a -> Query d () (Kol O.PGInt8)
-countRows = Query . fmap Kol . O.countRows . unQuery
+countRows :: Query d () a -> Query d () (Kol E.PGInt8)
+countRows = Query . fmap Kol . E.countRows . unQuery
 
 -- | Instances of 'AggAvg' can be used with 'aggAvg'.
 --
 -- TODO: Support all possible inputs and ouputs. See PostgreSQL docs.
 class (PgNum a, PgNum b) => AggAvg a b
 instance {-# OVERLAPPABLE #-} PgNum a => AggAvg a a
-instance AggAvg O.PGFloat4 O.PGFloat8
+instance AggAvg E.PGFloat4 E.PGFloat8
 -- | Warning: Depending on your choice of @s@, you might be getting less
 -- resolution than expected.
-instance KnownNat s => AggAvg O.PGInt2 (PGNumeric s)
+instance KnownNat s => AggAvg E.PGInt2 (E.PGSNumeric s)
 -- | Warning: Depending on your choice of @s@, you might be getting less
 -- resolution than expected.
-instance KnownNat s => AggAvg O.PGInt4 (PGNumeric s)
+instance KnownNat s => AggAvg E.PGInt4 (E.PGSNumeric s)
 -- | Warning: Depending on your choice of @s@, you might be getting less
 -- resolution than expected.
-instance KnownNat s => AggAvg O.PGInt8 (PGNumeric s)
+instance KnownNat s => AggAvg E.PGInt8 (E.PGSNumeric s)
 -- | Warning: Depending on your choice of @s'@, you might be getting less
 -- resolution than expected.
-instance (KnownNat s, KnownNat s', CmpNat s (s' + 1) ~ 'GT) => AggAvg (PGNumeric s) (PGNumeric s')
+instance (KnownNat s, KnownNat s', CmpNat s (s' + 1) ~ 'GT) => AggAvg (E.PGSNumeric s) (E.PGSNumeric s')
 
 -- | The average (arithmetic mean) of all input values
-avggg :: AggAvg a b => O.Aggregator (Kol a) (Kol b)
+avggg :: AggAvg a b => E.Aggregator (Kol a) (Kol b)
 avggg = unsafeMakeAggr HDB.AggrAvg
 
 -- | Bitwise AND of all input values.
-bwandgg :: PgIntegral a => O.Aggregator (Kol a) (Kol a)
+bwandgg :: PgIntegral a => E.Aggregator (Kol a) (Kol a)
 bwandgg = unsafeMakeAggr (HDB.AggrOther "bit_and")
 
 -- | Bitwise OR of all input values.
-bworgg :: PgIntegral a => O.Aggregator (Kol a) (Kol a)
+bworgg :: PgIntegral a => E.Aggregator (Kol a) (Kol a)
 bworgg = unsafeMakeAggr (HDB.AggrOther "bit_or")
 
 -- | Logical AND of all input values.
-landgg :: O.Aggregator (Kol O.PGBool) (Kol O.PGBool)
+landgg :: E.Aggregator (Kol E.PGBool) (Kol E.PGBool)
 landgg = unsafeMakeAggr HDB.AggrBoolAnd
 
 -- | Logical OR of all input values.
-lorgg :: O.Aggregator (Kol O.PGBool) (Kol O.PGBool)
+lorgg :: E.Aggregator (Kol E.PGBool) (Kol E.PGBool)
 lorgg = unsafeMakeAggr HDB.AggrBoolOr
 
 -- | Maximum value of all input values.
-maxgg :: PgOrd a => O.Aggregator (Kol a) (Kol a)
+maxgg :: PgOrd a => E.Aggregator (Kol a) (Kol a)
 maxgg = unsafeMakeAggr HDB.AggrMax
 
 -- | Minimum value of all input values.
-mingg :: PgOrd a => O.Aggregator (Kol a) (Kol a)
+mingg :: PgOrd a => E.Aggregator (Kol a) (Kol a)
 mingg = unsafeMakeAggr HDB.AggrMin
 
--- | Collect all non-@NULL@ input values into a 'O.PGArray'.
-arraygg :: PgTyped a => O.Aggregator (Kol a) (Kol (O.PGArray a))
+-- | Collect all non-@NULL@ input values into a 'E.PGArray'.
+arraygg :: PgTyped a => E.Aggregator (Kol a) (Kol (E.PGArray a))
 arraygg = unsafeMakeAggr HDB.AggrArr
 
--- | Collect all nullable input values into a 'O.PGArrayn'.
-arrayngg :: PgTyped a => O.Aggregator (Koln a) (Kol (PGArrayn a))
+-- | Collect all nullable input values into a 'E.PGArrayn'.
+arrayngg :: PgTyped a => E.Aggregator (Koln a) (Kol (PGArrayn a))
 arrayngg = P.dimap unKoln Kol (OI.makeAggr HDB.AggrArr)
 
--- | Aggregates values as a 'O.PGJson' array.
-jsonarraygg :: O.Aggregator (Kol a) (Kol O.PGJson)
+-- | Aggregates values as a 'E.PGJson' array.
+jsonarraygg :: E.Aggregator (Kol a) (Kol E.PGJson)
 jsonarraygg = unsafeMakeAggr (HDB.AggrOther "json_agg")
 
--- | Aggregates values as a 'O.PGJsonb' array.
-jsonbarraygg :: O.Aggregator (Kol a) (Kol O.PGJsonb)
+-- | Aggregates values as a 'E.PGJsonb' array.
+jsonbarraygg :: E.Aggregator (Kol a) (Kol E.PGJsonb)
 jsonbarraygg = unsafeMakeAggr (HDB.AggrOther "jsonb_agg")
 
--- | Aggregates 'O.PGText' values by concatenating them using the given
+-- | Aggregates 'E.PGText' values by concatenating them using the given
 -- separator.
-textgg :: Kol O.PGText -> O.Aggregator (Kol O.PGText) (Kol O.PGText)
+textgg :: Kol E.PGText -> E.Aggregator (Kol E.PGText) (Kol E.PGText)
 textgg = unsafeMakeAggr . HDB.AggrStringAggr . OI.unColumn . unKol
 
--- | Aggregates 'O.PGBytea' values by concatenating them using the given
+-- | Aggregates 'E.PGBytea' values by concatenating them using the given
 -- separator.
-byteagg :: Kol O.PGBytea -> O.Aggregator (Kol O.PGBytea) (Kol O.PGBytea)
+byteagg :: Kol E.PGBytea -> E.Aggregator (Kol E.PGBytea) (Kol E.PGBytea)
 byteagg = unsafeMakeAggr . HDB.AggrStringAggr . OI.unColumn . unKol
 
 -- | Instances of 'AggStdDev' can be used with 'stddevgg',
 -- 'stddevpopgg', 'variance' and 'variancepopgg'.
 class (PgNum a, PgNum b) => AggStdDev a b
-instance AggStdDev O.PGFloat4 O.PGFloat8
-instance AggStdDev O.PGFloat8 O.PGFloat8
+instance AggStdDev E.PGFloat4 E.PGFloat8
+instance AggStdDev E.PGFloat8 E.PGFloat8
 -- | Warning: Depending on your choice of @s@, you might be getting less
 -- resolution than expected.
-instance KnownNat s => AggStdDev O.PGInt2 (PGNumeric s)
+instance KnownNat s => AggStdDev E.PGInt2 (E.PGSNumeric s)
 -- | Warning: Depending on your choice of @s@, you might be getting less
 -- resolution than expected.
-instance KnownNat s => AggStdDev O.PGInt4 (PGNumeric s)
+instance KnownNat s => AggStdDev E.PGInt4 (E.PGSNumeric s)
 -- | Warning: Depending on your choice of @s@, you might be getting less
 -- resolution than expected.
-instance KnownNat s => AggStdDev O.PGInt8 (PGNumeric s)
+instance KnownNat s => AggStdDev E.PGInt8 (E.PGSNumeric s)
 -- | Warning: Depending on your choice of @s'@, you might be getting less
 -- resolution than expected.
-instance (KnownNat s, KnownNat s', CmpNat s (s' + 1) ~ 'GT) => AggStdDev (PGNumeric s) (PGNumeric s')
+instance (KnownNat s, KnownNat s', CmpNat s (s' + 1) ~ 'GT) => AggStdDev (E.PGSNumeric s) (E.PGSNumeric s')
 
 -- | Sample standard deviation of the input values.
-stddevgg :: AggStdDev a b => O.Aggregator (Kol a) (Kol b)
+stddevgg :: AggStdDev a b => E.Aggregator (Kol a) (Kol b)
 stddevgg = unsafeMakeAggr HDB.AggrStdDev
 
 -- | Population standard deviation of the input values.
-stddevpopgg :: AggStdDev a b => O.Aggregator (Kol a) (Kol b)
+stddevpopgg :: AggStdDev a b => E.Aggregator (Kol a) (Kol b)
 stddevpopgg = unsafeMakeAggr HDB.AggrStdDevP
 
 -- | Sample variance of the input values (square of the sample standard
 -- deviation 'stdevgg').
-variancegg :: AggStdDev a b => O.Aggregator (Kol a) (Kol b)
+variancegg :: AggStdDev a b => E.Aggregator (Kol a) (Kol b)
 variancegg = unsafeMakeAggr HDB.AggrVar
 
 -- | Population variance of the input values (square of the population standard
 -- deviation 'stdevoppgg').
-variancepopgg :: AggStdDev a b => O.Aggregator (Kol a) (Kol b)
+variancepopgg :: AggStdDev a b => E.Aggregator (Kol a) (Kol b)
 variancepopgg = unsafeMakeAggr HDB.AggrVarP
 
 --------------------------------------------------------------------------------
 
-unsafeMakeAggr :: PgTyped b => HDB.AggrOp -> O.Aggregator (Kol a) (Kol b)
+unsafeMakeAggr :: PgTyped b => HDB.AggrOp -> E.Aggregator (Kol a) (Kol b)
 unsafeMakeAggr x = P.dimap unKol Kol (OI.makeAggr x)
 {-# INLINE unsafeMakeAggr #-}
