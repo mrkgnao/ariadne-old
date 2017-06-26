@@ -80,7 +80,7 @@ module Edible
    -- * Selecting
  , col
    -- * Ordering
- , O.Order
+ , E.Order
  , orderBy
  , asc
  , ascNullsFirst
@@ -187,25 +187,25 @@ module Edible
  , variancepopgg
    -- * Column types
  , PgTyped(..)
- , O.PGArray
+ , E.PGArray
  , PGArrayn
- , O.PGBool
- , O.PGBytea
- , O.PGCitext
- , O.PGDate
- , O.PGFloat4
- , O.PGFloat8
- , O.PGInt2
- , O.PGInt4
- , O.PGInt8
- , O.PGJsonb
- , O.PGJson
+ , E.PGBool
+ , E.PGBytea
+ , E.PGCitext
+ , E.PGDate
+ , E.PGFloat4
+ , E.PGFloat8
+ , E.PGInt2
+ , E.PGInt4
+ , E.PGInt8
+ , E.PGJsonb
+ , E.PGJson
  , PGNumeric
- , O.PGText
- , O.PGTimestamptz
- , O.PGTimestamp
- , O.PGTime
- , O.PGUuid
+ , E.PGText
+ , E.PGTimestamptz
+ , E.PGTimestamp
+ , E.PGTime
+ , E.PGUuid
    -- ** Parsing
  , QueryRunnerColumnDefault(..)
  , qrcFromField
@@ -232,25 +232,26 @@ import           Tisch.Internal.Kol
 import           Tisch.Internal.Koln
 import           Tisch.Internal.Query
 import           Tisch.Internal.Table
-import           Tisch.Run
 
-import qualified Edible.Aggregate           as O
-import qualified Edible.Binary              as O
-import qualified Edible.Column              as O
-import qualified Edible.Constant            as O
-import qualified Edible.Distinct            as O
-import qualified Edible.FunctionalJoin      as O
-import qualified Edible.Join                as O
-import qualified Edible.Label               as O
-import qualified Edible.Manipulation        as O
-import qualified Edible.Operators           as O
-import qualified Edible.Order               as O
-import qualified Edible.PGTypes             as O
-import qualified Edible.QueryArr            as O
-import qualified Edible.RunQuery            as O
-import qualified Edible.Sql                 as O
-import qualified Edible.Table               as O
-import qualified Edible.Values              as O
+import           Edible.Run
+
+import qualified Edible.Aggregate           as E
+import qualified Edible.Binary              as E
+import qualified Edible.Column              as E
+import qualified Edible.Constant            as E
+import qualified Edible.Distinct            as E
+import qualified Edible.FunctionalJoin      as E
+import qualified Edible.Join                as E
+import qualified Edible.Label               as E
+import qualified Edible.Manipulation        as E
+import qualified Edible.Operators           as E
+import qualified Edible.Order               as E
+import qualified Edible.PGTypes             as E
+import qualified Edible.QueryArr            as E
+import qualified Edible.RunQuery            as E
+import qualified Edible.Sql                 as E
+import qualified Edible.Table               as E
+import qualified Edible.Values              as E
 
 -- $runningQueries
 --
