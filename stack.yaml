@@ -5,6 +5,7 @@ packages:
     extra-dep: yes
   - location: '../katip/katip/'
     extra-dep: yes
-extra-deps: []
+extra-deps:
+  - Only-0.1
 flags: {}
 extra-package-dbs: []

@@ -7,10 +7,9 @@ author: TODO
 maintainer: TODO
 copyright: TODO
 license: TODO
-github: tomjaguarpaw/haskell-opaleye.git
+github: TODO
 homepage: TODO
 bug-reports: TODO
-tested-with: GHC==8.0.1 GHC==7.10.3 GHC==7.8.4 GHC==7.6.3
 dependencies:
 - Only
 - aeson

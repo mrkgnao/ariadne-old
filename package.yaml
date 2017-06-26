@@ -35,7 +35,6 @@ library:
   dependencies:
   - base
   - edible
-  - postgresql-simple
   - lens
   - lens-aeson
   - time
