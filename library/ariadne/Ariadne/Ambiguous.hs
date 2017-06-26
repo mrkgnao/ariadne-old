@@ -6,7 +6,7 @@ module Ariadne.Ambiguous
   ( colLens
   ) where
 
-import Tisch (col)
+import Odbhut (col)
 import Tisch.Internal.Table (ColLens)
 
 import Control.Lens (Lens')

@@ -5,7 +5,7 @@
 -- can't find here, please refer to those modules instead.
 --
 -- This module doesn't export any infix operator, and likely never will.
-module Tisch
+module Odbhut
  ( -- * Running queries
    --
    -- $runningQueries
