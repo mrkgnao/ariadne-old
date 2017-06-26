@@ -1,22 +1,22 @@
-{-# LANGUAGE ConstraintKinds #-}
-{-# LANGUAGE DataKinds #-}
-{-# LANGUAGE DeriveDataTypeable #-}
-{-# LANGUAGE DeriveFunctor #-}
-{-# LANGUAGE DeriveGeneric #-}
-{-# LANGUAGE DeriveFoldable #-}
-{-# LANGUAGE DeriveTraversable #-}
-{-# LANGUAGE FlexibleContexts #-}
-{-# LANGUAGE FlexibleInstances #-}
-{-# LANGUAGE FunctionalDependencies #-}
-{-# LANGUAGE MultiParamTypeClasses #-}
-{-# LANGUAGE PolyKinds #-}
-{-# LANGUAGE RankNTypes #-}
-{-# LANGUAGE ScopedTypeVariables #-}
-{-# LANGUAGE StandaloneDeriving #-}
-{-# LANGUAGE TypeApplications #-}
-{-# LANGUAGE TypeFamilies #-}
-{-# LANGUAGE TypeOperators #-}
-{-# LANGUAGE UndecidableInstances #-}
+{-# LANGUAGE ConstraintKinds         #-}
+{-# LANGUAGE DataKinds               #-}
+{-# LANGUAGE DeriveDataTypeable      #-}
+{-# LANGUAGE DeriveFoldable          #-}
+{-# LANGUAGE DeriveFunctor           #-}
+{-# LANGUAGE DeriveGeneric           #-}
+{-# LANGUAGE DeriveTraversable       #-}
+{-# LANGUAGE FlexibleContexts        #-}
+{-# LANGUAGE FlexibleInstances       #-}
+{-# LANGUAGE FunctionalDependencies  #-}
+{-# LANGUAGE MultiParamTypeClasses   #-}
+{-# LANGUAGE PolyKinds               #-}
+{-# LANGUAGE RankNTypes              #-}
+{-# LANGUAGE ScopedTypeVariables     #-}
+{-# LANGUAGE StandaloneDeriving      #-}
+{-# LANGUAGE TypeApplications        #-}
+{-# LANGUAGE TypeFamilies            #-}
+{-# LANGUAGE TypeOperators           #-}
+{-# LANGUAGE UndecidableInstances    #-}
 {-# LANGUAGE UndecidableSuperClasses #-}
 {-# OPTIONS_GHC -Wno-redundant-constraints #-}
 --
@@ -87,37 +87,56 @@ module Tisch.Internal.Table
 
 import           Control.Applicative
 import           Control.Lens
-import           Control.Monad (MonadPlus(..))
-import           Control.Monad.Fix (MonadFix(..))
-import qualified Data.Aeson as Aeson
-import           Data.Data (Data)
+import           Control.Monad                   (MonadPlus (..))
+import           Control.Monad.Fix               (MonadFix (..))
+import qualified Data.Aeson                      as Aeson
+import           Data.Data                       (Data)
 import           Data.Kind
-import qualified Data.Profunctor as P
+import qualified Data.Profunctor                 as P
 import qualified Data.Profunctor.Product.Default as PP
-import qualified Data.Promotion.Prelude.List as List (Map)
-import           Data.Promotion.Prelude.Bool (If)
-import           Data.Proxy (Proxy(..))
+import           Data.Promotion.Prelude.Bool     (If)
+import qualified Data.Promotion.Prelude.List     as List (Map)
+import           Data.Proxy                      (Proxy (..))
 import           Data.Singletons
 import           Data.Tagged
 import           Data.Type.Equality
-import           Data.Typeable (Typeable)
+import           Data.Typeable                   (Typeable)
 import           Data.Void
-import           GHC.Exts (Constraint)
-import qualified GHC.OverloadedLabels as GHC
-import           GHC.Generics (Generic)
-import qualified GHC.TypeLits as GHC
-import           GHC.TypeLits (Symbol, KnownSymbol, symbolVal)
-import qualified Opaleye as O
-import qualified Opaleye.Internal.PackMap as OI
-import qualified Opaleye.Internal.Table as OI
-import qualified Opaleye.Internal.TableMaker as OI
+import           GHC.Exts                        (Constraint)
+import           GHC.Generics                    (Generic)
+import qualified GHC.OverloadedLabels            as GHC
+import           GHC.TypeLits                    (KnownSymbol, Symbol,
+                                                  symbolVal)
+import qualified GHC.TypeLits                    as GHC
+import qualified Odbhut.Internal.PackMap         as OI
+import qualified Odbhut.Internal.Table           as OI
+import qualified Odbhut.Internal.TableMaker      as OI
 
-import qualified Tisch.Internal.Profunctors as PP
-import           Tisch.Internal.Record (Record(RNil, RCons))
-import qualified Tisch.Internal.Record as Record
-import           Tisch.Internal.Singletons ((:&&&$$$))
+import qualified Odbhut.Aggregate                as O
+import qualified Odbhut.Binary                   as O
+import qualified Odbhut.Column                   as O
+import qualified Odbhut.Constant                 as O
+import qualified Odbhut.Distinct                 as O
+import qualified Odbhut.FunctionalJoin           as O
+import qualified Odbhut.Join                     as O
+import qualified Odbhut.Label                    as O
+import qualified Odbhut.Manipulation             as O
+import qualified Odbhut.Operators                as O
+import qualified Odbhut.Order                    as O
+import qualified Odbhut.PGTypes                  as O
+import qualified Odbhut.QueryArr                 as O
+import qualified Odbhut.RunQuery                 as O
+import qualified Odbhut.Sql                      as O
+import qualified Odbhut.Table                    as O
+import qualified Odbhut.Values                   as O
+
+
 import           Tisch.Internal.Kol
 import           Tisch.Internal.Koln
+import qualified Tisch.Internal.Profunctors      as PP
+import           Tisch.Internal.Record           (Record (RCons, RNil))
+import qualified Tisch.Internal.Record           as Record
+import           Tisch.Internal.Singletons       ((:&&&$$$))
 
 --------------------------------------------------------------------------------
 
@@ -210,10 +229,10 @@ instance Aeson.ToJSON a => Aeson.ToJSON (WDef a) where
 --
 -- * @rcap@: Reading capabilities for the column. See 'R'.
 --
--- * @pgType@: Type of the column value used in Opaleye queries as index to
+-- * @pgType@: Type of the column value used in Odbhut queries as index to
 --   'Kol' or 'Koln'. This must be an instance of 'PgTyped'.
 --
--- * @hsType@: Type of the column value used in Haskell outside Opaleye
+-- * @hsType@: Type of the column value used in Haskell outside Odbhut
 --   queries. Hint: don't use something like @'Maybe' 'Bool'@ here if you
 --   want to indicate that this is an optional 'Bool' column. Instead, use
 --   'Bool' here and 'RN' in the @r@ field.
@@ -849,7 +868,7 @@ rawTableRW (_ :: Table t) = RawTable $ O.TableWithSchema
 -- | Obtain the read-only 'RawTable' for a 'Table'.
 --
 -- Hint: You probably won't need to use this function unless you are trying to
--- interact with the underlying Opaleye library.
+-- interact with the underlying Odbhut library.
 rawTableRO :: TableR t => Table t -> RawTable (Database t) Void (PgR t)
 rawTableRO (_ :: Table t) = RawTable $ O.TableWithSchema
   (symbolVal (Proxy :: Proxy (SchemaName t)))

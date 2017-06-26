@@ -13,10 +13,10 @@ module Tisch.Internal.Window
  , winNth
  ) where
 
-import qualified Opaleye as O
-import Tisch.Internal.Kol (PgTyped, Kol(..))
-import Tisch.Internal.Koln (Koln(..))
-import Tisch.Internal.Compat (AnyColumn(..), unsafeFunExpr)
+import qualified Odbhut                as O
+import           Tisch.Internal.Compat (AnyColumn (..), unsafeFunExpr)
+import           Tisch.Internal.Kol    (Kol (..), PgTyped)
+import           Tisch.Internal.Koln   (Koln (..))
 
 --------------------------------------------------------------------------------
 

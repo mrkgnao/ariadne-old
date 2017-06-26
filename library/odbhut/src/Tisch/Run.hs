@@ -1,19 +1,19 @@
 {-# OPTIONS_GHC -Wno-redundant-constraints #-}
-{-# LANGUAGE ConstraintKinds #-}
-{-# LANGUAGE DataKinds #-}
-{-# LANGUAGE DefaultSignatures #-}
-{-# LANGUAGE GADTs #-}
-{-# LANGUAGE FlexibleContexts #-}
-{-# LANGUAGE FlexibleInstances #-}
-{-# LANGUAGE KindSignatures #-}
-{-# LANGUAGE LambdaCase #-}
+{-# LANGUAGE ConstraintKinds       #-}
+{-# LANGUAGE DataKinds             #-}
+{-# LANGUAGE DefaultSignatures     #-}
+{-# LANGUAGE FlexibleContexts      #-}
+{-# LANGUAGE FlexibleInstances     #-}
+{-# LANGUAGE GADTs                 #-}
+{-# LANGUAGE KindSignatures        #-}
+{-# LANGUAGE LambdaCase            #-}
 {-# LANGUAGE MultiParamTypeClasses #-}
-{-# LANGUAGE PolyKinds #-}
-{-# LANGUAGE RankNTypes #-}
-{-# LANGUAGE ScopedTypeVariables #-}
-{-# LANGUAGE TypeFamilies #-}
-{-# LANGUAGE TypeOperators #-}
-{-# LANGUAGE UndecidableInstances #-}
+{-# LANGUAGE PolyKinds             #-}
+{-# LANGUAGE RankNTypes            #-}
+{-# LANGUAGE ScopedTypeVariables   #-}
+{-# LANGUAGE TypeFamilies          #-}
+{-# LANGUAGE TypeOperators         #-}
+{-# LANGUAGE UndecidableInstances  #-}
 
 module Tisch.Run
   ( -- * Connection
@@ -71,28 +71,56 @@ module Tisch.Run
   ) where
 
 import           Control.Lens
-import           Control.Monad (when)
+import           Control.Monad                          (when)
+import qualified Control.Monad.Catch                    as Cx
 import           Control.Monad.IO.Class
-import qualified Control.Monad.Catch as Cx
+import qualified Data.ByteString.Char8                  as B8
 import           Data.Int
-import qualified Data.List.NonEmpty as NEL
-import qualified Data.Profunctor as P
-import qualified Data.Profunctor.Product.Default as PP
-import           Data.Typeable (Typeable)
-import qualified Data.ByteString.Char8 as B8
-import qualified Database.PostgreSQL.Simple as Pg
-import qualified Database.PostgreSQL.Simple.FromField as Pg
+import qualified Data.List.NonEmpty                     as NEL
+import qualified Data.Profunctor                        as P
+import qualified Data.Profunctor.Product.Default        as PP
+import           Data.Typeable                          (Typeable)
+import qualified Database.PostgreSQL.Simple             as Pg
+import qualified Database.PostgreSQL.Simple.FromField   as Pg
 import qualified Database.PostgreSQL.Simple.Transaction as Pg
-import           GHC.Exts (Constraint)
-import qualified Opaleye as O
-import qualified Opaleye.Internal.Unpackspec as OI
-import qualified Opaleye.Internal.RunQuery as OI
+import           GHC.Exts                               (Constraint)
+-- import qualified Odbhut as O
+import qualified Odbhut.Aggregate                       as O
+import qualified Odbhut.Binary                          as O
+import qualified Odbhut.Column                          as O
+import qualified Odbhut.Constant                        as O
+import qualified Odbhut.Distinct                        as O
+import qualified Odbhut.FunctionalJoin                  as O
+import qualified Odbhut.Internal.RunQuery               as OI
+import qualified Odbhut.Internal.Unpackspec             as OI
+import qualified Odbhut.Join                            as O
+import qualified Odbhut.Label                           as O
+import qualified Odbhut.Manipulation                    as O
+import qualified Odbhut.Operators                       as O
+import qualified Odbhut.Order                           as O
+import qualified Odbhut.PGTypes                         as O
+import qualified Odbhut.QueryArr                        as O
+import qualified Odbhut.RunQuery                        as O
+import qualified Odbhut.Sql                             as O
+import qualified Odbhut.Table                           as O
+import qualified Odbhut.Values                          as O
 
-import Tisch.Internal.Table
-  (Database, Table, TableRW, PgR, PgW, HsI, RawTable(..), rawTableRW, pgWfromHsI, pgWfromPgR)
-import Tisch.Internal.Kol (Kol(..))
-import Tisch.Internal.Query (Query(..))
-import Tisch.Internal.Debug (renderSqlQuery')
+
+import           Tisch.Internal.Debug                   (renderSqlQuery')
+import           Tisch.Internal.Kol                     (Kol(..))
+import           Tisch.Internal.Query                   (Query(..))
+import           Tisch.Internal.Table
+    ( Database
+    , HsI
+    , PgR
+    , PgW
+    , RawTable(..)
+    , Table
+    , TableRW
+    , pgWfromHsI
+    , pgWfromPgR
+    , rawTableRW
+    )
 
 --------------------------------------------------------------------------------
 
@@ -204,9 +232,9 @@ data IsolationLevel = ReadCommitted | RepeatableRead | Serializable
   deriving (Eq, Ord, Show, Enum, Bounded)
 
 pgIsolationLevel :: IsolationLevel -> Pg.IsolationLevel
-pgIsolationLevel ReadCommitted = Pg.ReadCommitted
+pgIsolationLevel ReadCommitted  = Pg.ReadCommitted
 pgIsolationLevel RepeatableRead = Pg.RepeatableRead
-pgIsolationLevel Serializable = Pg.Serializable
+pgIsolationLevel Serializable   = Pg.Serializable
 
 ---
 
@@ -477,7 +505,7 @@ instance Cx.Exception ErrNumRows
 
 --------------------------------------------------------------------------------
 --------------------------------------------------------------------------------
--- This might belong in Opaleye
+-- This might belong in Odbhut
 
 qrcFromField :: Pg.FromField b => O.QueryRunnerColumn a b
 qrcFromField = O.fieldQueryRunnerColumn

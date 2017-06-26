@@ -1,8 +1,8 @@
-{-# LANGUAGE DataKinds #-}
-{-# LANGUAGE FlexibleInstances #-}
-{-# LANGUAGE MultiParamTypeClasses #-}
-{-# LANGUAGE TypeFamilies #-}
-{-# LANGUAGE TypeOperators #-}
+{-# LANGUAGE DataKinds               #-}
+{-# LANGUAGE FlexibleInstances       #-}
+{-# LANGUAGE MultiParamTypeClasses   #-}
+{-# LANGUAGE TypeFamilies            #-}
+{-# LANGUAGE TypeOperators           #-}
 {-# LANGUAGE UndecidableSuperClasses #-}
 {-# OPTIONS_GHC -Wno-redundant-constraints #-}
 
@@ -37,18 +37,38 @@ module Tisch.Internal.Aggregation
   , variancepopgg
   ) where
 
-import qualified Data.Profunctor as P
-import GHC.TypeLits (KnownNat, CmpNat, type (+))
-import qualified Opaleye as O
-import qualified Opaleye.Internal.Column as OI
-import qualified Opaleye.Internal.Aggregate as OI
-import qualified Opaleye.Internal.HaskellDB.PrimQuery as HDB
+import qualified Data.Profunctor                     as P
+import           GHC.TypeLits                        (type (+), CmpNat,
+                                                      KnownNat)
+import qualified Odbhut.Aggregate                    as O
+import qualified Odbhut.Binary                       as O
+import qualified Odbhut.Column                       as O
+import qualified Odbhut.Constant                     as O
+import qualified Odbhut.Distinct                     as O
+import qualified Odbhut.FunctionalJoin               as O
+import qualified Odbhut.Internal.Aggregate           as OI
+import qualified Odbhut.Internal.Column              as OI
+import qualified Odbhut.Internal.HaskellDB.PrimQuery as HDB
+import qualified Odbhut.Join                         as O
+import qualified Odbhut.Label                        as O
+import qualified Odbhut.Manipulation                 as O
+import qualified Odbhut.Operators                    as O
+import qualified Odbhut.Order                        as O
+import qualified Odbhut.PGTypes                      as O
+import qualified Odbhut.QueryArr                     as O
+import qualified Odbhut.RunQuery                     as O
+import qualified Odbhut.Sql                          as O
+import qualified Odbhut.Table                        as O
+import qualified Odbhut.Values                       as O
 
-import Tisch.Internal.Compat (PGNumeric)
-import Tisch.Internal.Fun (PgOrd, PgEq, PgNum, PgIntegral)
-import Tisch.Internal.Kol (Kol(..), PgTyped(..), PGArrayn)
-import Tisch.Internal.Koln (Koln(..))
-import Tisch.Internal.Query (Query(..))
+
+import           Tisch.Internal.Compat               (PGNumeric)
+import           Tisch.Internal.Fun                  (PgEq, PgIntegral, PgNum,
+                                                      PgOrd)
+import           Tisch.Internal.Kol                  (Kol (..), PGArrayn,
+                                                      PgTyped (..))
+import           Tisch.Internal.Koln                 (Koln (..))
+import           Tisch.Internal.Query                (Query (..))
 
 --------------------------------------------------------------------------------
 

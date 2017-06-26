@@ -1,5 +1,5 @@
-{-# LANGUAGE PolyKinds #-}
-{-# LANGUAGE FlexibleContexts #-}
+{-# LANGUAGE FlexibleContexts    #-}
+{-# LANGUAGE PolyKinds           #-}
 {-# LANGUAGE ScopedTypeVariables #-}
 
 module Tisch.Internal.Debug
@@ -8,10 +8,10 @@ module Tisch.Internal.Debug
  ) where
 
 import qualified Data.Profunctor.Product.Default as PP
-import qualified Opaleye.Sql as O
-import qualified Opaleye.Internal.Unpackspec as OI
+import qualified Odbhut.Internal.Unpackspec      as OI
+import qualified Odbhut.Sql                      as O
 
-import Tisch.Internal.Query (Query(..))
+import           Tisch.Internal.Query            (Query (..))
 
 --------------------------------------------------------------------------------
 

@@ -1,10 +1,10 @@
-{-# LANGUAGE Arrows #-}
-{-# LANGUAGE DeriveFunctor #-}
+{-# LANGUAGE Arrows                     #-}
+{-# LANGUAGE DeriveFunctor              #-}
+{-# LANGUAGE FlexibleContexts           #-}
 {-# LANGUAGE GeneralizedNewtypeDeriving #-}
-{-# LANGUAGE FlexibleContexts #-}
-{-# LANGUAGE PolyKinds #-}
-{-# LANGUAGE ScopedTypeVariables #-}
-{-# LANGUAGE TypeFamilies #-}
+{-# LANGUAGE PolyKinds                  #-}
+{-# LANGUAGE ScopedTypeVariables        #-}
+{-# LANGUAGE TypeFamilies               #-}
 {-# OPTIONS_GHC -Wno-redundant-constraints #-}
 
 -- | This is an internal module. You are very discouraged from using it directly.
@@ -33,23 +33,43 @@ module Tisch.Internal.Query
  ) where
 
 import           Control.Arrow
-import           Control.Category (Category)
-import           Data.Profunctor (Profunctor, rmap)
-import           Data.Profunctor.Product (ProductProfunctor)
-import qualified Data.Profunctor.Product.Default as PP
-import qualified Opaleye as O
-import qualified Opaleye.Internal.Column as OI
-import qualified Opaleye.Internal.Distinct as OI
-import qualified Opaleye.Internal.Join as OI
-import qualified Opaleye.Internal.Operators as OI
-import qualified Opaleye.Internal.HaskellDB.PrimQuery as HDB
+import           Control.Category                    (Category)
+import           Data.Profunctor                     (Profunctor, rmap)
+import           Data.Profunctor.Product             (ProductProfunctor)
+import qualified Data.Profunctor.Product.Default     as PP
+-- import qualified Odbhut as O
+import qualified Odbhut.Internal.Column              as OI
+import qualified Odbhut.Internal.Distinct            as OI
+import qualified Odbhut.Internal.HaskellDB.PrimQuery as HDB
+import qualified Odbhut.Internal.Join                as OI
+import qualified Odbhut.Internal.Operators           as OI
 
-import Tisch.Internal.Koln (Koln(..), isNull)
-import Tisch.Internal.Kol (Kol(..))
-import Tisch.Internal.Table
-  (Table, TableR, Database, PgR, RawTable(..), rawTableRO)
-import Tisch.Internal.Compat (unsafeUnNullableColumn)
-import Tisch.Internal.Fun (PgEq, PgOrd, eq, lnot)
+import qualified Odbhut.Aggregate                    as O
+import qualified Odbhut.Binary                       as O
+import qualified Odbhut.Column                       as O
+import qualified Odbhut.Constant                     as O
+import qualified Odbhut.Distinct                     as O
+import qualified Odbhut.FunctionalJoin               as O
+import qualified Odbhut.Join                         as O
+import qualified Odbhut.Label                        as O
+import qualified Odbhut.Manipulation                 as O
+import qualified Odbhut.Operators                    as O
+import qualified Odbhut.Order                        as O
+import qualified Odbhut.PGTypes                      as O
+import qualified Odbhut.QueryArr                     as O
+import qualified Odbhut.RunQuery                     as O
+import qualified Odbhut.Sql                          as O
+import qualified Odbhut.Table                        as O
+import qualified Odbhut.Values                       as O
+
+
+import           Tisch.Internal.Compat               (unsafeUnNullableColumn)
+import           Tisch.Internal.Fun                  (PgEq, PgOrd, eq, lnot)
+import           Tisch.Internal.Kol                  (Kol (..))
+import           Tisch.Internal.Koln                 (Koln (..), isNull)
+import           Tisch.Internal.Table                (Database, PgR,
+                                                      RawTable (..), Table,
+                                                      TableR, rawTableRO)
 
 --------------------------------------------------------------------------------
 

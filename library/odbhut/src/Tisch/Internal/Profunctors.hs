@@ -1,7 +1,7 @@
-{-# LANGUAGE FlexibleContexts #-}
-{-# LANGUAGE FlexibleInstances #-}
+{-# LANGUAGE FlexibleContexts      #-}
+{-# LANGUAGE FlexibleInstances     #-}
 {-# LANGUAGE MultiParamTypeClasses #-}
-{-# LANGUAGE PolyKinds #-}
+{-# LANGUAGE PolyKinds             #-}
 
 module Tisch.Internal.Profunctors
   ( ProductProfunctorAdaptor(ppa)
@@ -9,8 +9,8 @@ module Tisch.Internal.Profunctors
   ) where
 
 --------------------------------------------------------------------------------
-import qualified Data.Profunctor as P
-import qualified Data.Profunctor.Product as PP
+import qualified Data.Profunctor                 as P
+import qualified Data.Profunctor.Product         as PP
 import qualified Data.Profunctor.Product.Default as PP
 import           Data.Tagged
 

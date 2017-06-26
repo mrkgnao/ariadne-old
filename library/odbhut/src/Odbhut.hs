@@ -225,34 +225,32 @@ module Odbhut
  , unsaferCastKol
  ) where
 
-import qualified Opaleye as O
+import           Tisch.Internal.Aggregation
+import           Tisch.Internal.Compat
+import           Tisch.Internal.Fun
+import           Tisch.Internal.Kol
+import           Tisch.Internal.Koln
+import           Tisch.Internal.Query
+import           Tisch.Internal.Table
+import           Tisch.Run
 
-import Tisch.Internal.Aggregation
-import Tisch.Internal.Compat
-import Tisch.Internal.Fun
-import Tisch.Internal.Kol
-import Tisch.Internal.Koln
-import Tisch.Internal.Query
-import Tisch.Internal.Table
-import Tisch.Run
-
--- import Opaleye.Aggregate
--- import Opaleye.Binary
--- import Opaleye.Column
--- import Opaleye.Constant
--- import Opaleye.Distinct
--- import Opaleye.FunctionalJoin
--- import Opaleye.Join
--- import Opaleye.Label
--- import Opaleye.Manipulation
--- import Opaleye.Operators
--- import Opaleye.Order
--- import Opaleye.PGTypes
--- import Opaleye.QueryArr
--- import Opaleye.RunQuery
--- import Opaleye.Sql
--- import Opaleye.Table
--- import Opaleye.Values
+import qualified Odbhut.Aggregate           as O
+import qualified Odbhut.Binary              as O
+import qualified Odbhut.Column              as O
+import qualified Odbhut.Constant            as O
+import qualified Odbhut.Distinct            as O
+import qualified Odbhut.FunctionalJoin      as O
+import qualified Odbhut.Join                as O
+import qualified Odbhut.Label               as O
+import qualified Odbhut.Manipulation        as O
+import qualified Odbhut.Operators           as O
+import qualified Odbhut.Order               as O
+import qualified Odbhut.PGTypes             as O
+import qualified Odbhut.QueryArr            as O
+import qualified Odbhut.RunQuery            as O
+import qualified Odbhut.Sql                 as O
+import qualified Odbhut.Table               as O
+import qualified Odbhut.Values              as O
 
 -- $runningQueries
 --

@@ -1,13 +1,13 @@
-{-# LANGUAGE DataKinds #-}
+{-# LANGUAGE DataKinds                 #-}
 {-# LANGUAGE ExistentialQuantification #-}
-{-# LANGUAGE FlexibleInstances #-}
-{-# LANGUAGE KindSignatures #-}
-{-# LANGUAGE MultiParamTypeClasses #-}
-{-# LANGUAGE PolyKinds #-}
-{-# LANGUAGE ScopedTypeVariables #-}
-{-# LANGUAGE TypeOperators #-}
-{-# LANGUAGE TypeFamilies #-}
-{-# LANGUAGE UndecidableInstances #-}
+{-# LANGUAGE FlexibleInstances         #-}
+{-# LANGUAGE KindSignatures            #-}
+{-# LANGUAGE MultiParamTypeClasses     #-}
+{-# LANGUAGE PolyKinds                 #-}
+{-# LANGUAGE ScopedTypeVariables       #-}
+{-# LANGUAGE TypeFamilies              #-}
+{-# LANGUAGE TypeOperators             #-}
+{-# LANGUAGE UndecidableInstances      #-}
 {-# OPTIONS_GHC -fno-warn-orphans #-}
 {-# OPTIONS_GHC -Wno-redundant-constraints #-}
 
@@ -26,23 +26,42 @@ module Tisch.Internal.Compat
   , pgFixed
   ) where
 
-import qualified Control.Exception as Ex
-import           Data.Fixed (Fixed(..))
-import qualified Data.Fixed as Fixed
+import qualified Control.Exception                    as Ex
+import           Data.Fixed                           (Fixed (..))
+import qualified Data.Fixed                           as Fixed
 import           Data.Int
 import           Data.Proxy
-import           Data.Scientific (Scientific, formatScientific)
-import qualified Data.Scientific as Scientific
+import           Data.Scientific                      (Scientific,
+                                                       formatScientific)
+import qualified Data.Scientific                      as Scientific
 import qualified Database.PostgreSQL.Simple.FromField as Pg
-import           GHC.Float (float2Double)
-import           GHC.Real (infinity, notANumber)
-import           GHC.TypeLits (Nat, KnownNat, type (+))
-import qualified GHC.TypeLits as GHC
-import qualified Opaleye as O
-import qualified Opaleye.Internal.Column as OI
-import qualified Opaleye.Internal.HaskellDB.PrimQuery as HDB
-import qualified Opaleye.Internal.PGTypes as OI
-import qualified Opaleye.Internal.RunQuery as OI
+import           GHC.Float                            (float2Double)
+import           GHC.Real                             (infinity, notANumber)
+import           GHC.TypeLits                         (type (+), KnownNat, Nat)
+import qualified GHC.TypeLits                         as GHC
+
+import qualified Odbhut.Aggregate                     as O
+import qualified Odbhut.Binary                        as O
+import qualified Odbhut.Column                        as O
+import qualified Odbhut.Constant                      as O
+import qualified Odbhut.Distinct                      as O
+import qualified Odbhut.FunctionalJoin                as O
+import qualified Odbhut.Join                          as O
+import qualified Odbhut.Label                         as O
+import qualified Odbhut.Manipulation                  as O
+import qualified Odbhut.Operators                     as O
+import qualified Odbhut.Order                         as O
+import qualified Odbhut.PGTypes                       as O
+import qualified Odbhut.QueryArr                      as O
+import qualified Odbhut.RunQuery                      as O
+import qualified Odbhut.Sql                           as O
+import qualified Odbhut.Table                         as O
+import qualified Odbhut.Values                        as O
+
+import qualified Odbhut.Internal.Column               as OI
+import qualified Odbhut.Internal.HaskellDB.PrimQuery  as HDB
+import qualified Odbhut.Internal.PGTypes              as OI
+import qualified Odbhut.Internal.RunQuery             as OI
 
 --------------------------------------------------------------------------------
 

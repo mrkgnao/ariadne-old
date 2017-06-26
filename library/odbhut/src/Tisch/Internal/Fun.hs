@@ -1,11 +1,11 @@
-{-# LANGUAGE DataKinds #-}
-{-# LANGUAGE FlexibleContexts #-}
-{-# LANGUAGE FlexibleInstances #-}
-{-# LANGUAGE PolyKinds #-}
-{-# LANGUAGE ScopedTypeVariables #-}
-{-# LANGUAGE TypeApplications #-}
-{-# LANGUAGE TypeFamilies #-}
-{-# LANGUAGE UndecidableInstances #-}
+{-# LANGUAGE DataKinds               #-}
+{-# LANGUAGE FlexibleContexts        #-}
+{-# LANGUAGE FlexibleInstances       #-}
+{-# LANGUAGE PolyKinds               #-}
+{-# LANGUAGE ScopedTypeVariables     #-}
+{-# LANGUAGE TypeApplications        #-}
+{-# LANGUAGE TypeFamilies            #-}
+{-# LANGUAGE UndecidableInstances    #-}
 {-# LANGUAGE UndecidableSuperClasses #-}
 {-# OPTIONS_GHC -Wno-redundant-constraints #-}
 {-# OPTIONS_GHC -Wno-orphans #-}
@@ -76,21 +76,43 @@ module Tisch.Internal.Fun
  , ilike
  ) where
 
-import Control.Lens ()
-import Data.Foldable
+import           Control.Lens                        ()
 import qualified Data.ByteString
 import qualified Data.CaseInsensitive
-import Data.Semigroup (Semigroup(..))
-import qualified GHC.TypeLits as GHC
-import qualified Opaleye as O
-import qualified Opaleye.Internal.Column as OI
-import qualified Opaleye.Internal.HaskellDB.PrimQuery as HDB
+import           Data.Foldable
+import           Data.Semigroup                      (Semigroup (..))
+import qualified GHC.TypeLits                        as GHC
+import qualified Odbhut.Internal.Column              as OI
+import qualified Odbhut.Internal.HaskellDB.PrimQuery as HDB
 
-import Tisch.Internal.Kol
-  (CastKol, Kol(..), PgTyped(..), ToKol(..), liftKol1, liftKol2, liftKol3,
-   unsaferCastKol, unsaferCoerceKol, kolArray)
-import Tisch.Internal.Koln (Koln(..))
-import Tisch.Internal.Compat (PGNumeric, AnyColumn(..), unsafeFunExpr)
+import qualified Odbhut.Aggregate                    as O
+import qualified Odbhut.Binary                       as O
+import qualified Odbhut.Column                       as O
+import qualified Odbhut.Constant                     as O
+import qualified Odbhut.Distinct                     as O
+import qualified Odbhut.FunctionalJoin               as O
+import qualified Odbhut.Join                         as O
+import qualified Odbhut.Label                        as O
+import qualified Odbhut.Manipulation                 as O
+import qualified Odbhut.Operators                    as O
+import qualified Odbhut.Order                        as O
+import qualified Odbhut.PGTypes                      as O
+import qualified Odbhut.QueryArr                     as O
+import qualified Odbhut.RunQuery                     as O
+import qualified Odbhut.Sql                          as O
+import qualified Odbhut.Table                        as O
+import qualified Odbhut.Values                       as O
+
+
+import           Tisch.Internal.Compat               (AnyColumn (..), PGNumeric,
+                                                      unsafeFunExpr)
+import           Tisch.Internal.Kol                  (CastKol, Kol (..),
+                                                      PgTyped (..), ToKol (..),
+                                                      kolArray, liftKol1,
+                                                      liftKol2, liftKol3,
+                                                      unsaferCastKol,
+                                                      unsaferCoerceKol)
+import           Tisch.Internal.Koln                 (Koln (..))
 
 -------------------------------------------------------------------------------
 -- Semigroups, Monoids

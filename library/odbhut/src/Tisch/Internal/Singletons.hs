@@ -1,8 +1,8 @@
-{-# LANGUAGE ScopedTypeVariables #-}
-{-# LANGUAGE PolyKinds #-}
-{-# LANGUAGE DataKinds #-}
-{-# LANGUAGE TypeOperators #-}
-{-# LANGUAGE TypeFamilies #-}
+{-# LANGUAGE DataKinds            #-}
+{-# LANGUAGE PolyKinds            #-}
+{-# LANGUAGE ScopedTypeVariables  #-}
+{-# LANGUAGE TypeFamilies         #-}
+{-# LANGUAGE TypeOperators        #-}
 {-# LANGUAGE UndecidableInstances #-}
 
 module Tisch.Internal.Singletons
@@ -13,8 +13,8 @@ module Tisch.Internal.Singletons
  , (:&&&$$$$)
  ) where
 
-import Data.Kind
-import Data.Singletons.TH
+import           Data.Kind
+import           Data.Singletons.TH
 
 type (:&&&$$$$) (a :: TyFun x y -> Type)
                 (b :: TyFun x z -> Type)

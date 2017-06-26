@@ -1,14 +1,14 @@
-{-# LANGUAGE DataKinds #-}
+{-# LANGUAGE DataKinds                 #-}
 {-# LANGUAGE ExistentialQuantification #-}
-{-# LANGUAGE FlexibleInstances #-}
-{-# LANGUAGE MultiParamTypeClasses #-}
-{-# LANGUAGE PolyKinds #-}
-{-# LANGUAGE RankNTypes #-}
-{-# LANGUAGE ScopedTypeVariables #-}
-{-# LANGUAGE StandaloneDeriving #-}
-{-# LANGUAGE TypeFamilies #-}
-{-# LANGUAGE TypeOperators #-}
-{-# LANGUAGE UndecidableInstances #-}
+{-# LANGUAGE FlexibleInstances         #-}
+{-# LANGUAGE MultiParamTypeClasses     #-}
+{-# LANGUAGE PolyKinds                 #-}
+{-# LANGUAGE RankNTypes                #-}
+{-# LANGUAGE ScopedTypeVariables       #-}
+{-# LANGUAGE StandaloneDeriving        #-}
+{-# LANGUAGE TypeFamilies              #-}
+{-# LANGUAGE TypeOperators             #-}
+{-# LANGUAGE UndecidableInstances      #-}
 {-# OPTIONS_GHC -Wno-orphans #-}
 
 -- | This is an internal module. You are very discouraged from using it directly.
@@ -28,18 +28,37 @@ module Tisch.Internal.Koln
   , kolArrayn
   ) where
 
-import qualified Data.Profunctor as P
-import qualified Data.Profunctor.Product.Default as PP
-import           Data.Proxy (Proxy(..))
 import           Data.Foldable
-import qualified GHC.TypeLits as GHC
-import qualified Opaleye as O
-import qualified Opaleye.Internal.Column as OI
-import qualified Opaleye.Internal.HaskellDB.PrimQuery as HDB
-import qualified Opaleye.Internal.RunQuery as OI
+import qualified Data.Profunctor                     as P
+import qualified Data.Profunctor.Product.Default     as PP
+import           Data.Proxy                          (Proxy (..))
+import qualified GHC.TypeLits                        as GHC
+import qualified Odbhut.Internal.Column              as OI
+import qualified Odbhut.Internal.HaskellDB.PrimQuery as HDB
+import qualified Odbhut.Internal.RunQuery            as OI
 
-import Tisch.Internal.Kol
-  (Kol(..), PgTyped(..), ToKol(..), PGArrayn, pgPrimTypeName)
+import qualified Odbhut.Aggregate                    as O
+import qualified Odbhut.Binary                       as O
+import qualified Odbhut.Column                       as O
+import qualified Odbhut.Constant                     as O
+import qualified Odbhut.Distinct                     as O
+import qualified Odbhut.FunctionalJoin               as O
+import qualified Odbhut.Join                         as O
+import qualified Odbhut.Label                        as O
+import qualified Odbhut.Manipulation                 as O
+import qualified Odbhut.Operators                    as O
+import qualified Odbhut.Order                        as O
+import qualified Odbhut.PGTypes                      as O
+import qualified Odbhut.QueryArr                     as O
+import qualified Odbhut.RunQuery                     as O
+import qualified Odbhut.Sql                          as O
+import qualified Odbhut.Table                        as O
+import qualified Odbhut.Values                       as O
+
+
+import           Tisch.Internal.Kol                  (Kol (..), PGArrayn,
+                                                      PgTyped (..), ToKol (..),
+                                                      pgPrimTypeName)
 
 --------------------------------------------------------------------------------
 
@@ -58,7 +77,7 @@ import Tisch.Internal.Kol
 --
 -- We do not use @opaleye@'s @'O.Column' ('O.Nullable' x)@, instead we use
 -- @'Koln' y@ where @x ~ 'PgType' y@. This is where we drift a bit appart from
--- Opaleye. See https://github.com/tomjaguarpaw/haskell-opaleye/issues/97
+-- Odbhut. See https://github.com/tomjaguarpaw/haskell-opaleye/issues/97
 data Koln (a :: k) = PgTyped a => Koln { unKoln :: O.Column (O.Nullable (PgType a)) }
 
 deriving instance Show (O.Column (O.Nullable a)) => Show (Koln a)

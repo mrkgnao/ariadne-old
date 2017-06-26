@@ -1,18 +1,18 @@
-{-# LANGUAGE DataKinds #-}
-{-# LANGUAGE DefaultSignatures #-}
+{-# LANGUAGE DataKinds                 #-}
+{-# LANGUAGE DefaultSignatures         #-}
 {-# LANGUAGE ExistentialQuantification #-}
-{-# LANGUAGE FlexibleContexts #-}
-{-# LANGUAGE FlexibleInstances #-}
-{-# LANGUAGE MultiParamTypeClasses #-}
-{-# LANGUAGE PolyKinds #-}
-{-# LANGUAGE RankNTypes #-}
-{-# LANGUAGE ScopedTypeVariables #-}
-{-# LANGUAGE StandaloneDeriving #-}
-{-# LANGUAGE TypeApplications #-}
-{-# LANGUAGE TypeFamilies #-}
-{-# LANGUAGE TypeOperators #-}
-{-# LANGUAGE UndecidableInstances #-}
-{-# LANGUAGE UndecidableSuperClasses #-}
+{-# LANGUAGE FlexibleContexts          #-}
+{-# LANGUAGE FlexibleInstances         #-}
+{-# LANGUAGE MultiParamTypeClasses     #-}
+{-# LANGUAGE PolyKinds                 #-}
+{-# LANGUAGE RankNTypes                #-}
+{-# LANGUAGE ScopedTypeVariables       #-}
+{-# LANGUAGE StandaloneDeriving        #-}
+{-# LANGUAGE TypeApplications          #-}
+{-# LANGUAGE TypeFamilies              #-}
+{-# LANGUAGE TypeOperators             #-}
+{-# LANGUAGE UndecidableInstances      #-}
+{-# LANGUAGE UndecidableSuperClasses   #-}
 {-# OPTIONS_GHC -Wno-redundant-constraints #-}
 
 -- | This is an internal module. You are very discouraged from using it directly.
@@ -35,39 +35,57 @@ module Tisch.Internal.Kol
  , castKol
  ) where
 
-import Control.Lens
-import Data.Fixed (Fixed(..))
-import qualified Data.Fixed as Fixed
-import Data.Kind
-import Data.Foldable
-import qualified Data.Aeson as Aeson
+import           Control.Lens
+import qualified Data.Aeson                           as Aeson
 import qualified Data.ByteString
 import qualified Data.ByteString.Lazy
 import qualified Data.CaseInsensitive
-import Data.Int
-import Data.Proxy (Proxy(..))
-import qualified Data.Profunctor as P
-import qualified Data.Profunctor.Product.Default as PP
-import Data.Scientific (Scientific)
-import Data.Tagged
+import           Data.Fixed                           (Fixed (..))
+import qualified Data.Fixed                           as Fixed
+import           Data.Foldable
+import           Data.Int
+import           Data.Kind
+import qualified Data.Profunctor                      as P
+import qualified Data.Profunctor.Product.Default      as PP
+import           Data.Proxy                           (Proxy (..))
+import           Data.Scientific                      (Scientific)
+import           Data.Tagged
 import qualified Data.Text
 import qualified Data.Text.Lazy
 import qualified Data.Time
-import Data.Typeable (Typeable)
+import           Data.Typeable                        (Typeable)
 import qualified Data.UUID
-import Data.Word
+import           Data.Word
 import qualified Database.PostgreSQL.Simple.FromField as Pg
-import qualified Database.PostgreSQL.Simple.Types as Pg
-import GHC.Exts (Constraint)
-import qualified GHC.TypeLits as GHC
-import qualified Opaleye as O
-import qualified Opaleye.Internal.Column as OI
-import qualified Opaleye.Internal.RunQuery as OI
-import qualified Opaleye.Internal.HaskellDB.PrimQuery as HDB
+import qualified Database.PostgreSQL.Simple.Types     as Pg
+import           GHC.Exts                             (Constraint)
+import qualified GHC.TypeLits                         as GHC
+import qualified Odbhut.Aggregate                     as O
+import qualified Odbhut.Binary                        as O
+import qualified Odbhut.Column                        as O
+import qualified Odbhut.Constant                      as O
+import qualified Odbhut.Distinct                      as O
+import qualified Odbhut.FunctionalJoin                as O
+import qualified Odbhut.Internal.Column               as OI
+import qualified Odbhut.Internal.HaskellDB.PrimQuery  as HDB
+import qualified Odbhut.Internal.RunQuery             as OI
+import qualified Odbhut.Join                          as O
+import qualified Odbhut.Label                         as O
+import qualified Odbhut.Manipulation                  as O
+import qualified Odbhut.Operators                     as O
+import qualified Odbhut.Order                         as O
+import qualified Odbhut.PGTypes                       as O
+import qualified Odbhut.QueryArr                      as O
+import qualified Odbhut.RunQuery                      as O
+import qualified Odbhut.Sql                           as O
+import qualified Odbhut.Table                         as O
+import qualified Odbhut.Values                        as O
 
-import Tisch.Internal.Compat
-  (PGNumeric, PGNumericScale,
-   pgFloat4, pgFloat8, pgInt2, pgScientific, pgFixed)
+
+import           Tisch.Internal.Compat                (PGNumeric,
+                                                       PGNumericScale, pgFixed,
+                                                       pgFloat4, pgFloat8,
+                                                       pgInt2, pgScientific)
 
 -------------------------------------------------------------------------------
 
@@ -132,7 +150,7 @@ instance PgPrimType (PGNumeric scale) where pgPrimTypeName _ = "numeric"
 
 instance
   ( GHC.TypeError
-      ('GHC.Text "Opaleye.PGNumeric is not supported," 'GHC.:$$:
+      ('GHC.Text "Odbhut.PGNumeric is not supported," 'GHC.:$$:
        'GHC.Text "Use Tisch.PGNumeric instead.")
   ) => PgPrimType O.PGNumeric where pgPrimTypeName = undefined
 
@@ -233,7 +251,7 @@ instance PgTyped a => PgTyped (PGArrayn a) where type PgType (PGArrayn a) = PGAr
 -- /for manipulating with values stored in columns./
 --
 -- We do not use @opaleye@'s @'O.Column' x@, instead we use @'Kol' y@ where @x ~
--- 'PgType' y@. This is where we drift a bit appart from Opaleye. See
+-- 'PgType' y@. This is where we drift a bit appart from Odbhut. See
 -- https://github.com/tomjaguarpaw/haskell-opaleye/issues/97
 data Kol (a :: k) = PgTyped a => Kol { unKol :: O.Column (PgType a) }
 
@@ -257,7 +275,7 @@ unsaferCastKol :: forall a b. (PgTyped a, PgTyped b) => Kol a -> Kol b
 unsaferCastKol =
   liftKol1 (O.unsafeCast (pgPrimTypeName (Proxy @(PgType b))))
 
--- | Converts an unary function on Opaleye's 'O.Column' to an unary function
+-- | Converts an unary function on Odbhut's 'O.Column' to an unary function
 -- taking any of 'Kol' and 'Koln' as argument, with the result type fully
 -- determined by it.
 liftKol1
@@ -266,7 +284,7 @@ liftKol1
   -> (Kol a -> Kol b) -- ^
 liftKol1 f = Kol . f . unKol
 
--- | Converts a binary function on Opaleye's 'O.Column's to an binary function
+-- | Converts a binary function on Odbhut's 'O.Column's to an binary function
 -- taking any of 'Kol' and 'Koln' as arguments, with the result type fully
 -- determined by them.
 liftKol2
@@ -275,7 +293,7 @@ liftKol2
   -> (Kol a -> Kol b -> Kol c)
 liftKol2 f = \ka kb -> Kol (f (unKol ka) (unKol kb))
 
--- | Converts a ternary function on Opaleye's 'O.Column's to an ternary function
+-- | Converts a ternary function on Odbhut's 'O.Column's to an ternary function
 -- on 'Kol'.
 --
 -- /Hint/: You can further compose the result of this function with 'op3'

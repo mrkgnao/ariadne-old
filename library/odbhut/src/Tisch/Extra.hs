@@ -1,6 +1,6 @@
-{-# LANGUAGE TypeFamilies #-}
-{-# LANGUAGE RankNTypes #-}
+{-# LANGUAGE RankNTypes          #-}
 {-# LANGUAGE ScopedTypeVariables #-}
+{-# LANGUAGE TypeFamilies        #-}
 
 -- | This module exports some tools that are not directly related to
 -- @tisch@, yet they complement it.
@@ -17,11 +17,11 @@ module Tisch.Extra
   ) where
 
 import           Control.Lens
-import           Control.Monad (when)
-import qualified Data.ByteString.Char8 as B8
-import qualified Data.Text as Text
-import qualified Data.Text.Encoding as Text
-import           Data.Typeable (Typeable)
+import           Control.Monad                        (when)
+import qualified Data.ByteString.Char8                as B8
+import qualified Data.Text                            as Text
+import qualified Data.Text.Encoding                   as Text
+import           Data.Typeable                        (Typeable)
 import qualified Database.PostgreSQL.Simple.FromField as Pg
 
 --------------------------------------------------------------------------------
@@ -40,7 +40,7 @@ pgFromFieldMapMay
 pgFromFieldMapMay f = \a mb -> do
     t <- Pg.fromField a mb
     case f t of
-       Just x -> return x
+       Just x  -> return x
        Nothing -> Pg.returnError Pg.ConversionFailed a (show t)
 {-# INLINABLE pgFromFieldMapMay #-}
 
@@ -59,7 +59,7 @@ pgGuardTypeName ty f = do
 pgGuardNotNull :: Pg.FieldParser B8.ByteString
 pgGuardNotNull = \f mb -> case mb of
    Nothing -> Pg.returnError Pg.UnexpectedNull f ""
-   Just b -> return b
+   Just b  -> return b
 {-# INLINABLE pgGuardNotNull #-}
 
 -- | Like the 'Pg.FromField' instance for 'Text.Text' but doesn't check the
@@ -68,7 +68,7 @@ pgTextFromFieldNoTypeCheck :: Pg.FieldParser Text.Text
 pgTextFromFieldNoTypeCheck = \f mb -> do
    b <- pgGuardNotNull f mb
    case Text.decodeUtf8' b of
-      Left e -> Pg.conversionError e
+      Left e  -> Pg.conversionError e
       Right t -> return t
 {-# INLINABLE pgTextFromFieldNoTypeCheck #-}
 

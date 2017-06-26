@@ -1,17 +1,17 @@
-{-# LANGUAGE AllowAmbiguousTypes #-}
-{-# LANGUAGE ConstraintKinds #-}
-{-# LANGUAGE DataKinds #-}
-{-# LANGUAGE FlexibleContexts #-}
-{-# LANGUAGE FlexibleInstances #-}
-{-# LANGUAGE GADTs #-}
-{-# LANGUAGE MultiParamTypeClasses #-}
-{-# LANGUAGE RankNTypes #-}
-{-# LANGUAGE PolyKinds #-}
+{-# LANGUAGE AllowAmbiguousTypes    #-}
+{-# LANGUAGE ConstraintKinds        #-}
+{-# LANGUAGE DataKinds              #-}
+{-# LANGUAGE FlexibleContexts       #-}
+{-# LANGUAGE FlexibleInstances      #-}
 {-# LANGUAGE FunctionalDependencies #-}
-{-# LANGUAGE ScopedTypeVariables #-}
-{-# LANGUAGE TypeFamilies #-}
-{-# LANGUAGE TypeOperators #-}
-{-# LANGUAGE UndecidableInstances #-}
+{-# LANGUAGE GADTs                  #-}
+{-# LANGUAGE MultiParamTypeClasses  #-}
+{-# LANGUAGE PolyKinds              #-}
+{-# LANGUAGE RankNTypes             #-}
+{-# LANGUAGE ScopedTypeVariables    #-}
+{-# LANGUAGE TypeFamilies           #-}
+{-# LANGUAGE TypeOperators          #-}
+{-# LANGUAGE UndecidableInstances   #-}
 {-# OPTIONS_GHC -Wno-redundant-constraints #-}
 {-# OPTIONS_GHC -Wno-orphans #-}
 
@@ -36,16 +36,16 @@
 
 module Tisch.Internal.Record where
 
-import           Control.Lens (Lens)
+import           Control.Lens                    (Lens)
 import           Data.Kind
-import           Data.Void
-import qualified Data.Profunctor as P
-import qualified Data.Profunctor.Product as PP
+import qualified Data.Profunctor                 as P
+import qualified Data.Profunctor.Product         as PP
 import qualified Data.Profunctor.Product.Default as PP
 import           Data.Proxy
 import           Data.Tagged
-import           GHC.TypeLits (Symbol)
-import           Tisch.Internal.Profunctors as PP
+import           Data.Void
+import           GHC.TypeLits                    (Symbol)
+import           Tisch.Internal.Profunctors      as PP
 
 --------------------------------------------------------------------------------
 data Record :: [(k, Type)] -> Type where
