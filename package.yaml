@@ -38,6 +38,8 @@ library:
   - lens
   - lens-aeson
   - time
+  - cassava
+  - bytestring
   - mtl
   - transformers
   - katip
