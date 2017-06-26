@@ -214,7 +214,7 @@ q_Fulltext_by_id kid = proc () -> do
 q_Fulltext_by_contents :: Text >-> PgR Fulltext
 q_Fulltext_by_contents cts = proc () -> do
   l <- query Fulltext -< ()
-  restrict -< reMatch (l ^. contents) (kol (".*" <> cts <> ".*"))
+  restrict -< like (l ^. contents) (kol ("%" <> cts <> "%"))
   returnA -< l
 
 mkFulltext'
@@ -383,8 +383,8 @@ runTisch = do
     b <- mkKnot
     mkPath a b >>= print
     mkFulltext a "<html>Very funny website</html>" >>= print
-    fetch @Link (q_Link_by_url "site") >>= print
-    fetch @Fulltext (q_Fulltext_by_contents "html") >>= traverse_ print
+    fetch (q_Link_by_url "site") >>= print
+    fetch (q_Fulltext_by_contents "html") >>= traverse_ print
     -- fetchLink q_Link_all >>= (map (^. link_id) |> traverse_ print)
     -- fetchLink (q_Link_by_url "http://lol.kol") >>= traverse_ print
     -- fetchKnot q_Knot_all >>= (length |> print)
