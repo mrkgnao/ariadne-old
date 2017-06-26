@@ -25,6 +25,8 @@ import qualified Edible.PGTypes as T
 
 import qualified Edible.Internal.HaskellDB.PrimQuery as HPQ
 
+import Data.Maybe (fromMaybe)
+
 {-| Order the rows of a `Query` according to the `Order`.
 
 @
@@ -103,3 +105,6 @@ instance PGOrd T.PGTimestamp
 instance PGOrd T.PGCitext
 instance PGOrd T.PGUuid
 instance PGOrd a => PGOrd (C.Nullable a)
+
+instance PGOrd (T.PGSNumeric s)
+

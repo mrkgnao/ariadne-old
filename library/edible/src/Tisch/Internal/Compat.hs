@@ -111,32 +111,6 @@ type instance PGNumericScale Fixed.E12 = 12
 
 instance O.PGOrd (PGNumeric s)
 
-instance KnownNat s => OI.PGNum (PGNumeric s) where
-  pgFromInteger = pgScientific . fromInteger
-  {-# INLINE pgFromInteger #-}
-
--- | WARNING: 'pgFromRational' throws 'Ex.RatioZeroDenominator' if given a
--- positive or negative 'infinity'.
-instance GHC.KnownNat s => OI.PGFractional (PGNumeric s) where
-  pgFromRational = fromMaybe (Ex.throw Ex.RatioZeroDenominator) . pgRational
-  {-# INLINE pgFromRational #-}
-
--- | Convert a 'Rational' to a @numeric@ column in PostgreSQL. 'notANumber' is
--- supported.
---
--- Returns 'Nothing' in case of positive or negative 'infinity'.
-pgRational :: KnownNat s => Rational -> Maybe (O.Column (PGNumeric s))
-pgRational x
-  | x == infinity    = Nothing
-  | x == (-infinity) = Nothing
-  | x == notANumber  = Just (OI.literalColumn (HDB.StringLit "NaN"))
-  | otherwise        = Just (pgScientific (fromRational x))
-
-pgScientific :: forall s. KnownNat s => Scientific -> O.Column (PGNumeric s)
-pgScientific = OI.literalColumn . HDB.OtherLit . formatScientific
-  Scientific.Fixed (Just (fromInteger (GHC.natVal (Proxy :: Proxy s))))
-{-# INLINE pgScientific #-}
-
 pgFixed
   :: forall e s
   .  ( KnownNat s

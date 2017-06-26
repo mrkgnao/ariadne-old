@@ -1,3 +1,5 @@
+{-# LANGUAGE DataKinds           #-}
+{-# LANGUAGE KindSignatures      #-}
 -- | Postgres types and functions to create 'Column's of those types.
 -- You may find it more convenient to use "Edible.Constant" instead.
 
@@ -5,6 +7,8 @@
 {-# LANGUAGE ScopedTypeVariables #-}
 
 module Edible.PGTypes (module Edible.PGTypes) where
+
+import qualified Control.Exception                    as Ex
 
 import           Edible.Internal.Column                (Column)
 import qualified Edible.Internal.Column                as C
@@ -22,10 +26,19 @@ import qualified Data.Text.Lazy                        as LText
 import qualified Data.Time                             as Time
 import qualified Data.UUID                             as UUID
 
-import           GHC.Float                            (float2Double)
 import           Data.Int
+import           GHC.Float                             (float2Double)
+import           GHC.Real                             (infinity, notANumber)
 
 import qualified Database.PostgreSQL.Simple.Range      as R
+
+import           Data.Scientific                      (Scientific,
+                                                       formatScientific)
+import qualified Data.Scientific                      as Scientific
+
+import           GHC.TypeLits
+import           Data.Proxy
+import Data.Maybe (fromMaybe)
 
 instance C.PGNum PGFloat8 where
   pgFromInteger = pgDouble . fromInteger
@@ -253,6 +266,7 @@ data PGInt8
 data PGInt4
 data PGInt2
 data PGNumeric
+data PGSNumeric (scale :: Nat)
 data PGText
 data PGTime
 data PGTimestamp
@@ -264,6 +278,33 @@ data PGBytea
 data PGJson
 data PGJsonb
 data PGRange a
+
+instance KnownNat s => C.PGNum (PGSNumeric s) where
+  pgFromInteger = pgScientific . fromInteger
+  {-# INLINE pgFromInteger #-}
+
+-- | WARNING: 'pgFromRational' throws 'Ex.RatioZeroDenominator' if given a
+-- positive or negative 'infinity'.
+instance KnownNat s => C.PGFractional (PGSNumeric s) where
+  pgFromRational = fromMaybe (Ex.throw Ex.RatioZeroDenominator) . pgRational
+  {-# INLINE pgFromRational #-}
+
+-- | Convert a 'Rational' to a @numeric@ column in PostgreSQL. 'notANumber' is
+-- supported.
+--
+-- Returns 'Nothing' in case of positive or negative 'infinity'.
+pgRational :: KnownNat s => Rational -> Maybe (C.Column (PGSNumeric s))
+pgRational x
+  | x == infinity    = Nothing
+  | x == (-infinity) = Nothing
+  | x == notANumber  = Just (literalColumn (HPQ.StringLit "NaN"))
+  | otherwise        = Just (pgScientific (fromRational x))
+
+
+pgScientific :: forall s. KnownNat s => Scientific -> Column (PGSNumeric s)
+pgScientific = literalColumn . HPQ.OtherLit . formatScientific
+  Scientific.Fixed (Just (fromInteger (natVal (Proxy :: Proxy s))))
+{-# INLINE pgScientific #-}
 
 -- * Deprecated functions
 
