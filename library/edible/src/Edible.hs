@@ -226,7 +226,6 @@ module Edible
  ) where
 
 import           Tisch.Internal.Aggregation
--- import           Tisch.Internal.Compat
 import           Tisch.Internal.Fun
 import           Tisch.Internal.Kol
 import           Tisch.Internal.Koln
@@ -234,6 +233,8 @@ import           Tisch.Internal.Query
 import           Tisch.Internal.Table
 
 import           Edible.Run
+import qualified Edible.Order               as E
+import qualified Edible.PGTypes             as E
 
 -- import qualified Edible.Aggregate           as E
 -- import qualified Edible.Binary              as E
@@ -245,8 +246,6 @@ import           Edible.Run
 -- import qualified Edible.Label               as E
 -- import qualified Edible.Manipulation        as E
 -- import qualified Edible.Operators           as E
-import qualified Edible.Order               as E
-import qualified Edible.PGTypes             as E
 -- import qualified Edible.QueryArr            as E
 -- import qualified Edible.RunQuery            as E
 -- import qualified Edible.Sql                 as E
