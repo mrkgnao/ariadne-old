@@ -1,4 +1,5 @@
 {-# LANGUAGE CPP, DeriveDataTypeable, DeriveFunctor  #-}
+{-# LANGUAGE OverloadedStrings #-}
 {-# LANGUAGE FlexibleInstances, TypeSynonymInstances #-}
 {-# LANGUAGE PatternGuards, ScopedTypeVariables      #-}
 {-# LANGUAGE RecordWildCards, TemplateHaskell        #-}

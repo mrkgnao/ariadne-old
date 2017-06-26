@@ -1,3 +1,4 @@
+{-# LANGUAGE OverloadedStrings #-}
 ------------------------------------------------------------------------------
 -- |
 -- Module:      Database.PostgreSQL.Simple.Time.Internal

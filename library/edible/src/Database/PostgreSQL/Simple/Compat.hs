@@ -1,3 +1,4 @@
+{-# LANGUAGE OverloadedStrings #-}
 {-# LANGUAGE CPP #-}
 -- | This is a module of its own, partly because it uses the CPP extension,
 -- which doesn't play well with backslash-broken string literals.

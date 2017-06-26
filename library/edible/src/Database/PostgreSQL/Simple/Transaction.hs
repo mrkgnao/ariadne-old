@@ -1,4 +1,4 @@
-{-# LANGUAGE RecordWildCards, ScopedTypeVariables #-}
+{-# LANGUAGE RecordWildCards, ScopedTypeVariables, OverloadedStrings #-}
 
 ------------------------------------------------------------------------------
 -- |

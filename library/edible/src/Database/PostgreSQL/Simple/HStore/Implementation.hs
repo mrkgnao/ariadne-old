@@ -1,3 +1,4 @@
+{-# LANGUAGE OverloadedStrings #-}
 {-# LANGUAGE CPP, ViewPatterns, DeriveDataTypeable, GeneralizedNewtypeDeriving #-}
 
 ------------------------------------------------------------------------------
