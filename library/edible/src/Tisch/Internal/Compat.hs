@@ -16,9 +16,6 @@ module Tisch.Internal.Compat
   ( AnyColumn(..)
   , unsafeFunExpr
   , unsafeUnNullableColumn
-  , pgFloat4
-  , pgFloat8
-  , pgInt2
   , PGNumeric
   , PGNumericScale
   , pgRational
@@ -30,6 +27,7 @@ import qualified Control.Exception                    as Ex
 import           Data.Fixed                           (Fixed (..))
 import qualified Data.Fixed                           as Fixed
 import           Data.Int
+import           Data.Maybe
 import           Data.Proxy
 import           Data.Scientific                      (Scientific,
                                                        formatScientific)
@@ -63,15 +61,6 @@ unsafeFunExpr fname =
 unsafeUnNullableColumn :: O.Column (O.Nullable a) -> O.Column a
 unsafeUnNullableColumn = O.unsafeCoerceColumn
 
-pgFloat4 :: Float -> O.Column O.PGFloat4
-pgFloat4 = OI.literalColumn . HDB.DoubleLit . float2Double
-
-pgFloat8 :: Float -> O.Column O.PGFloat8
-pgFloat8 = OI.literalColumn . HDB.DoubleLit . float2Double
-
-pgInt2 :: Int16 -> O.Column O.PGInt2
-pgInt2 = OI.literalColumn . HDB.IntegerLit . fromIntegral
-
 -- | Orphan. "Tisch.Internal".
 instance OI.QueryRunnerColumnDefault O.PGFloat4 Float where
   queryRunnerColumnDefault = O.fieldQueryRunnerColumn
@@ -96,18 +85,6 @@ instance {-# OVERLAPPING #-}
   ) => OI.QueryRunnerColumnDefault a Word
   where queryRunnerColumnDefault = undefined
 
--- | Orphan. "Tisch.Internal".
-instance OI.PGFractional O.PGFloat4 where
-  pgFromRational = pgFloat4 . fromRational
-
--- | Orphan. "Tisch.Internal".
-instance OI.PGNum O.PGFloat4 where
-  pgFromInteger = pgFloat4 . fromInteger
-
--- | Orphan. "Tisch.Internal".
-instance OI.PGNum O.PGInt2 where
-  pgFromInteger = pgInt2 . fromInteger
-
 --------------------------------------------------------------------------------
 
 -- | PostgreSQL @numeric@ type, with @scale@ indicating how many decimal digits
@@ -117,7 +94,7 @@ instance OI.PGNum O.PGInt2 where
 -- and never on the PostgreSQL side. That is, a @'PGNumeric' s@ type in
 -- Haskell maps to a @numeric@ type without a scale specified.
 --
--- 'PGNumeric' doesn't support specifying the “precission” of the PostgreSQL
+-- 'PGNumeric' doesn't support specifying the “precision” of the PostgreSQL
 -- @numeric@ type, as there's no use for that precision on the Haskell side and
 -- we always support the full precision.
 data PGNumeric (scale :: Nat)
@@ -141,7 +118,7 @@ instance KnownNat s => OI.PGNum (PGNumeric s) where
 -- | WARNING: 'pgFromRational' throws 'Ex.RatioZeroDenominator' if given a
 -- positive or negative 'infinity'.
 instance GHC.KnownNat s => OI.PGFractional (PGNumeric s) where
-  pgFromRational = maybe (Ex.throw Ex.RatioZeroDenominator) id . pgRational
+  pgFromRational = fromMaybe (Ex.throw Ex.RatioZeroDenominator) . pgRational
   {-# INLINE pgFromRational #-}
 
 -- | Convert a 'Rational' to a @numeric@ column in PostgreSQL. 'notANumber' is

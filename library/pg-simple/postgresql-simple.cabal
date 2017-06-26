@@ -79,8 +79,7 @@ Library
     Build-depends:
       ghc-prim
 
-  extensions: DoAndIfThenElse, OverloadedStrings, BangPatterns, ViewPatterns
-              TypeOperators
+  extensions: DoAndIfThenElse, OverloadedStrings, BangPatterns, ViewPatterns, TypeOperators
 
   ghc-options: -Wall -fno-warn-name-shadowing
 

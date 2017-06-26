@@ -67,11 +67,12 @@ import qualified Edible.Internal.RunQuery             as OI
 import qualified Edible.RunQuery                      as O
 import qualified Edible.Column                        as O
 import qualified Edible.PGTypes                       as O
+import           Edible.PGTypes                       (pgFloat4, pgFloat8,
+                                                       pgInt2)
 
 import           Tisch.Internal.Compat                (PGNumeric,
                                                        PGNumericScale, pgFixed,
-                                                       pgFloat4, pgFloat8,
-                                                       pgInt2, pgScientific)
+                                                       pgScientific)
 
 -------------------------------------------------------------------------------
 

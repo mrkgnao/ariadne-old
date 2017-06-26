@@ -12,17 +12,21 @@ homepage: TODO
 bug-reports: TODO
 tested-with: GHC==8.0.1 GHC==7.10.3 GHC==7.8.4 GHC==7.6.3
 dependencies:
+- Only
 - aeson
 - attoparsec
 - base
 - base16-bytestring
 - bytestring
+- bytestring-builder
 - case-insensitive
+- containers
 - contravariant
 - exceptions
+- hashable
 - lens
 - mtl
-- postgresql-simple
+- postgresql-libpq
 - pretty
 - product-profunctors
 - profunctors
@@ -30,12 +34,20 @@ dependencies:
 - semigroups
 - singletons
 - tagged
+- template-haskell
 - text
 - time
 - time-locale-compat
 - transformers
 - uuid
+- uuid-types
+- vector
 - void
 library:
   source-dirs: src
   ghc-options: -Wall
+  default-extensions:
+    - DoAndIfThenElse
+    - BangPatterns
+    - ViewPatterns
+    - TypeOperators

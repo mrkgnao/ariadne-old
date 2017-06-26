@@ -22,7 +22,8 @@ import qualified Data.Text.Lazy                        as LText
 import qualified Data.Time                             as Time
 import qualified Data.UUID                             as UUID
 
-import           Data.Int                              (Int64)
+import           GHC.Float                            (float2Double)
+import           Data.Int
 
 import qualified Database.PostgreSQL.Simple.Range      as R
 
@@ -37,6 +38,28 @@ instance C.PGNum PGInt8 where
 
 instance C.PGFractional PGFloat8 where
   pgFromRational = pgDouble . fromRational
+
+-- | Orphan. "Tisch.Internal".
+instance C.PGFractional PGFloat4 where
+  pgFromRational = pgFloat4 . fromRational
+
+pgFloat4 :: Float -> Column PGFloat4
+pgFloat4 = literalColumn . HPQ.DoubleLit . float2Double
+
+pgFloat8 :: Float -> Column PGFloat8
+pgFloat8 = literalColumn . HPQ.DoubleLit . float2Double
+
+pgInt2 :: Int16 -> Column PGInt2
+pgInt2 = literalColumn . HPQ.IntegerLit . fromIntegral
+
+
+-- | Orphan. "Tisch.Internal".
+instance C.PGNum PGFloat4 where
+  pgFromInteger = pgFloat4 . fromInteger
+
+-- | Orphan. "Tisch.Internal".
+instance C.PGNum PGInt2 where
+  pgFromInteger = pgInt2 . fromInteger
 
 instance C.PGIntegral PGInt2
 instance C.PGIntegral PGInt4
