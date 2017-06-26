@@ -1,0 +1,102 @@
+name: odbhut
+version: '0.0.0.0'
+synopsis: TODO
+description: TODO
+category: Database
+author: TODO
+maintainer: TODO
+copyright: TODO
+license: TODO
+github: tomjaguarpaw/haskell-opaleye.git
+homepage: TODO
+bug-reports: TODO
+tested-with: GHC==8.0.1 GHC==7.10.3 GHC==7.8.4 GHC==7.6.3
+dependencies:
+- aeson
+- attoparsec
+- base
+- base16-bytestring
+- bytestring
+- case-insensitive
+- contravariant
+- exceptions
+- lens
+- mtl
+- postgresql-simple
+- pretty
+- product-profunctors
+- profunctors
+- scientific
+- semigroups
+- singletons
+- tagged
+- text
+- time
+- time-locale-compat
+- transformers
+- uuid
+- void
+library:
+  source-dirs: src
+  ghc-options: -Wall
+  exposed-modules:
+  - Tisch
+  - Tisch.Run
+  - Tisch.Extra
+  - Tisch.Internal.Aggregation
+  - Tisch.Internal.Compat
+  - Tisch.Internal.Debug
+  - Tisch.Internal.Fun
+  - Tisch.Internal.Kol
+  - Tisch.Internal.Koln
+  - Tisch.Internal.Profunctors
+  - Tisch.Internal.Query
+  - Tisch.Internal.Record
+  - Tisch.Internal.Singletons
+  - Tisch.Internal.Table
+  - Tisch.Internal.Window
+  - Opaleye
+  - Opaleye.Aggregate
+  - Opaleye.Binary
+  - Opaleye.Column
+  - Opaleye.Constant
+  - Opaleye.Distinct
+  - Opaleye.FunctionalJoin
+  - Opaleye.Join
+  - Opaleye.Label
+  - Opaleye.Manipulation
+  - Opaleye.Operators
+  - Opaleye.Order
+  - Opaleye.PGTypes
+  - Opaleye.QueryArr
+  - Opaleye.RunQuery
+  - Opaleye.Sql
+  - Opaleye.Table
+  - Opaleye.Values
+  - Opaleye.Internal.Aggregate
+  - Opaleye.Internal.Binary
+  - Opaleye.Internal.Column
+  - Opaleye.Internal.Distinct
+  - Opaleye.Internal.Helpers
+  - Opaleye.Internal.Join
+  - Opaleye.Internal.Label
+  - Opaleye.Internal.Order
+  - Opaleye.Internal.Operators
+  - Opaleye.Internal.Optimize
+  - Opaleye.Internal.PackMap
+  - Opaleye.Internal.PGTypes
+  - Opaleye.Internal.PrimQuery
+  - Opaleye.Internal.Print
+  - Opaleye.Internal.QueryArr
+  - Opaleye.Internal.RunQuery
+  - Opaleye.Internal.Sql
+  - Opaleye.Internal.Table
+  - Opaleye.Internal.TableMaker
+  - Opaleye.Internal.Tag
+  - Opaleye.Internal.Unpackspec
+  - Opaleye.Internal.Values
+  - Opaleye.Internal.HaskellDB.PrimQuery
+  - Opaleye.Internal.HaskellDB.Sql
+  - Opaleye.Internal.HaskellDB.Sql.Default
+  - Opaleye.Internal.HaskellDB.Sql.Generate
+  - Opaleye.Internal.HaskellDB.Sql.Print

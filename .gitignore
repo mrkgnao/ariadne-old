@@ -1,4 +1,5 @@
-# Stack uses this directory as scratch space.
-/.stack-work/
-# Stack generates the Cabal file from `package.yaml` through hpack.
-/*.cabal
+.stack-work/
+*.cabal
+
+library/odbhut/.stack-work/
+library/odbhut/odbhut.cabal

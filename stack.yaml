@@ -1,9 +1,7 @@
 resolver: lts-8.20
 packages:
   - '.'
-  - location: './library/opaleye/'
-    extra-dep: yes
-  - location: './library/tisch/'
+  - location: './library/odbhut/'
     extra-dep: yes
   - location: '../katip/katip/'
     extra-dep: yes

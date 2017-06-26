@@ -34,8 +34,7 @@ github: mrkgnao/ariadne
 library:
   dependencies:
   - base
-  - opaleye
-  - tisch
+  - odbhut
   - postgresql-simple
   - lens
   - lens-aeson
