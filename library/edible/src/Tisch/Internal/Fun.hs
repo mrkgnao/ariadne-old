@@ -88,7 +88,7 @@ import qualified GHC.TypeLits                        as GHC
 import qualified Edible.Column                       as O
 import qualified Edible.Operators                    as O
 import qualified Edible.Order                        as O
-import           Edible.PGTypes                      (PGSNumeric)
+import           Edible.PGTypes                      (PGNumeric)
 import qualified Edible.PGTypes                      as O
 
 
@@ -149,7 +149,7 @@ instance PgNum O.PGInt4
 instance PgNum O.PGInt8
 instance PgNum O.PGFloat4
 instance PgNum O.PGFloat8
-instance GHC.KnownNat s => PgNum (PGSNumeric s)
+instance GHC.KnownNat s => PgNum (PGNumeric s)
 
 instance (PgNum a, Num (O.Column (PgType a))) => Num (Kol a) where
   fromInteger = Kol . fromInteger
@@ -172,7 +172,7 @@ class PgTyped a => PgIntegral (a :: k)
 instance PgIntegral O.PGInt2
 instance PgIntegral O.PGInt4
 instance PgIntegral O.PGInt8
-instance PgIntegral (PGSNumeric 0)
+instance PgIntegral (PGNumeric 0)
 
 itruncate :: (PgFloating a, PgIntegral b) => Kol a -> Kol b
 itruncate = liftKol1 (unsafeFunExpr "trunc" . pure . AnyColumn)
@@ -194,7 +194,7 @@ class (PgTyped a, PgNum a, OI.PGFractional (PgType a)) => PgFractional (a :: k)
 
 instance PgFractional O.PGFloat4
 instance PgFractional O.PGFloat8
-instance GHC.KnownNat s => PgFractional (PGSNumeric s)
+instance GHC.KnownNat s => PgFractional (PGNumeric s)
 
 instance
     ( PgTyped a, PgFractional a
@@ -313,7 +313,7 @@ instance PgEq O.PGTimestamptz
 instance PgEq O.PGTimestamp
 instance PgEq O.PGTime
 instance PgEq O.PGUuid
-instance PgEq (PGSNumeric s)
+instance PgEq (PGNumeric s)
 
 -- | Whether two column values are equal.
 --

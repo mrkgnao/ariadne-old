@@ -212,7 +212,7 @@ instance IsSqlType PGInt4 where
   showSqlType _ = "integer"
 instance IsSqlType PGInt2 where
   showSqlType _ = "smallint"
-instance IsSqlType PGNumeric where
+instance IsSqlType PGRawNumeric where
   showSqlType _ = "numeric"
 instance IsSqlType PGText where
   showSqlType _ = "text"
@@ -248,7 +248,7 @@ instance IsRangeType PGInt4 where
 instance IsRangeType PGInt8 where
   showRangeType _ = "int8range"
 
-instance IsRangeType PGNumeric where
+instance IsRangeType PGRawNumeric where
   showRangeType _ = "numrange"
 
 instance IsRangeType PGTimestamp where
@@ -269,8 +269,8 @@ data PGFloat8
 data PGInt8
 data PGInt4
 data PGInt2
-data PGNumeric
-data PGSNumeric (scale :: Nat)
+data PGRawNumeric
+data PGNumeric (scale :: Nat)
 data PGText
 data PGTime
 data PGTimestamp
@@ -292,13 +292,13 @@ type instance PGNumericScale Fixed.E6  = 6
 type instance PGNumericScale Fixed.E9  = 9
 type instance PGNumericScale Fixed.E12 = 12
 
-instance KnownNat s => C.PGNum (PGSNumeric s) where
+instance KnownNat s => C.PGNum (PGNumeric s) where
   pgFromInteger = pgScientific . fromInteger
   {-# INLINE pgFromInteger #-}
 
 -- | WARNING: 'pgFromRational' throws 'Ex.RatioZeroDenominator' if given a
 -- positive or negative 'infinity'.
-instance KnownNat s => C.PGFractional (PGSNumeric s) where
+instance KnownNat s => C.PGFractional (PGNumeric s) where
   pgFromRational = fromMaybe (Ex.throw Ex.RatioZeroDenominator) . pgRational
   {-# INLINE pgFromRational #-}
 
@@ -306,7 +306,7 @@ instance KnownNat s => C.PGFractional (PGSNumeric s) where
 -- supported.
 --
 -- Returns 'Nothing' in case of positive or negative 'infinity'.
-pgRational :: KnownNat s => Rational -> Maybe (C.Column (PGSNumeric s))
+pgRational :: KnownNat s => Rational -> Maybe (C.Column (PGNumeric s))
 pgRational x
   | x == infinity    = Nothing
   | x == (-infinity) = Nothing
@@ -314,7 +314,7 @@ pgRational x
   | otherwise        = Just (pgScientific (fromRational x))
 
 
-pgScientific :: forall s. KnownNat s => Scientific -> Column (PGSNumeric s)
+pgScientific :: forall s. KnownNat s => Scientific -> Column (PGNumeric s)
 pgScientific = literalColumn . HPQ.OtherLit . formatScientific
   Scientific.Fixed (Just (fromInteger (natVal (Proxy :: Proxy s))))
 {-# INLINE pgScientific #-}

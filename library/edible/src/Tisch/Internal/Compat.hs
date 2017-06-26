@@ -87,10 +87,10 @@ instance {-# OVERLAPPING #-}
 -- does this @numeric@ value support.
 --
 -- Note that @scale@ is a phantom types are only ever used in the Haskell side,
--- and never on the PostgreSQL side. That is, a @'PGNumeric' s@ type in
+-- and never on the PostgreSQL side. That is, a @'PGRawNumeric' s@ type in
 -- Haskell maps to a @numeric@ type without a scale specified.
 --
--- 'PGNumeric' doesn't support specifying the “precision” of the PostgreSQL
+-- 'PGRawNumeric' doesn't support specifying the “precision” of the PostgreSQL
 -- @numeric@ type, as there's no use for that precision on the Haskell side and
 -- we always support the full precision.
 
@@ -98,7 +98,7 @@ pgFixed
   :: forall e s
   .  ( KnownNat s
      , Fixed.HasResolution e, GHC.CmpNat s (O.PGNumericScale e + 1) ~ 'LT)
-  => Fixed e -> O.Column (O.PGSNumeric s)
+  => Fixed e -> O.Column (O.PGNumeric s)
 pgFixed = case GHC.natVal (Proxy :: Proxy s) of
   0 -> \(MkFixed x) -> OI.literalColumn (HDB.IntegerLit x)
   _ -> OI.literalColumn . HDB.OtherLit . Fixed.showFixed False
@@ -112,7 +112,7 @@ instance Fixed.HasResolution e => Pg.FromField (WrapFixed e) where
 
 instance
   ( Fixed.HasResolution e, GHC.CmpNat s (O.PGNumericScale e + 1) ~ 'LT
-  ) => OI.QueryRunnerColumnDefault (O.PGSNumeric s) (Fixed e) where
+  ) => OI.QueryRunnerColumnDefault (O.PGNumeric s) (Fixed e) where
     queryRunnerColumnDefault = fmap unWrapFixed O.fieldQueryRunnerColumn
     {-# INLINE queryRunnerColumnDefault #-}
 

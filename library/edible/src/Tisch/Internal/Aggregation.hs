@@ -128,9 +128,9 @@ class (PgNum a, PgNum b) => AggSum a b
 instance {-# OVERLAPPABLE #-} PgNum a => AggSum a a
 instance AggSum E.PGInt2 E.PGInt8
 instance AggSum E.PGInt4 E.PGInt8
-instance KnownNat s => AggSum E.PGInt8 (E.PGSNumeric s)
+instance KnownNat s => AggSum E.PGInt8 (E.PGNumeric s)
 instance AggSum E.PGFloat4 E.PGFloat8
-instance AggSum E.PGInt8 (E.PGSNumeric 0)
+instance AggSum E.PGInt8 (E.PGNumeric 0)
 
 -- | Add the values in input columns.
 sumgg :: AggSum a b => E.Aggregator (Kol a) (Kol b)
@@ -165,16 +165,16 @@ instance {-# OVERLAPPABLE #-} PgNum a => AggAvg a a
 instance AggAvg E.PGFloat4 E.PGFloat8
 -- | Warning: Depending on your choice of @s@, you might be getting less
 -- resolution than expected.
-instance KnownNat s => AggAvg E.PGInt2 (E.PGSNumeric s)
+instance KnownNat s => AggAvg E.PGInt2 (E.PGNumeric s)
 -- | Warning: Depending on your choice of @s@, you might be getting less
 -- resolution than expected.
-instance KnownNat s => AggAvg E.PGInt4 (E.PGSNumeric s)
+instance KnownNat s => AggAvg E.PGInt4 (E.PGNumeric s)
 -- | Warning: Depending on your choice of @s@, you might be getting less
 -- resolution than expected.
-instance KnownNat s => AggAvg E.PGInt8 (E.PGSNumeric s)
+instance KnownNat s => AggAvg E.PGInt8 (E.PGNumeric s)
 -- | Warning: Depending on your choice of @s'@, you might be getting less
 -- resolution than expected.
-instance (KnownNat s, KnownNat s', CmpNat s (s' + 1) ~ 'GT) => AggAvg (E.PGSNumeric s) (E.PGSNumeric s')
+instance (KnownNat s, KnownNat s', CmpNat s (s' + 1) ~ 'GT) => AggAvg (E.PGNumeric s) (E.PGNumeric s')
 
 -- | The average (arithmetic mean) of all input values
 avggg :: AggAvg a b => E.Aggregator (Kol a) (Kol b)
@@ -237,16 +237,16 @@ instance AggStdDev E.PGFloat4 E.PGFloat8
 instance AggStdDev E.PGFloat8 E.PGFloat8
 -- | Warning: Depending on your choice of @s@, you might be getting less
 -- resolution than expected.
-instance KnownNat s => AggStdDev E.PGInt2 (E.PGSNumeric s)
+instance KnownNat s => AggStdDev E.PGInt2 (E.PGNumeric s)
 -- | Warning: Depending on your choice of @s@, you might be getting less
 -- resolution than expected.
-instance KnownNat s => AggStdDev E.PGInt4 (E.PGSNumeric s)
+instance KnownNat s => AggStdDev E.PGInt4 (E.PGNumeric s)
 -- | Warning: Depending on your choice of @s@, you might be getting less
 -- resolution than expected.
-instance KnownNat s => AggStdDev E.PGInt8 (E.PGSNumeric s)
+instance KnownNat s => AggStdDev E.PGInt8 (E.PGNumeric s)
 -- | Warning: Depending on your choice of @s'@, you might be getting less
 -- resolution than expected.
-instance (KnownNat s, KnownNat s', CmpNat s (s' + 1) ~ 'GT) => AggStdDev (E.PGSNumeric s) (E.PGSNumeric s')
+instance (KnownNat s, KnownNat s', CmpNat s (s' + 1) ~ 'GT) => AggStdDev (E.PGNumeric s) (E.PGNumeric s')
 
 -- | Sample standard deviation of the input values.
 stddevgg :: AggStdDev a b => E.Aggregator (Kol a) (Kol b)

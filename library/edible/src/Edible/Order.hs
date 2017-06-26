@@ -97,7 +97,7 @@ instance PGOrd T.PGFloat4
 instance PGOrd T.PGInt8
 instance PGOrd T.PGInt4
 instance PGOrd T.PGInt2
-instance PGOrd T.PGNumeric
+instance PGOrd T.PGRawNumeric
 instance PGOrd T.PGText
 instance PGOrd T.PGTime
 instance PGOrd T.PGTimestamptz
@@ -106,5 +106,5 @@ instance PGOrd T.PGCitext
 instance PGOrd T.PGUuid
 instance PGOrd a => PGOrd (C.Nullable a)
 
-instance PGOrd (T.PGSNumeric s)
+instance PGOrd (T.PGNumeric s)
 

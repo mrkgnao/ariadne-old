@@ -141,7 +141,7 @@ instance D.Default Constant (R.PGRange Int.Int64) (Column (T.PGRange T.PGInt8)) 
   def = Constant $ \(R.PGRange a b) -> T.pgRange T.pgInt8 a b
 
 -- TODO
---instance D.Default Constant (R.PGRange _) (Column (T.PGRange PGNumeric)) where
+--instance D.Default Constant (R.PGRange _) (Column (T.PGRange PGRawNumeric)) where
 
 instance D.Default Constant (R.PGRange Time.LocalTime) (Column (T.PGRange T.PGTimestamp)) where
   def = Constant $ \(R.PGRange a b) -> T.pgRange T.pgLocalTime a b

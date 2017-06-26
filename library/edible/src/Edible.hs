@@ -200,7 +200,7 @@ module Edible
  , E.PGInt8
  , E.PGJsonb
  , E.PGJson
- , E.PGSNumeric
+ , E.PGNumeric
  , E.PGText
  , E.PGTimestamptz
  , E.PGTimestamp

@@ -217,15 +217,15 @@ instance QueryRunnerColumnDefault T.PGJsonb String where
 instance QueryRunnerColumnDefault T.PGJsonb Ae.Value where
   queryRunnerColumnDefault = fieldQueryRunnerColumn
 
-instance QueryRunnerColumnDefault (T.PGSNumeric s) Rational where
+instance QueryRunnerColumnDefault (T.PGNumeric s) Rational where
   queryRunnerColumnDefault = fieldQueryRunnerColumn
   {-# INLINE queryRunnerColumnDefault #-}
 
-instance QueryRunnerColumnDefault (T.PGSNumeric s) Scientific where
+instance QueryRunnerColumnDefault (T.PGNumeric s) Scientific where
   queryRunnerColumnDefault = fieldQueryRunnerColumn
   {-# INLINE queryRunnerColumnDefault #-}
 
-instance QueryRunnerColumnDefault (T.PGSNumeric 0) Integer where
+instance QueryRunnerColumnDefault (T.PGNumeric 0) Integer where
   queryRunnerColumnDefault = fieldQueryRunnerColumn
   {-# INLINE queryRunnerColumnDefault #-}
 
