@@ -1,30 +1,30 @@
 -- | Postgres types and functions to create 'Column's of those types.
 -- You may find it more convenient to use "Edible.Constant" instead.
 
-{-# LANGUAGE EmptyDataDecls #-}
+{-# LANGUAGE EmptyDataDecls      #-}
 {-# LANGUAGE ScopedTypeVariables #-}
 
 module Edible.PGTypes (module Edible.PGTypes) where
 
-import           Edible.Internal.Column (Column)
-import qualified Edible.Internal.Column as C
-import qualified Edible.Internal.PGTypes as IPT
+import           Edible.Internal.Column                (Column)
+import qualified Edible.Internal.Column                as C
+import qualified Edible.Internal.PGTypes               as IPT
 
-import qualified Edible.Internal.HaskellDB.PrimQuery as HPQ
+import qualified Edible.Internal.HaskellDB.PrimQuery   as HPQ
 import qualified Edible.Internal.HaskellDB.Sql.Default as HSD
 
-import qualified Data.CaseInsensitive as CI
-import qualified Data.Aeson as Ae
-import qualified Data.Text as SText
-import qualified Data.Text.Lazy as LText
-import qualified Data.ByteString as SByteString
-import qualified Data.ByteString.Lazy as LByteString
-import qualified Data.Time as Time
-import qualified Data.UUID as UUID
+import qualified Data.Aeson                            as Ae
+import qualified Data.ByteString                       as SByteString
+import qualified Data.ByteString.Lazy                  as LByteString
+import qualified Data.CaseInsensitive                  as CI
+import qualified Data.Text                             as SText
+import qualified Data.Text.Lazy                        as LText
+import qualified Data.Time                             as Time
+import qualified Data.UUID                             as UUID
 
-import           Data.Int (Int64)
+import           Data.Int                              (Int64)
 
-import qualified Database.PostgreSQL.Simple.Range as R
+import qualified Database.PostgreSQL.Simple.Range      as R
 
 instance C.PGNum PGFloat8 where
   pgFromInteger = pgDouble . fromInteger
