@@ -38,14 +38,14 @@ module Tisch.Internal.Aggregation
   ) where
 
 import qualified Data.Profunctor                     as P
-import           GHC.TypeLits                        (type (+), CmpNat,
-                                                      KnownNat)
 import qualified Edible.Aggregate                    as E
 import qualified Edible.Internal.Aggregate           as OI
 import qualified Edible.Internal.Column              as OI
 import qualified Edible.Internal.HaskellDB.PrimQuery as HDB
 import qualified Edible.Order                        as E
 import qualified Edible.PGTypes                      as E
+import           GHC.TypeLits                        (type (+), CmpNat,
+                                                      KnownNat)
 
 
 import           Tisch.Internal.Fun                  (PgEq, PgIntegral, PgNum,
@@ -96,22 +96,23 @@ orderAggregator = OI.orderAggregate
 
 --------------------------------------------------------------------------------
 
--- | Given a 'Query' producing rows of type @a@ and an 'Aggregator' accepting
--- rows of type @a@, apply the aggregator to the results of the query.
---
--- Please note that when aggregating an empty query with no @GROUP BY@ clause,
--- @tisch@'s behaviour differs from Postgres's behaviour. PostgreSQL
--- returns a single row whereas @tisch@ returns zero rows.
--- @tisch@'s behaviour is consistent with the meaning of aggregating over
--- groups of rows, while PostgreSQL's behaviour is. When a query has zero rows
--- it has zero groups, and thus zero rows in the result of an aggregation.
---
--- If you simply want to count the number of rows in a query you might find the
--- 'countRows' function more convenient.
---
--- By design there is no aggregation function of type @Aggregator a b ->
--- Query d x a -> QueryArr d x b@, as such a function would allow violation of
--- SQL's scoping rules and lead to invalid queries.
+{-| Given a 'Query' producing rows of type @a@ and an 'Aggregator' accepting
+    rows of type @a@, apply the aggregator to the results of the query.
+
+    Please note that when aggregating an empty query with no @GROUP BY@ clause,
+    @tisch@'s behaviour differs from Postgres's behaviour. PostgreSQL
+    returns a single row whereas @tisch@ returns zero rows.
+    @tisch@'s behaviour is consistent with the meaning of aggregating over
+    groups of rows, unlike PostgreSQL's behaviour: when a query has zero rows
+    it has zero groups, and thus zero rows in the result of an aggregation.
+
+    If you simply want to count the number of rows in a query you might find the
+    'countRows' function more convenient.
+
+    By design there is no aggregation function of type @Aggregator a b ->
+    Query d x a -> QueryArr d x b@, as such a function would allow violation of
+    SQL's scoping rules and lead to invalid queries.
+-}
 aggregate :: E.Aggregator a b -> Query d () a -> Query d () b
 aggregate f = Query . E.aggregate f . unQuery
 
