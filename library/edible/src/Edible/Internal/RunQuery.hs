@@ -46,9 +46,9 @@ import           Data.Typeable (Typeable)
 
 -- }
 
--- | A 'QueryRunnerColumn' @pgType@ @haskellType@ encodes how to turn
+-- | A 'QueryRunnerColumn' @pgType@ @hsType@ encodes how to turn
 -- a value of Postgres type @pgType@ into a value of Haskell type
--- @haskellType@.  For example a value of type 'QueryRunnerColumn'
+-- @hsType@.  For example a value of type 'QueryRunnerColumn'
 -- 'T.PGText' 'String' encodes how to turn a 'T.PGText' result from the
 -- database into a Haskell 'String'.
 
@@ -60,8 +60,8 @@ import           Data.Typeable (Typeable)
 -- be that we can't add nullability to a RowParser, only to a
 -- FieldParser, so we have to have some type that we know contains
 -- just a FieldParser.
-data QueryRunnerColumn pgType haskellType =
-  QueryRunnerColumn (U.Unpackspec (Column pgType) ()) (FieldParser haskellType)
+data QueryRunnerColumn pgType hsType =
+  QueryRunnerColumn (U.Unpackspec (Column pgType) ()) (FieldParser hsType)
 
 instance Functor (QueryRunnerColumn u) where
   fmap f ~(QueryRunnerColumn u fp) = QueryRunnerColumn u ((fmap . fmap . fmap) f fp)
@@ -123,9 +123,9 @@ instance QueryRunnerColumnDefault a b =>
 -- { Instances that must be provided once for each type.  Instances
 --   for Nullable are derived automatically from these.
 
--- | A 'QueryRunnerColumnDefault' @pgType@ @haskellType@ represents
+-- | A 'QueryRunnerColumnDefault' @pgType@ @hsType@ represents
 -- the default way to turn a @pgType@ result from the database into a
--- Haskell value of type @haskellType@.
+-- Haskell value of type @hsType@.
 --
 -- Creating an instance of 'QueryRunnerColumnDefault' for your own types is
 -- necessary for retrieving those types from the database.
@@ -133,7 +133,7 @@ instance QueryRunnerColumnDefault a b =>
 -- You should use one of the three methods below for writing a
 -- 'QueryRunnerColumnDefault' instance.
 --
--- 1. If you already have a 'FromField' instance for your @haskellType@, use
+-- 1. If you already have a 'FromField' instance for your @hsType@, use
 -- 'fieldQueryRunnerColumn'.  (This is how most of the built-in instances are
 -- defined.)
 --
@@ -144,8 +144,8 @@ instance QueryRunnerColumnDefault a b =>
 -- 3. If you have a more complicated case, but not a 'FromField' instance,
 -- write a 'FieldParser' for your type and use 'fieldParserQueryRunnerColumn'.
 -- You can also add a 'FromField' instance using this.
-class QueryRunnerColumnDefault pgType haskellType where
-  queryRunnerColumnDefault :: QueryRunnerColumn pgType haskellType
+class QueryRunnerColumnDefault pgType hsType where
+  queryRunnerColumnDefault :: QueryRunnerColumn pgType hsType
 
 instance QueryRunnerColumnDefault T.PGInt4 Int where
   queryRunnerColumnDefault = fieldQueryRunnerColumn
