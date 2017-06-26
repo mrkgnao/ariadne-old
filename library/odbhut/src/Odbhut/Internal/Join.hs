@@ -1,16 +1,16 @@
 {-# LANGUAGE FlexibleContexts, FlexibleInstances, MultiParamTypeClasses #-}
 
-module Opaleye.Internal.Join where
+module Odbhut.Internal.Join where
 
-import qualified Opaleye.Internal.HaskellDB.PrimQuery as HPQ
-import qualified Opaleye.Internal.PackMap             as PM
-import qualified Opaleye.Internal.Tag                 as T
-import qualified Opaleye.Internal.Unpackspec          as U
-import           Opaleye.Internal.Column (Column(Column), Nullable)
-import qualified Opaleye.Internal.QueryArr as Q
-import qualified Opaleye.Internal.PrimQuery as PQ
-import qualified Opaleye.PGTypes as T
-import qualified Opaleye.Column as C
+import qualified Odbhut.Internal.HaskellDB.PrimQuery as HPQ
+import qualified Odbhut.Internal.PackMap             as PM
+import qualified Odbhut.Internal.Tag                 as T
+import qualified Odbhut.Internal.Unpackspec          as U
+import           Odbhut.Internal.Column (Column(Column), Nullable)
+import qualified Odbhut.Internal.QueryArr as Q
+import qualified Odbhut.Internal.PrimQuery as PQ
+import qualified Odbhut.PGTypes as T
+import qualified Odbhut.Column as C
 
 import qualified Control.Applicative as A
 

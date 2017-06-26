@@ -1,10 +1,10 @@
 {-# LANGUAGE MultiParamTypeClasses, FlexibleInstances #-}
 
-module Opaleye.Internal.Unpackspec where
+module Odbhut.Internal.Unpackspec where
 
-import qualified Opaleye.Internal.PackMap as PM
-import qualified Opaleye.Internal.Column as IC
-import qualified Opaleye.Column as C
+import qualified Odbhut.Internal.PackMap as PM
+import qualified Odbhut.Internal.Column as IC
+import qualified Odbhut.Column as C
 
 import           Control.Applicative (Applicative, pure, (<*>))
 import           Data.Profunctor (Profunctor, dimap)
@@ -12,7 +12,7 @@ import           Data.Profunctor.Product (ProductProfunctor, empty, (***!))
 import qualified Data.Profunctor.Product as PP
 import qualified Data.Profunctor.Product.Default as D
 
-import qualified Opaleye.Internal.HaskellDB.PrimQuery as HPQ
+import qualified Odbhut.Internal.HaskellDB.PrimQuery as HPQ
 
 newtype Unpackspec columns columns' =
   -- | An 'Unpackspec' @columns@ @columns'@ allows you to extract and

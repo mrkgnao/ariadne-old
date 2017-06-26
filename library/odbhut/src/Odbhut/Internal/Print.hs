@@ -1,9 +1,9 @@
-module Opaleye.Internal.Print where
+module Odbhut.Internal.Print where
 
 import           Prelude hiding (product)
 
-import qualified Opaleye.Internal.Sql as Sql
-import           Opaleye.Internal.Sql (Select(SelectFrom,
+import qualified Odbhut.Internal.Sql as Sql
+import           Odbhut.Internal.Sql (Select(SelectFrom,
                                               Table,
                                               RelExpr,
                                               SelectJoin,
@@ -13,8 +13,8 @@ import           Opaleye.Internal.Sql (Select(SelectFrom,
                                               SelectExists),
                                        From, Join, Values, Binary, Label, Exists)
 
-import qualified Opaleye.Internal.HaskellDB.Sql as HSql
-import qualified Opaleye.Internal.HaskellDB.Sql.Print as HPrint
+import qualified Odbhut.Internal.HaskellDB.Sql as HSql
+import qualified Odbhut.Internal.HaskellDB.Sql.Print as HPrint
 
 import           Text.PrettyPrint.HughesPJ (Doc, ($$), (<+>), text, empty,
                                             parens)

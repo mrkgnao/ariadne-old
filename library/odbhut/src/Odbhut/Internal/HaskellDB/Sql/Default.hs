@@ -2,16 +2,16 @@
 --                HWT Group (c) 2003, haskelldb-users@lists.sourceforge.net
 -- License     :  BSD-style
 
-module Opaleye.Internal.HaskellDB.Sql.Default  where
+module Odbhut.Internal.HaskellDB.Sql.Default  where
 
 import Control.Applicative ((<$>))
 
-import Opaleye.Internal.HaskellDB.PrimQuery
-import qualified Opaleye.Internal.HaskellDB.PrimQuery as PQ
-import Opaleye.Internal.HaskellDB.Sql
-import Opaleye.Internal.HaskellDB.Sql.Generate
-import qualified Opaleye.Internal.HaskellDB.Sql as Sql
-import Opaleye.Internal.Tag (tagWith)
+import Odbhut.Internal.HaskellDB.PrimQuery
+import qualified Odbhut.Internal.HaskellDB.PrimQuery as PQ
+import Odbhut.Internal.HaskellDB.Sql
+import Odbhut.Internal.HaskellDB.Sql.Generate
+import qualified Odbhut.Internal.HaskellDB.Sql as Sql
+import Odbhut.Internal.Tag (tagWith)
 import Data.ByteString (ByteString)
 import qualified Data.ByteString.Char8 as BS8
 import qualified Data.ByteString.Base16 as Base16

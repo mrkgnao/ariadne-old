@@ -1,17 +1,17 @@
 -- | Postgres types and functions to create 'Column's of those types.
--- You may find it more convenient to use "Opaleye.Constant" instead.
+-- You may find it more convenient to use "Odbhut.Constant" instead.
 
 {-# LANGUAGE EmptyDataDecls #-}
 {-# LANGUAGE ScopedTypeVariables #-}
 
-module Opaleye.PGTypes (module Opaleye.PGTypes) where
+module Odbhut.PGTypes (module Odbhut.PGTypes) where
 
-import           Opaleye.Internal.Column (Column)
-import qualified Opaleye.Internal.Column as C
-import qualified Opaleye.Internal.PGTypes as IPT
+import           Odbhut.Internal.Column (Column)
+import qualified Odbhut.Internal.Column as C
+import qualified Odbhut.Internal.PGTypes as IPT
 
-import qualified Opaleye.Internal.HaskellDB.PrimQuery as HPQ
-import qualified Opaleye.Internal.HaskellDB.Sql.Default as HSD
+import qualified Odbhut.Internal.HaskellDB.PrimQuery as HPQ
+import qualified Odbhut.Internal.HaskellDB.Sql.Default as HSD
 
 import qualified Data.CaseInsensitive as CI
 import qualified Data.Aeson as Ae
@@ -247,11 +247,11 @@ data PGRange a
 literalColumn :: HPQ.Literal -> Column a
 literalColumn = IPT.literalColumn
 {-# WARNING literalColumn
-    "'literalColumn' has been moved to Opaleye.Internal.PGTypes and will be deprecated in version 0.6"
+    "'literalColumn' has been moved to Odbhut.Internal.PGTypes and will be deprecated in version 0.6"
   #-}
 
 unsafePgFormatTime :: Time.FormatTime t => HPQ.Name -> String -> t -> Column c
 unsafePgFormatTime = IPT.unsafePgFormatTime
 {-# WARNING unsafePgFormatTime
-    "'unsafePgFormatTime' has been moved to Opaleye.Internal.PGTypes and will be deprecated in version 0.6"
+    "'unsafePgFormatTime' has been moved to Odbhut.Internal.PGTypes and will be deprecated in version 0.6"
   #-}

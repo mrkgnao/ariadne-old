@@ -2,9 +2,9 @@
 --                HWT Group (c) 2003, haskelldb-users@lists.sourceforge.net
 -- License     :  BSD-style
 
-module Opaleye.Internal.HaskellDB.PrimQuery where
+module Odbhut.Internal.HaskellDB.PrimQuery where
 
-import qualified Opaleye.Internal.Tag as T
+import qualified Odbhut.Internal.Tag as T
 import Data.ByteString (ByteString)
 import qualified Data.List.NonEmpty as NEL
 

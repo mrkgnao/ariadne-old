@@ -1,10 +1,10 @@
 {-# LANGUAGE MultiParamTypeClasses, FlexibleInstances #-}
 
-module Opaleye.Internal.TableMaker where
+module Odbhut.Internal.TableMaker where
 
-import qualified Opaleye.Column as C
-import qualified Opaleye.Internal.Column as IC
-import qualified Opaleye.Internal.PackMap as PM
+import qualified Odbhut.Column as C
+import qualified Odbhut.Internal.Column as IC
+import qualified Odbhut.Internal.PackMap as PM
 
 import           Data.Profunctor (Profunctor, dimap)
 import           Data.Profunctor.Product (ProductProfunctor, empty, (***!))
@@ -13,7 +13,7 @@ import           Data.Profunctor.Product.Default (Default, def)
 
 import           Control.Applicative (Applicative, pure, (<*>))
 
-import qualified Opaleye.Internal.HaskellDB.PrimQuery as HPQ
+import qualified Odbhut.Internal.HaskellDB.PrimQuery as HPQ
 
 
 -- If we switch to a more lens-like approach to PackMap this should be

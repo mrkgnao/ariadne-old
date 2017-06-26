@@ -2,12 +2,12 @@
 --
 -- The interface in this module is much nicer than the standard \"make
 -- missing rows NULL\" interface that SQL provides.  If you really
--- want the standard interface then use "Opaleye.Join".
+-- want the standard interface then use "Odbhut.Join".
 
 {-# LANGUAGE FlexibleContexts      #-}
 {-# LANGUAGE MultiParamTypeClasses #-}
 
-module Opaleye.FunctionalJoin where
+module Odbhut.FunctionalJoin where
 
 import           Control.Applicative             ((<$>), (<*>))
 import           Control.Arrow                   ((<<<))
@@ -15,15 +15,15 @@ import           Control.Arrow                   ((<<<))
 import qualified Data.Profunctor.Product.Default as D
 import qualified Data.Profunctor.Product         as PP
 
-import qualified Opaleye.Column                  as C
-import           Opaleye.Internal.Column         (Column, Nullable)
-import qualified Opaleye.Internal.Join           as IJ
-import qualified Opaleye.Internal.Operators      as IO
-import qualified Opaleye.Internal.Unpackspec     as IU
-import qualified Opaleye.Join                    as J
-import qualified Opaleye.PGTypes                 as T
-import qualified Opaleye.Operators               as O
-import           Opaleye.QueryArr                (Query)
+import qualified Odbhut.Column                  as C
+import           Odbhut.Internal.Column         (Column, Nullable)
+import qualified Odbhut.Internal.Join           as IJ
+import qualified Odbhut.Internal.Operators      as IO
+import qualified Odbhut.Internal.Unpackspec     as IU
+import qualified Odbhut.Join                    as J
+import qualified Odbhut.PGTypes                 as T
+import qualified Odbhut.Operators               as O
+import           Odbhut.QueryArr                (Query)
 
 joinF :: (columnsL -> columnsR -> columnsResult)
       -- ^ Calculate result columns from input columns

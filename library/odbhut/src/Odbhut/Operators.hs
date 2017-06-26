@@ -4,27 +4,27 @@
 -- | Operators on 'Column's.  Please note that numeric 'Column' types
 -- are instances of 'Num', so you can use '*', '/', '+', '-' on them.
 
-module Opaleye.Operators (module Opaleye.Operators) where
+module Odbhut.Operators (module Odbhut.Operators) where
 
 import qualified Control.Arrow as A
 import qualified Data.Foldable as F
 import qualified Data.List.NonEmpty as NEL
 
-import           Opaleye.Internal.Column (Column(Column), unsafeCase_,
+import           Odbhut.Internal.Column (Column(Column), unsafeCase_,
                                           unsafeIfThenElse, unsafeGt)
-import qualified Opaleye.Internal.Column as C
-import           Opaleye.Internal.QueryArr (QueryArr(QueryArr), Query, runSimpleQueryArr)
-import qualified Opaleye.Internal.PrimQuery as PQ
-import qualified Opaleye.Internal.Operators as O
-import           Opaleye.Internal.Helpers   ((.:))
-import qualified Opaleye.Order as Ord
-import qualified Opaleye.PGTypes as T
+import qualified Odbhut.Internal.Column as C
+import           Odbhut.Internal.QueryArr (QueryArr(QueryArr), Query, runSimpleQueryArr)
+import qualified Odbhut.Internal.PrimQuery as PQ
+import qualified Odbhut.Internal.Operators as O
+import           Odbhut.Internal.Helpers   ((.:))
+import qualified Odbhut.Order as Ord
+import qualified Odbhut.PGTypes as T
 
-import qualified Opaleye.Column   as Column
-import qualified Opaleye.Distinct as Distinct
-import qualified Opaleye.Join     as Join
+import qualified Odbhut.Column   as Column
+import qualified Odbhut.Distinct as Distinct
+import qualified Odbhut.Join     as Join
 
-import qualified Opaleye.Internal.HaskellDB.PrimQuery as HPQ
+import qualified Odbhut.Internal.HaskellDB.PrimQuery as HPQ
 
 import qualified Data.Profunctor.Product.Default as D
 
@@ -80,7 +80,7 @@ infix 4 ./==
 -- you have run `makeAdaptorAndInstance` on.  This may be unified with
 -- `./=` in a future version.
 (./==) :: D.Default O.EqPP columns columns => columns -> columns -> Column T.PGBool
-(./==) = Opaleye.Operators.not .: (O..==)
+(./==) = Odbhut.Operators.not .: (O..==)
 
 -- * Comparison operators
 
@@ -213,7 +213,7 @@ inQuery c q = qj'
 
         -- Check whether it is 'NULL'
         qj' :: Query (Column T.PGBool)
-        qj' = A.arr (Opaleye.Operators.not
+        qj' = A.arr (Odbhut.Operators.not
                      . Column.isNull
                      . snd)
               A.<<< qj

@@ -1,4 +1,4 @@
-module Opaleye.Internal.Helpers where
+module Odbhut.Internal.Helpers where
 
 infixr 8 .:
 

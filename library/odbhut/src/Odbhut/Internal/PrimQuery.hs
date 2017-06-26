@@ -1,11 +1,11 @@
-module Opaleye.Internal.PrimQuery where
+module Odbhut.Internal.PrimQuery where
 
 import           Prelude hiding (product)
 
 import qualified Data.List.NonEmpty as NEL
-import qualified Opaleye.Internal.HaskellDB.Sql as HSql
-import qualified Opaleye.Internal.HaskellDB.PrimQuery as HPQ
-import           Opaleye.Internal.HaskellDB.PrimQuery (Symbol)
+import qualified Odbhut.Internal.HaskellDB.Sql as HSql
+import qualified Odbhut.Internal.HaskellDB.PrimQuery as HPQ
+import           Odbhut.Internal.HaskellDB.PrimQuery (Symbol)
 
 data LimitOp = LimitOp Int | OffsetOp Int | LimitOffsetOp Int Int
              deriving Show

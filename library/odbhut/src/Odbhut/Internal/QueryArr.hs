@@ -1,13 +1,13 @@
-module Opaleye.Internal.QueryArr where
+module Odbhut.Internal.QueryArr where
 
 import           Prelude hiding (id)
 
-import qualified Opaleye.Internal.Unpackspec as U
-import qualified Opaleye.Internal.Tag as Tag
-import           Opaleye.Internal.Tag (Tag)
-import qualified Opaleye.Internal.PrimQuery as PQ
+import qualified Odbhut.Internal.Unpackspec as U
+import qualified Odbhut.Internal.Tag as Tag
+import           Odbhut.Internal.Tag (Tag)
+import qualified Odbhut.Internal.PrimQuery as PQ
 
-import qualified Opaleye.Internal.HaskellDB.PrimQuery as HPQ
+import qualified Odbhut.Internal.HaskellDB.PrimQuery as HPQ
 
 import qualified Control.Arrow as Arr
 import           Control.Arrow ((&&&), (***), arr)

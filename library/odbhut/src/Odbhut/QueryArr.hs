@@ -1,6 +1,6 @@
 -- | 'Query' and 'QueryArr' are the composable units of database
--- querying that are used in Opaleye.
+-- querying that are used in Odbhut.
 
-module Opaleye.QueryArr (Query, QueryArr) where
+module Odbhut.QueryArr (Query, QueryArr) where
 
-import           Opaleye.Internal.QueryArr (QueryArr, Query)
+import           Odbhut.Internal.QueryArr (QueryArr, Query)

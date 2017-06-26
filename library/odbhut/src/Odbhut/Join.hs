@@ -1,6 +1,6 @@
 -- | Left, right, and full outer joins.
 --
--- "Opaleye.FunctionalJoin" provides a much nicer, Haskelly, interface
+-- "Odbhut.FunctionalJoin" provides a much nicer, Haskelly, interface
 -- to joins than this module, which sticks to the (horrible) standard
 -- \"make missing rows NULL\" interface that SQL provides.
 --
@@ -15,7 +15,7 @@
 -- @
 -- leftJoin :: Query (Column a, Column b)
 --          -> Query (Column c, Column (Nullable d))
---          -> (((Column a, Column b), (Column c, Column (Nullable d))) -> Column 'Opaleye.PGTypes.PGBool')
+--          -> (((Column a, Column b), (Column c, Column (Nullable d))) -> Column 'Odbhut.PGTypes.PGBool')
 --          -> Query ((Column a, Column b), (Column (Nullable c), Column (Nullable d)))
 -- @
 
@@ -23,14 +23,14 @@
 {-# LANGUAGE FlexibleInstances     #-}
 {-# LANGUAGE MultiParamTypeClasses #-}
 
-module Opaleye.Join where
+module Odbhut.Join where
 
-import qualified Opaleye.Internal.Unpackspec as U
-import qualified Opaleye.Internal.Join as J
-import qualified Opaleye.Internal.PrimQuery as PQ
-import           Opaleye.QueryArr (Query)
-import           Opaleye.Internal.Column (Column)
-import qualified Opaleye.PGTypes as T
+import qualified Odbhut.Internal.Unpackspec as U
+import qualified Odbhut.Internal.Join as J
+import qualified Odbhut.Internal.PrimQuery as PQ
+import           Odbhut.QueryArr (Query)
+import           Odbhut.Internal.Column (Column)
+import qualified Odbhut.PGTypes as T
 
 import qualified Data.Profunctor.Product.Default as D
 

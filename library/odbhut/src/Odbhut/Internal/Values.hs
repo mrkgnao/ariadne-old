@@ -1,13 +1,13 @@
 {-# LANGUAGE FlexibleInstances, MultiParamTypeClasses #-}
 
-module Opaleye.Internal.Values where
+module Odbhut.Internal.Values where
 
-import           Opaleye.Internal.Column (Column(Column))
-import qualified Opaleye.Internal.Unpackspec as U
-import qualified Opaleye.Internal.Tag as T
-import qualified Opaleye.Internal.PrimQuery as PQ
-import qualified Opaleye.Internal.PackMap as PM
-import qualified Opaleye.Internal.HaskellDB.PrimQuery as HPQ
+import           Odbhut.Internal.Column (Column(Column))
+import qualified Odbhut.Internal.Unpackspec as U
+import qualified Odbhut.Internal.Tag as T
+import qualified Odbhut.Internal.PrimQuery as PQ
+import qualified Odbhut.Internal.PackMap as PM
+import qualified Odbhut.Internal.HaskellDB.PrimQuery as HPQ
 
 import qualified Data.List.NonEmpty as NEL
 import           Data.Profunctor (Profunctor, dimap, rmap)

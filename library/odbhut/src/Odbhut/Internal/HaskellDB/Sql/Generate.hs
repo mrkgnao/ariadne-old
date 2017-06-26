@@ -2,10 +2,10 @@
 --                HWT Group (c) 2003, haskelldb-users@lists.sourceforge.net
 -- License     :  BSD-style
 
-module Opaleye.Internal.HaskellDB.Sql.Generate (SqlGenerator(..)) where
+module Odbhut.Internal.HaskellDB.Sql.Generate (SqlGenerator(..)) where
 
-import Opaleye.Internal.HaskellDB.PrimQuery
-import Opaleye.Internal.HaskellDB.Sql
+import Odbhut.Internal.HaskellDB.PrimQuery
+import Odbhut.Internal.HaskellDB.Sql
 
 import qualified Data.List.NonEmpty as NEL
 

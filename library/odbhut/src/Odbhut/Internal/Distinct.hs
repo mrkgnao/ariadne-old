@@ -1,10 +1,10 @@
 {-# LANGUAGE MultiParamTypeClasses #-}
 
-module Opaleye.Internal.Distinct where
+module Odbhut.Internal.Distinct where
 
-import           Opaleye.QueryArr (Query)
-import           Opaleye.Column (Column)
-import           Opaleye.Aggregate (Aggregator, groupBy, aggregate)
+import           Odbhut.QueryArr (Query)
+import           Odbhut.Column (Column)
+import           Odbhut.Aggregate (Aggregator, groupBy, aggregate)
 
 import           Control.Applicative (Applicative, pure, (<*>))
 

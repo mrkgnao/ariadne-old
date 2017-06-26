@@ -1,16 +1,16 @@
-module Opaleye.Internal.Sql where
+module Odbhut.Internal.Sql where
 
 import           Prelude hiding (product)
 
-import qualified Opaleye.Internal.PrimQuery as PQ
+import qualified Odbhut.Internal.PrimQuery as PQ
 
-import qualified Opaleye.Internal.HaskellDB.PrimQuery as HPQ
-import           Opaleye.Internal.HaskellDB.PrimQuery (Symbol(Symbol))
-import qualified Opaleye.Internal.HaskellDB.Sql as HSql
-import qualified Opaleye.Internal.HaskellDB.Sql.Default as SD
-import qualified Opaleye.Internal.HaskellDB.Sql.Print as SP
-import qualified Opaleye.Internal.HaskellDB.Sql.Generate as SG
-import qualified Opaleye.Internal.Tag as T
+import qualified Odbhut.Internal.HaskellDB.PrimQuery as HPQ
+import           Odbhut.Internal.HaskellDB.PrimQuery (Symbol(Symbol))
+import qualified Odbhut.Internal.HaskellDB.Sql as HSql
+import qualified Odbhut.Internal.HaskellDB.Sql.Default as SD
+import qualified Odbhut.Internal.HaskellDB.Sql.Print as SP
+import qualified Odbhut.Internal.HaskellDB.Sql.Generate as SG
+import qualified Odbhut.Internal.Tag as T
 
 import qualified Data.List.NonEmpty as NEL
 import qualified Data.Maybe as M

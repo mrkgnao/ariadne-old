@@ -1,10 +1,10 @@
 {-# LANGUAGE Rank2Types #-}
 
-module Opaleye.Internal.PackMap where
+module Odbhut.Internal.PackMap where
 
-import qualified Opaleye.Internal.Tag as T
+import qualified Odbhut.Internal.Tag as T
 
-import qualified Opaleye.Internal.HaskellDB.PrimQuery as HPQ
+import qualified Odbhut.Internal.HaskellDB.PrimQuery as HPQ
 
 import           Control.Applicative (Applicative, pure, (<*>), liftA2)
 import qualified Control.Monad.Trans.State as State

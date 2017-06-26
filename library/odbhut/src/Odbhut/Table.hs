@@ -54,24 +54,24 @@
 
 -}
 
-module Opaleye.Table (module Opaleye.Table,
+module Odbhut.Table (module Odbhut.Table,
                       -- * Other
                       View,
                       Writer,
                       T.Table(T.Table, T.TableWithSchema),
                       TableProperties) where
 
-import           Opaleye.Internal.Column (Column(Column))
-import qualified Opaleye.Internal.QueryArr as Q
-import qualified Opaleye.Internal.Table as T
-import           Opaleye.Internal.Table (View(View), Table, Writer,
+import           Odbhut.Internal.Column (Column(Column))
+import qualified Odbhut.Internal.QueryArr as Q
+import qualified Odbhut.Internal.Table as T
+import           Odbhut.Internal.Table (View(View), Table, Writer,
                                          TableProperties)
-import qualified Opaleye.Internal.TableMaker as TM
-import qualified Opaleye.Internal.Tag as Tag
+import qualified Odbhut.Internal.TableMaker as TM
+import qualified Odbhut.Internal.Tag as Tag
 
 import qualified Data.Profunctor.Product.Default as D
 
-import qualified Opaleye.Internal.HaskellDB.PrimQuery as HPQ
+import qualified Odbhut.Internal.HaskellDB.PrimQuery as HPQ
 
 -- | Example type specialization:
 --

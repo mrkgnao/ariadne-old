@@ -1,10 +1,10 @@
 {-# LANGUAGE FlexibleContexts, FlexibleInstances, MultiParamTypeClasses #-}
 
-module Opaleye.Constant where
+module Odbhut.Constant where
 
-import           Opaleye.Column                  (Column)
-import qualified Opaleye.Column                  as C
-import qualified Opaleye.PGTypes                 as T
+import           Odbhut.Column                  (Column)
+import qualified Odbhut.Column                  as C
+import qualified Odbhut.PGTypes                 as T
 
 import qualified Data.Aeson                      as Ae
 import qualified Data.CaseInsensitive            as CI
@@ -27,10 +27,10 @@ import           Data.Functor                    ((<$>))
 import qualified Database.PostgreSQL.Simple.Range as R
 
 -- | 'constant' provides a convenient typeclass wrapper around the
--- 'Column' creation functions in "Opaleye.PGTypes".  Besides
+-- 'Column' creation functions in "Odbhut.PGTypes".  Besides
 -- convenience it doesn't provide any additional functionality.
 --
--- It can be used with functions like 'Opaleye.Manipulation.runInsert'
+-- It can be used with functions like 'Odbhut.Manipulation.runInsert'
 -- to insert custom Haskell types into the database.
 -- The following is an example of a function for inserting custom types.
 --
@@ -38,10 +38,10 @@ import qualified Database.PostgreSQL.Simple.Range as R
 --   customInsert
 --      :: ( 'D.Default' 'Constant' haskells columns )
 --      => Connection
---      -> 'Opaleye.Table' columns columns'
+--      -> 'Odbhut.Table' columns columns'
 --      -> haskells
 --      -> IO Int64
---   customInsert conn table haskells = 'Opaleye.Manipulation.runInsert' conn table $ 'constant' haskells
+--   customInsert conn table haskells = 'Odbhut.Manipulation.runInsert' conn table $ 'constant' haskells
 -- @
 --
 -- In order to use this function with your custom types, you need to define an

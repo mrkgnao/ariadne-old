@@ -18,26 +18,26 @@
 --    (SELECT num FROM thetable ORDER BY num DESC LIMIT 1) + 1;
 -- @
 
-module Opaleye.Manipulation (module Opaleye.Manipulation,
+module Odbhut.Manipulation (module Odbhut.Manipulation,
                              -- * Other
                              U.Unpackspec) where
 
-import qualified Opaleye.Internal.Sql as Sql
-import qualified Opaleye.Internal.Print as Print
-import qualified Opaleye.RunQuery as RQ
-import qualified Opaleye.Internal.RunQuery as IRQ
-import qualified Opaleye.Table as T
-import qualified Opaleye.Internal.Table as TI
-import           Opaleye.Internal.Column (Column(Column))
-import           Opaleye.Internal.Helpers ((.:), (.:.), (.::), (.::.))
-import qualified Opaleye.Internal.PrimQuery as PQ
-import qualified Opaleye.Internal.Unpackspec as U
-import           Opaleye.PGTypes (PGBool)
+import qualified Odbhut.Internal.Sql as Sql
+import qualified Odbhut.Internal.Print as Print
+import qualified Odbhut.RunQuery as RQ
+import qualified Odbhut.Internal.RunQuery as IRQ
+import qualified Odbhut.Table as T
+import qualified Odbhut.Internal.Table as TI
+import           Odbhut.Internal.Column (Column(Column))
+import           Odbhut.Internal.Helpers ((.:), (.:.), (.::), (.::.))
+import qualified Odbhut.Internal.PrimQuery as PQ
+import qualified Odbhut.Internal.Unpackspec as U
+import           Odbhut.PGTypes (PGBool)
 
-import qualified Opaleye.Internal.HaskellDB.Sql as HSql
-import qualified Opaleye.Internal.HaskellDB.Sql.Print as HPrint
-import qualified Opaleye.Internal.HaskellDB.Sql.Default as SD
-import qualified Opaleye.Internal.HaskellDB.Sql.Generate as SG
+import qualified Odbhut.Internal.HaskellDB.Sql as HSql
+import qualified Odbhut.Internal.HaskellDB.Sql.Print as HPrint
+import qualified Odbhut.Internal.HaskellDB.Sql.Default as SD
+import qualified Odbhut.Internal.HaskellDB.Sql.Generate as SG
 
 import qualified Database.PostgreSQL.Simple as PGS
 

@@ -29,11 +29,11 @@
 
 {-# LANGUAGE MultiParamTypeClasses, FlexibleContexts #-}
 
-module Opaleye.Binary where
+module Odbhut.Binary where
 
-import           Opaleye.QueryArr (Query)
-import qualified Opaleye.Internal.Binary as B
-import qualified Opaleye.Internal.PrimQuery as PQ
+import           Odbhut.QueryArr (Query)
+import qualified Odbhut.Internal.Binary as B
+import qualified Odbhut.Internal.PrimQuery as PQ
 
 import           Data.Profunctor.Product.Default (Default, def)
 

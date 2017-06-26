@@ -4,7 +4,7 @@
 -- Please note that numeric 'Column' types are instances of 'Num', so
 -- you can use '*', '/', '+', '-' on them.
 
-module Opaleye.Column (-- * 'Column'
+module Odbhut.Column (-- * 'Column'
                        Column,
                        -- * Working with @NULL@
                        Nullable,
@@ -20,13 +20,13 @@ module Opaleye.Column (-- * 'Column'
                        unsafeCoerceColumn,
                        unsafeCompositeField,
                        -- * Entire module
-                       module Opaleye.Column)  where
+                       module Odbhut.Column)  where
 
-import           Opaleye.Internal.Column (Column, Nullable, unsafeCoerce, unsafeCoerceColumn,
+import           Odbhut.Internal.Column (Column, Nullable, unsafeCoerce, unsafeCoerceColumn,
                                           unsafeCast, unsafeCompositeField)
-import qualified Opaleye.Internal.Column as C
-import qualified Opaleye.Internal.HaskellDB.PrimQuery as HPQ
-import qualified Opaleye.PGTypes as T
+import qualified Odbhut.Internal.Column as C
+import qualified Odbhut.Internal.HaskellDB.PrimQuery as HPQ
+import qualified Odbhut.PGTypes as T
 import           Prelude hiding (null)
 
 -- | A NULL of any type
@@ -41,7 +41,7 @@ isNull = C.unOp HPQ.OpIsNull
 -- otherwise map the underlying @Column a@ using the provided
 -- function.
 --
--- The Opaleye equivalent of 'Data.Maybe.maybe'.
+-- The Odbhut equivalent of 'Data.Maybe.maybe'.
 matchNullable :: Column b -> (Column a -> Column b) -> Column (Nullable a)
               -> Column b
 matchNullable replacement f x = C.unsafeIfThenElse (isNull x) replacement
@@ -50,13 +50,13 @@ matchNullable replacement f x = C.unsafeIfThenElse (isNull x) replacement
 -- | If the @Column (Nullable a)@ is NULL then return the provided
 -- @Column a@ otherwise return the underlying @Column a@.
 --
--- The Opaleye equivalent of 'Data.Maybe.fromMaybe'.
+-- The Odbhut equivalent of 'Data.Maybe.fromMaybe'.
 fromNullable :: Column a -> Column (Nullable a) -> Column a
 fromNullable = flip matchNullable id
 
 -- | Treat a column as though it were nullable.  This is always safe.
 --
--- The Opaleye equivalent of 'Data.Maybe.Just'.
+-- The Odbhut equivalent of 'Data.Maybe.Just'.
 toNullable :: Column a -> Column (Nullable a)
 toNullable = unsafeCoerceColumn
 

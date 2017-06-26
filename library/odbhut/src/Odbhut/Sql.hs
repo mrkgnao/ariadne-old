@@ -1,17 +1,17 @@
 {-# LANGUAGE FlexibleContexts, ScopedTypeVariables #-}
 
-module Opaleye.Sql where
+module Odbhut.Sql where
 
-import qualified Opaleye.Internal.HaskellDB.PrimQuery as HPQ
+import qualified Odbhut.Internal.HaskellDB.PrimQuery as HPQ
 
-import qualified Opaleye.Internal.Unpackspec as U
-import qualified Opaleye.Internal.Sql as Sql
-import qualified Opaleye.Internal.Print as Pr
-import qualified Opaleye.Internal.PrimQuery as PQ
-import qualified Opaleye.Internal.Optimize as Op
-import           Opaleye.Internal.Helpers ((.:))
-import qualified Opaleye.Internal.QueryArr as Q
-import qualified Opaleye.Internal.Tag as T
+import qualified Odbhut.Internal.Unpackspec as U
+import qualified Odbhut.Internal.Sql as Sql
+import qualified Odbhut.Internal.Print as Pr
+import qualified Odbhut.Internal.PrimQuery as PQ
+import qualified Odbhut.Internal.Optimize as Op
+import           Odbhut.Internal.Helpers ((.:))
+import qualified Odbhut.Internal.QueryArr as Q
+import qualified Odbhut.Internal.Tag as T
 
 import qualified Data.Profunctor.Product.Default as D
 

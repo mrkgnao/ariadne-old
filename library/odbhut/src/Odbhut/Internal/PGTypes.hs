@@ -1,7 +1,7 @@
-module Opaleye.Internal.PGTypes where
+module Odbhut.Internal.PGTypes where
 
-import           Opaleye.Internal.Column (Column(Column))
-import qualified Opaleye.Internal.HaskellDB.PrimQuery as HPQ
+import           Odbhut.Internal.Column (Column(Column))
+import qualified Odbhut.Internal.HaskellDB.PrimQuery as HPQ
 
 import qualified Data.Text as SText
 import qualified Data.Text.Encoding as STextEncoding

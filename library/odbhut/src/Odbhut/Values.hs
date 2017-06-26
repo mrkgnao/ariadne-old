@@ -1,11 +1,11 @@
 {-# LANGUAGE FlexibleContexts #-}
 
-module Opaleye.Values where
+module Odbhut.Values where
 
-import qualified Opaleye.Internal.QueryArr as Q
-import           Opaleye.QueryArr (Query)
-import           Opaleye.Internal.Values as V
-import qualified Opaleye.Internal.Unpackspec as U
+import qualified Odbhut.Internal.QueryArr as Q
+import           Odbhut.QueryArr (Query)
+import           Odbhut.Internal.Values as V
+import qualified Odbhut.Internal.Unpackspec as U
 
 import           Data.Profunctor.Product.Default (Default, def)
 

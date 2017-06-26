@@ -2,7 +2,7 @@
 --                HWT Group (c) 2003, haskelldb-users@lists.sourceforge.net
 -- License     :  BSD-style
 
-module Opaleye.Internal.HaskellDB.Sql where
+module Odbhut.Internal.HaskellDB.Sql where
 
 
 import qualified Data.List.NonEmpty as NEL

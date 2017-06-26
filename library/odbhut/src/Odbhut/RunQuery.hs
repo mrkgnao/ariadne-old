@@ -1,6 +1,6 @@
 {-# LANGUAGE FlexibleContexts #-}
 
-module Opaleye.RunQuery (module Opaleye.RunQuery,
+module Odbhut.RunQuery (module Odbhut.RunQuery,
                          QueryRunner,
                          -- * Datatypes
                          IRQ.QueryRunnerColumn,
@@ -13,12 +13,12 @@ import qualified Database.PostgreSQL.Simple as PGS
 import qualified Database.PostgreSQL.Simple.FromRow as FR
 import qualified Data.String as String
 
-import           Opaleye.Column (Column)
-import qualified Opaleye.Sql as S
-import           Opaleye.QueryArr (Query)
-import           Opaleye.Internal.RunQuery (QueryRunner(QueryRunner))
-import qualified Opaleye.Internal.RunQuery as IRQ
-import qualified Opaleye.Internal.QueryArr as Q
+import           Odbhut.Column (Column)
+import qualified Odbhut.Sql as S
+import           Odbhut.QueryArr (Query)
+import           Odbhut.Internal.RunQuery (QueryRunner(QueryRunner))
+import qualified Odbhut.Internal.RunQuery as IRQ
+import qualified Odbhut.Internal.QueryArr as Q
 
 import qualified Data.Profunctor as P
 import qualified Data.Profunctor.Product.Default as D
@@ -33,18 +33,18 @@ import qualified Data.Profunctor.Product.Default as D
 -- Example type specialization:
 --
 -- @
--- runQuery :: Query (Column 'Opaleye.PGTypes.PGInt4', Column 'Opaleye.PGTypes.PGText') -> IO [(Int, String)]
+-- runQuery :: Query (Column 'Odbhut.PGTypes.PGInt4', Column 'Odbhut.PGTypes.PGText') -> IO [(Int, String)]
 -- @
 --
 -- Assuming the @makeAdaptorAndInstance@ splice has been run for the product type @Foo@:
 --
 -- @
--- runQuery :: Query (Foo (Column 'Opaleye.PGTypes.PGInt4') (Column 'Opaleye.PGTypes.PGText') (Column 'Opaleye.PGTypes.PGBool')
+-- runQuery :: Query (Foo (Column 'Odbhut.PGTypes.PGInt4') (Column 'Odbhut.PGTypes.PGText') (Column 'Odbhut.PGTypes.PGBool')
 --          -> IO [Foo Int String Bool]
 -- @
 --
--- Opaleye types are converted to Haskell types based on instances of
--- the 'Opaleye.Internal.RunQuery.QueryRunnerColumnDefault' typeclass.
+-- Odbhut types are converted to Haskell types based on instances of
+-- the 'Odbhut.Internal.RunQuery.QueryRunnerColumnDefault' typeclass.
 runQuery :: D.Default QueryRunner columns haskells
          => PGS.Connection
          -> Query columns
@@ -75,7 +75,7 @@ runQueryFold = runQueryFoldExplicit D.def
 --
 -- instance QueryRunnerColumnDefault Foo Foo where
 --    queryRunnerColumnDefault =
---        queryRunnerColumn ('Opaleye.Column.unsafeCoerceColumn'
+--        queryRunnerColumn ('Odbhut.Column.unsafeCoerceColumn'
 --                               :: Column Foo -> Column PGInt4)
 --                          Foo
 --                          queryRunnerColumnDefault

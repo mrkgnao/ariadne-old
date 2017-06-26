@@ -2,7 +2,7 @@
 --                HWT Group (c) 2003, haskelldb-users@lists.sourceforge.net
 -- License     :  BSD-style
 
-module Opaleye.Internal.HaskellDB.Sql.Print (
+module Odbhut.Internal.HaskellDB.Sql.Print (
                                      deliteral,
                                      ppUpdate,
                                      ppDelete,
@@ -17,10 +17,10 @@ module Opaleye.Internal.HaskellDB.Sql.Print (
                                      commaH
                                     ) where
 
-import Opaleye.Internal.HaskellDB.Sql (SqlColumn(..), SqlDelete(..),
+import Odbhut.Internal.HaskellDB.Sql (SqlColumn(..), SqlDelete(..),
                                SqlExpr(..), SqlOrder(..), SqlInsert(..),
                                SqlUpdate(..), SqlTable(..), SqlRangeBound(..))
-import qualified Opaleye.Internal.HaskellDB.Sql as Sql
+import qualified Odbhut.Internal.HaskellDB.Sql as Sql
 
 import Data.List (intersperse)
 import qualified Data.List.NonEmpty as NEL

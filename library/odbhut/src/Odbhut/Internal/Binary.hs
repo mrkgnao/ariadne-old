@@ -1,14 +1,14 @@
 {-# LANGUAGE MultiParamTypeClasses, FlexibleContexts #-}
 
-module Opaleye.Internal.Binary where
+module Odbhut.Internal.Binary where
 
-import           Opaleye.Internal.Column (Column(Column))
-import qualified Opaleye.Internal.Tag as T
-import qualified Opaleye.Internal.PackMap as PM
-import qualified Opaleye.Internal.QueryArr as Q
-import qualified Opaleye.Internal.PrimQuery as PQ
+import           Odbhut.Internal.Column (Column(Column))
+import qualified Odbhut.Internal.Tag as T
+import qualified Odbhut.Internal.PackMap as PM
+import qualified Odbhut.Internal.QueryArr as Q
+import qualified Odbhut.Internal.PrimQuery as PQ
 
-import qualified Opaleye.Internal.HaskellDB.PrimQuery as HPQ
+import qualified Odbhut.Internal.HaskellDB.PrimQuery as HPQ
 
 import           Data.Profunctor (Profunctor, dimap)
 import           Data.Profunctor.Product (ProductProfunctor, empty, (***!))

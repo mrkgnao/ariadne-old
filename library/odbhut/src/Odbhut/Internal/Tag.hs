@@ -1,4 +1,4 @@
-module Opaleye.Internal.Tag where
+module Odbhut.Internal.Tag where
 
 -- | Tag is for use as a source of unique IDs in QueryArr
 newtype Tag = UnsafeTag Int deriving (Read, Show)

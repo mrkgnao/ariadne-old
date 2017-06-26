@@ -2,17 +2,17 @@
 {-# LANGUAGE FlexibleContexts, FlexibleInstances, MultiParamTypeClasses #-}
 {-# LANGUAGE ScopedTypeVariables #-}
 
-module Opaleye.Internal.Operators where
+module Odbhut.Internal.Operators where
 
-import           Opaleye.Internal.Column (Column)
-import qualified Opaleye.Internal.Column as C
-import qualified Opaleye.Internal.PrimQuery as PQ
-import qualified Opaleye.Internal.HaskellDB.PrimQuery as HPQ
-import qualified Opaleye.Internal.QueryArr as QA
-import qualified Opaleye.Internal.TableMaker as TM
-import qualified Opaleye.Internal.Table as Table
-import qualified Opaleye.Internal.Tag as Tag
-import qualified Opaleye.PGTypes as T
+import           Odbhut.Internal.Column (Column)
+import qualified Odbhut.Internal.Column as C
+import qualified Odbhut.Internal.PrimQuery as PQ
+import qualified Odbhut.Internal.HaskellDB.PrimQuery as HPQ
+import qualified Odbhut.Internal.QueryArr as QA
+import qualified Odbhut.Internal.TableMaker as TM
+import qualified Odbhut.Internal.Table as Table
+import qualified Odbhut.Internal.Tag as Tag
+import qualified Odbhut.PGTypes as T
 
 import           Data.Profunctor (Profunctor, dimap, lmap, rmap)
 import           Data.Profunctor.Product (ProductProfunctor, empty, (***!))

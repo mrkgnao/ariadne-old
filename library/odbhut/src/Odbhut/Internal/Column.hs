@@ -1,8 +1,8 @@
-module Opaleye.Internal.Column where
+module Odbhut.Internal.Column where
 
 import Data.String
 
-import qualified Opaleye.Internal.HaskellDB.PrimQuery as HPQ
+import qualified Odbhut.Internal.HaskellDB.PrimQuery as HPQ
 
 -- | A column of a @Query@, of type @pgType@.  For example 'Column'
 -- @PGInt4@ is an @int4@ column and a 'Column' @PGText@ is a @text@

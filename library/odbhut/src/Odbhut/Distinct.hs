@@ -1,10 +1,10 @@
 {-# LANGUAGE FlexibleContexts #-}
 
-module Opaleye.Distinct (module Opaleye.Distinct, distinctExplicit)
+module Odbhut.Distinct (module Odbhut.Distinct, distinctExplicit)
        where
 
-import           Opaleye.QueryArr (Query)
-import           Opaleye.Internal.Distinct (distinctExplicit, Distinctspec)
+import           Odbhut.QueryArr (Query)
+import           Odbhut.Internal.Distinct (distinctExplicit, Distinctspec)
 
 import qualified Data.Profunctor.Product.Default as D
 

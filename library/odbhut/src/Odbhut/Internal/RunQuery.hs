@@ -1,6 +1,6 @@
 {-# LANGUAGE FlexibleContexts, FlexibleInstances, MultiParamTypeClasses #-}
 
-module Opaleye.Internal.RunQuery where
+module Odbhut.Internal.RunQuery where
 
 import           Control.Applicative (Applicative, pure, (*>), (<*>), liftA2)
 
@@ -10,13 +10,13 @@ import           Database.PostgreSQL.Simple.FromField
 import           Database.PostgreSQL.Simple.FromRow (fromRow, fieldWith)
 import           Database.PostgreSQL.Simple.Types (fromPGArray, Only(..))
 
-import           Opaleye.Column (Column)
-import           Opaleye.Internal.Column (Nullable)
-import qualified Opaleye.Internal.PackMap as PackMap
-import qualified Opaleye.Column as C
-import qualified Opaleye.Internal.Unpackspec as U
-import qualified Opaleye.PGTypes as T
-import qualified Opaleye.Internal.PGTypes as IPT (strictDecodeUtf8)
+import           Odbhut.Column (Column)
+import           Odbhut.Internal.Column (Nullable)
+import qualified Odbhut.Internal.PackMap as PackMap
+import qualified Odbhut.Column as C
+import qualified Odbhut.Internal.Unpackspec as U
+import qualified Odbhut.PGTypes as T
+import qualified Odbhut.Internal.PGTypes as IPT (strictDecodeUtf8)
 
 import qualified Data.Profunctor as P
 import           Data.Profunctor (dimap)
@@ -138,8 +138,8 @@ instance QueryRunnerColumnDefault a b =>
 -- defined.)
 --
 -- 2. If you don't have a 'FromField' instance, use
--- 'Opaleye.RunQuery.queryRunnerColumn' if possible.  See the documentation for
--- 'Opaleye.RunQuery.queryRunnerColumn' for an example.
+-- 'Odbhut.RunQuery.queryRunnerColumn' if possible.  See the documentation for
+-- 'Odbhut.RunQuery.queryRunnerColumn' for an example.
 --
 -- 3. If you have a more complicated case, but not a 'FromField' instance,
 -- write a 'FieldParser' for your type and use 'fieldParserQueryRunnerColumn'.

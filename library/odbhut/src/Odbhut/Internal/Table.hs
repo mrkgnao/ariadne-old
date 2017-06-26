@@ -1,15 +1,15 @@
 {-# LANGUAGE FlexibleContexts #-}
 {-# LANGUAGE Rank2Types #-}
 
-module Opaleye.Internal.Table where
+module Odbhut.Internal.Table where
 
-import           Opaleye.Internal.Column (Column, unColumn)
-import qualified Opaleye.Internal.TableMaker as TM
-import qualified Opaleye.Internal.Tag as Tag
-import qualified Opaleye.Internal.PrimQuery as PQ
-import qualified Opaleye.Internal.PackMap as PM
+import           Odbhut.Internal.Column (Column, unColumn)
+import qualified Odbhut.Internal.TableMaker as TM
+import qualified Odbhut.Internal.Tag as Tag
+import qualified Odbhut.Internal.PrimQuery as PQ
+import qualified Odbhut.Internal.PackMap as PM
 
-import qualified Opaleye.Internal.HaskellDB.PrimQuery as HPQ
+import qualified Odbhut.Internal.HaskellDB.PrimQuery as HPQ
 
 import qualified Data.Functor.Identity as I
 import           Data.Profunctor (Profunctor, dimap, lmap)

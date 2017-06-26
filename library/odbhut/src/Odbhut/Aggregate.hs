@@ -6,19 +6,19 @@
 -- below by using the combining operations from
 -- "Data.Profunctor.Product".
 
-module Opaleye.Aggregate
+module Odbhut.Aggregate
        (
        -- * Aggregation
          aggregate
        , Aggregator
        -- * Basic 'Aggregator's
        , groupBy
-       , Opaleye.Aggregate.sum
+       , Odbhut.Aggregate.sum
        , count
        , countStar
        , avg
-       , Opaleye.Aggregate.max
-       , Opaleye.Aggregate.min
+       , Odbhut.Aggregate.max
+       , Odbhut.Aggregate.min
        , boolOr
        , boolAnd
        , arrayAgg
@@ -26,25 +26,25 @@ module Opaleye.Aggregate
        -- * Counting rows
        , countRows
        -- * Entire module
-       , module Opaleye.Aggregate
+       , module Odbhut.Aggregate
        ) where
 
 import           Control.Applicative (pure)
 import           Data.Profunctor     (lmap)
 import qualified Data.Profunctor as P
 
-import qualified Opaleye.Internal.Aggregate as A
-import           Opaleye.Internal.Aggregate (Aggregator, orderAggregate)
-import qualified Opaleye.Internal.Column as IC
-import qualified Opaleye.Internal.QueryArr as Q
-import qualified Opaleye.Internal.HaskellDB.PrimQuery as HPQ
-import qualified Opaleye.Internal.PackMap as PM
+import qualified Odbhut.Internal.Aggregate as A
+import           Odbhut.Internal.Aggregate (Aggregator, orderAggregate)
+import qualified Odbhut.Internal.Column as IC
+import qualified Odbhut.Internal.QueryArr as Q
+import qualified Odbhut.Internal.HaskellDB.PrimQuery as HPQ
+import qualified Odbhut.Internal.PackMap as PM
 
-import           Opaleye.QueryArr  (Query)
-import qualified Opaleye.Column    as C
-import qualified Opaleye.Order     as Ord
-import qualified Opaleye.PGTypes   as T
-import qualified Opaleye.Join      as J
+import           Odbhut.QueryArr  (Query)
+import qualified Odbhut.Column    as C
+import qualified Odbhut.Order     as Ord
+import qualified Odbhut.PGTypes   as T
+import qualified Odbhut.Join      as J
 
 -- This page of Postgres documentation tell us what aggregate
 -- functions are available
@@ -63,9 +63,9 @@ QueryArr a b -> QueryArr a b'@.  Such a function would allow violation
 of SQL's scoping rules and lead to invalid queries.
 
 Please note that when aggregating an empty query with no @GROUP BY@
-clause, Opaleye's behaviour differs from Postgres's behaviour.
-Postgres returns a single row whereas Opaleye returns zero rows.
-Opaleye's behaviour is consistent with the meaning of aggregating
+clause, Odbhut's behaviour differs from Postgres's behaviour.
+Postgres returns a single row whereas Odbhut returns zero rows.
+Odbhut's behaviour is consistent with the meaning of aggregating
 over groups of rows and Postgres's behaviour is inconsistent.  When a
 query has zero rows it has zero groups, and thus zero rows in the
 result of an aggregation.
@@ -81,7 +81,7 @@ aggregate agg q = Q.simpleQueryArr (A.aggregateU agg . Q.runSimpleQueryArr q)
 --
 -- Note that this orders all aggregations with the same ordering. If
 -- you need different orderings for different aggregations, use
--- 'Opaleye.Internal.Aggregate.orderAggregate'.
+-- 'Odbhut.Internal.Aggregate.orderAggregate'.
 
 aggregateOrdered  :: Ord.Order a -> Aggregator a b -> Query a -> Query b
 aggregateOrdered o agg = aggregate (orderAggregate o agg)

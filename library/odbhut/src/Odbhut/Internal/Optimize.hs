@@ -1,11 +1,11 @@
 {-# LANGUAGE LambdaCase #-}
 
-module Opaleye.Internal.Optimize where
+module Odbhut.Internal.Optimize where
 
 import           Prelude hiding (product)
 
-import qualified Opaleye.Internal.PrimQuery as PQ
-import           Opaleye.Internal.Helpers   ((.:))
+import qualified Odbhut.Internal.PrimQuery as PQ
+import           Odbhut.Internal.Helpers   ((.:))
 
 import qualified Data.List.NonEmpty as NEL
 

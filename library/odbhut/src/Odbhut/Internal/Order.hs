@@ -1,15 +1,15 @@
-module Opaleye.Internal.Order where
+module Odbhut.Internal.Order where
 
 import           Data.Function (on)
 
 import qualified Data.List.NonEmpty as NL
 
-import qualified Opaleye.Column as C
-import qualified Opaleye.Internal.Column as IC
-import qualified Opaleye.Internal.Tag as T
-import qualified Opaleye.Internal.PrimQuery as PQ
+import qualified Odbhut.Column as C
+import qualified Odbhut.Internal.Column as IC
+import qualified Odbhut.Internal.Tag as T
+import qualified Odbhut.Internal.PrimQuery as PQ
 
-import qualified Opaleye.Internal.HaskellDB.PrimQuery as HPQ
+import qualified Odbhut.Internal.HaskellDB.PrimQuery as HPQ
 import qualified Data.Functor.Contravariant as C
 import qualified Data.Functor.Contravariant.Divisible as Divisible
 import qualified Data.Profunctor as P

@@ -1,18 +1,18 @@
 {-# LANGUAGE TupleSections #-}
-module Opaleye.Internal.Aggregate where
+module Odbhut.Internal.Aggregate where
 
 import           Control.Applicative (Applicative, pure, (<*>))
 
 import qualified Data.Profunctor as P
 import qualified Data.Profunctor.Product as PP
 
-import qualified Opaleye.Internal.PackMap as PM
-import qualified Opaleye.Internal.PrimQuery as PQ
-import qualified Opaleye.Internal.Tag as T
-import qualified Opaleye.Internal.Column as C
-import qualified Opaleye.Internal.Order as O
+import qualified Odbhut.Internal.PackMap as PM
+import qualified Odbhut.Internal.PrimQuery as PQ
+import qualified Odbhut.Internal.Tag as T
+import qualified Odbhut.Internal.Column as C
+import qualified Odbhut.Internal.Order as O
 
-import qualified Opaleye.Internal.HaskellDB.PrimQuery as HPQ
+import qualified Odbhut.Internal.HaskellDB.PrimQuery as HPQ
 
 {-|
 An 'Aggregator' takes a collection of rows of type @a@, groups
@@ -42,7 +42,7 @@ makeAggr = makeAggr' . Just
 -- | Order the values within each aggregation in `Aggregator` using
 -- the given ordering. This is only relevant for aggregations that
 -- depend on the order they get their elements, like
--- `Opaleye.Aggregate.arrayAgg` and `Opaleye.Aggregate.stringAgg`.
+-- `Odbhut.Aggregate.arrayAgg` and `Odbhut.Aggregate.stringAgg`.
 --
 -- You can either apply it to an aggregation of multiple columns, in
 -- which case it will apply to all aggregation functions in there, or you
