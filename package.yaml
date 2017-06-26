@@ -52,7 +52,7 @@ library:
   - tagged
   - unordered-containers
   - protolude
-  source-dirs: library
+  source-dirs: library/ariadne
 license: MIT
 maintainer: Soham Chowdhury
 name: ariadne
