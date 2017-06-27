@@ -1,29 +1,33 @@
 {-# LANGUAGE OverloadedStrings #-}
-{-# LANGUAGE RecordWildCards   #-}
 
 module Ariadne.Logging where
-
-import Control.Monad.Logger
 
 import           Control.Monad.Logger
 import           System.Log.FastLogger
 
-import qualified Data.ByteString.Char8        as S8
+import           Data.Char                                 (toUpper)
+import           Data.Monoid                               (mconcat, (<>))
 
-import           Data.Char                    (toLower, toUpper)
-import           Data.Monoid                  (mconcat, (<>))
-import qualified Data.Text.Lazy                    as T
-import qualified Data.Text.Lazy.Encoding                    as T
-import qualified Data.Text.IO                 as T
+import qualified Data.ByteString.Char8                     as S8
+import           Data.Text.Lazy                            (Text)
+import qualified Data.Text.Lazy                            as TL
+import qualified Data.Text.Lazy.Encoding                   as TL
+
+import           Data.Text                                 as Strict (Text)
+import qualified Data.Text                                 as Strict
+import qualified Data.Text.Encoding                        as Strict
 
 import           Data.Time
 
-import           System.IO                    (stdout)
+import           System.IO                                 (stdout)
 
-import           Data.Text.Prettyprint.Doc hiding ((<>))
+import           Data.Text.Prettyprint.Doc                 hiding ((<>))
 import           Data.Text.Prettyprint.Doc.Render.Terminal
 
-import GHC.Stack
+layoutAndRender :: Doc AnsiStyle -> Strict.Text
+layoutAndRender = renderStrict . layoutPretty defaultLayoutOptions
+
+colorize x = annotate (color x) . pretty
 
 logger :: Loc -> LogSource -> LogLevel -> LogStr -> IO ()
 logger _ _ lvl msg = logger'
@@ -31,67 +35,49 @@ logger _ _ lvl msg = logger'
     logger' = do
       datestamp <- getDate
       timestamp <- getTime
-      S8.hPutStr stdout . fromLogStr $
-        mconcat [timeDate timestamp datestamp, "\n", logLine, "\n\n"]
+      let logStr = toLogStr $
+            mconcat
+              [ toLogStr (timeDate timestamp datestamp)
+              , "\n"
+              , toLogStr logLine
+              , "\n\n"
+              ]
+      S8.hPutStr stdout (fromLogStr logStr)
     timeDate ts ds =
-      mconcat
-        [ toLogStr
-            (renderLazy $
-             layoutPretty
-               defaultLayoutOptions
-               (annotate (color Black) (pretty ts)))
-        , " "
-        , toLogStr
-            (renderLazy $
-             layoutPretty
-               defaultLayoutOptions
-               (annotate (color Black) (pretty ds)))
-        ]
-    logLine = mconcat [defaultLogLevelStr lvl, " ", msg]
-    getDate = do
-      now <- getZonedTime
-      return $ formatTime' now
-      where
-        formatTime' = take dateLength . formatTime defaultTimeLocale "%F"
-        dateLength =
-          length $
-          formatTime defaultTimeLocale "%F" (UTCTime (ModifiedJulianDay 0) 0)
-    getTime = do
-      now <- getZonedTime
-      return $ formatTime' now
-      where
-        formatTime' = take timeLength . formatTime defaultTimeLocale "%T.%q"
-        timeLength =
-          length $
-          formatTime
-            defaultTimeLocale
-            "%T.000000"
-            (UTCTime (ModifiedJulianDay 0) 0)
+      layoutAndRender
+        (mconcat (map (colorize Black) [ts, " ", ds]))
+    logLine =
+      mconcat [Strict.encodeUtf8 (defaultLogLevelStr lvl), " ", fromLogStr msg]
+    getDate = getDateElement "%F" "%F"
+    getTime = getDateElement "%T.%q" "%T.000000"
 
-defaultLogLevelStr :: LogLevel -> LogStr
-defaultLogLevelStr (LevelOther t) = toLogStr t
+getDateElement a b = formatElt <$> getZonedTime
+  where
+    formatElt = take dateLength . formatTime defaultTimeLocale a
+    dateLength =
+      length
+        (formatTime defaultTimeLocale b (UTCTime (ModifiedJulianDay 0) 0))
 
-defaultLogLevelStr level = toLogStr (T.encodeUtf8 preCode)
+defaultLogLevelStr :: LogLevel -> Strict.Text
+defaultLogLevelStr (LevelOther t) = t
+defaultLogLevelStr level = preCode
   where
     basename = map toUpper $ drop 5 $ show level
-    preCode =
-      renderLazy $
-      layoutPretty defaultLayoutOptions $
-      fill 8 . colorString $ pretty ("[" <> basename <> "]")
+    preCode = (layoutAndRender . fill 8 . colorLevel) ("[" <> basename <> "]")
       where
-        colorString =
+        colorLevel =
           case level of
-            LevelError -> annotate (color Red)
-            LevelWarn -> annotate (color Yellow)
-            LevelDebug -> annotate (color Green)
-            LevelInfo -> annotate (color Blue)
-            _ -> id
+            LevelError -> colorize Red
+            LevelWarn -> colorize Yellow
+            LevelDebug -> colorize Green
+            LevelInfo -> colorize Blue
+            _ -> pretty
 
 execute :: LoggingT m a -> m a
 execute op =
   runLoggingT op logger
 
-logTest :: HasCallStack => LoggingT IO ()
+logTest :: LoggingT IO ()
 logTest = do
   logInfoN "Starting download"
   logErrorN "404"
