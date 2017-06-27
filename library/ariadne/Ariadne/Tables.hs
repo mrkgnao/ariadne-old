@@ -406,7 +406,8 @@ linkSearchLoop = do
     (do fetch @Link (q_Link_by_title str) >>=
           traverse_
             (\l ->
-               (do l ^. link_title . to putTextLn
+               (do l ^. link_title |$ ("Title: " <>) |> logInfoN
+                   l ^. link_url   |$ ("URL: " <>)   |> logInfoN
                    updateFulltext (l ^. link_id)))
         linkSearchLoop)
 

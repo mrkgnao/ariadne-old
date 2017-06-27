@@ -110,14 +110,13 @@ import qualified Edible.Table                           as O
 import qualified Edible.Values                          as O
 
 
+import           Data.Singletons.Prelude.Base           (Map)
 import           Tisch.Internal.Debug                   (renderSqlQuery')
 import           Tisch.Internal.Kol                     (Kol (..))
 import           Tisch.Internal.Query                   (Query (..))
-import           Tisch.Internal.Table                   (Database, HsI, PgR,
-                                                         PgW, RawTable (..),
-                                                         Table, TableRW,
-                                                         pgWfromHsI, pgWfromPgR,
-                                                         rawTableRW)
+import           Tisch.Internal.Record
+import           Tisch.Internal.Table
+import           Tisch.Internal.Singletons
 
 --------------------------------------------------------------------------------
 
@@ -314,10 +313,10 @@ printSql = T.pack . maybe "Empty query" id . O.showSqlForPostgres
 -- Throws 'ErrNumRows' if there is more than one row in the result.
 runQuery1
   :: forall v d r m ps.
-     ( MonadLogger m
-     , MonadIO m
+     ( MonadIO m
      , Cx.MonadThrow m
      , PP.Default O.QueryRunner v r
+     , MonadLogger m
      , PP.Default O.Unpackspec v v
      , Allow 'Fetch ps
      )
@@ -339,7 +338,14 @@ runQuery1 pc q = do
 -- the number of passed in rows. Use 'runInsertNoCountCheck' if you don't want
 -- this behavior (hint: you probably want this behavior).
 runInsert
-  :: (MonadIO m, Cx.MonadThrow m, Allow 'Insert ps, TableRW t, Database t ~ d)
+  :: ( MonadIO m
+     , Cx.MonadThrow m
+     , Allow 'Insert ps
+     , TableRW t
+     , Database t ~ d
+     , MonadLogger m
+     , (PP.Default O.Unpackspec (Record (Map (Column_NameSym0 :&&&$$$ Column_PgRSym0) (Columns t))) (Record (Map (Column_NameSym0 :&&&$$$ Column_PgRSym0) (Columns t))))
+     )
   => Conn d ps -> Table t -> [HsI t] -> m () -- ^
 runInsert conn t = runInsertRaw conn (rawTableRW t) . map pgWfromHsI
 
@@ -349,7 +355,14 @@ runInsert conn t = runInsertRaw conn (rawTableRW t) . map pgWfromHsI
 -- one. Use 'runInsertNoCountCheck' if you don't want this behavior (hint: you
 -- probably want this behavior).
 runInsert1
-  :: (MonadIO m, Cx.MonadThrow m, Allow 'Insert ps, TableRW t, Database t ~ d)
+  :: ( MonadIO m
+     , Cx.MonadThrow m
+     , Allow 'Insert ps
+     , TableRW t
+     , Database t ~ d
+     , MonadLogger m
+     , (PP.Default O.Unpackspec (Record (Map (Column_NameSym0 :&&&$$$ Column_PgRSym0) (Columns t))) (Record (Map (Column_NameSym0 :&&&$$$ Column_PgRSym0) (Columns t))))
+     )
   => Conn d ps -> Table t -> HsI t -> m () -- ^
 runInsert1 conn t = runInsertRaw1 conn (rawTableRW t) . pgWfromHsI
 
@@ -357,18 +370,29 @@ runInsert1 conn t = runInsertRaw1 conn (rawTableRW t) . pgWfromHsI
 -- the number of affected rows, which might be different than the number of
 -- passed in rows.
 runInsertNoCountCheck
-  :: (MonadIO m, Cx.MonadThrow m, Allow 'Insert ps, TableRW t, Database t ~ d)
+  :: ( MonadIO m
+     , Cx.MonadThrow m
+     , Allow 'Insert ps
+     , TableRW t
+     , Database t ~ d
+     , MonadLogger m
+     , (PP.Default O.Unpackspec (Record (Map (Column_NameSym0 :&&&$$$ Column_PgRSym0) (Columns t))) (Record (Map (Column_NameSym0 :&&&$$$ Column_PgRSym0) (Columns t))))
+     )
   => Conn d ps -> Table t -> [HsI t] -> m Int64 -- ^
 runInsertNoCountCheck conn t =
   runInsertRawNoCountCheck conn (rawTableRW t) . map pgWfromHsI
 
-
 -- | Like 'runInsert', but takes a 'RawTable' instead of a 'Table'.
 runInsertRaw
-  :: (MonadIO m, Cx.MonadThrow m, Allow 'Insert ps)
+  :: ( MonadIO m
+     , Cx.MonadThrow m
+     , Allow 'Insert ps
+     , PP.Default O.Unpackspec v v
+     , MonadLogger m
+     )
   => Conn d ps -> RawTable d w v -> [w] -> m () -- ^
 runInsertRaw conn t = \case
-  [] -> return ()
+  [] -> pure ()
   ws -> do
     nAffected <- runInsertRawNoCountCheck conn t ws
     let nExpected = fromIntegral (length ws) :: Int64
@@ -376,10 +400,9 @@ runInsertRaw conn t = \case
        let sql = O.arrangeInsertManySql (unRawTable t) (NEL.fromList ws)
        Cx.throwM (ErrNumRows nExpected nAffected (Just sql))
 
-
 -- | Like 'runInsertNoCountCheck', but takes a 'RawTable' instead of a 'Table'.
 runInsertRawNoCountCheck
-  :: (MonadIO m, Allow 'Insert ps)
+  :: (MonadIO m, Allow 'Insert ps, MonadLogger m, PP.Default O.Unpackspec v v)
   => Conn d ps -> RawTable d w v -> [w] -> m Int64 -- ^
 runInsertRawNoCountCheck (Conn conn) (RawTable t) = \case
   [] -> return 0
@@ -387,7 +410,12 @@ runInsertRawNoCountCheck (Conn conn) (RawTable t) = \case
 
 -- | Like 'runInsert1', but takes a 'RawTable' instead of a 'Table'.
 runInsertRaw1
-  :: (MonadIO m, Cx.MonadThrow m, Allow 'Insert ps)
+  :: ( MonadIO m
+     , Cx.MonadThrow m
+     , Allow 'Insert ps
+     , MonadLogger m
+     , PP.Default O.Unpackspec v v
+     )
   => Conn d ps -> RawTable d w v -> w -> m () -- ^
 runInsertRaw1 pc t w = runInsertRaw pc t [w]
 
