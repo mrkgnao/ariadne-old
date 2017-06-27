@@ -1,11 +1,12 @@
 {-# LANGUAGE CPP #-}
+{-# LANGUAGE Safe #-}
 
-module Network.Wai.Logger.IORef (
+module System.Log.FastLogger.IORef (
        IORef
      , newIORef
      , readIORef
-     , writeIORef
      , atomicModifyIORef'
+     , writeIORef
      ) where
 
 import Data.IORef
