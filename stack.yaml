@@ -5,8 +5,6 @@ packages:
     extra-dep: yes
   - location: './library/amalgam/'
     extra-dep: yes
-  - location: '../katip/katip/'
-    extra-dep: yes
 extra-deps:
   - Only-0.1
   - prettyprinter-1.1

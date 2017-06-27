@@ -36,8 +36,6 @@ library:
   - base
   - edible
   - amalgam
-  - ansi-terminal
-  - prettyprinter-compat-ansi-wl-pprint
   - prettyprinter-ansi-terminal
   - prettyprinter
   - lens
@@ -47,7 +45,6 @@ library:
   - bytestring
   - mtl
   - transformers
-  - katip
   - exceptions
   - text
   - vector

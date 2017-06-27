@@ -18,9 +18,8 @@ import qualified Data.Text.IO                 as T
 
 import           Data.Time
 
-import           System.IO                    (Handle, stderr, stdout)
+import           System.IO                    (stdout)
 
--- import           System.Console.ANSI
 import           Data.Text.Prettyprint.Doc hiding ((<>))
 import           Data.Text.Prettyprint.Doc.Render.Terminal
 
@@ -36,9 +35,17 @@ logger _ _ lvl msg = logger'
         mconcat [timeDate timestamp datestamp, "\n", logLine, "\n\n"]
     timeDate ts ds =
       mconcat
-        [ toLogStr (show (annotate (color Green) (pretty ts)))
+        [ toLogStr
+            (renderLazy $
+             layoutPretty
+               defaultLayoutOptions
+               (annotate (color Black) (pretty ts)))
         , " "
-        -- , toLogStr (show (black (text ds)))
+        , toLogStr
+            (renderLazy $
+             layoutPretty
+               defaultLayoutOptions
+               (annotate (color Black) (pretty ds)))
         ]
     logLine = mconcat [defaultLogLevelStr lvl, " ", msg]
     getDate = do
