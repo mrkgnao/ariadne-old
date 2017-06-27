@@ -24,6 +24,7 @@ module Ariadne.Tables where
 import           Control.Arrow              (returnA)
 import           Control.Monad.Catch        (MonadThrow)
 import           Control.Monad.IO.Class     (MonadIO, liftIO)
+import           Control.Monad.Logger
 import           Control.Monad.Reader
 import           Data.Aeson
 import           Data.Tagged
@@ -32,11 +33,13 @@ import           Data.Time.Clock            (UTCTime)
 import           Data.UUID
 import qualified Database.PostgreSQL.Simple as PGS
 import           Edible
-import           Tisch.Internal.Fun as Tisch
-import           Tisch.Internal.Table
 import           GHC.TypeLits
+import           Tisch.Internal.Fun         as Tisch
+import           Tisch.Internal.Table
 
 import           Lib.Prelude                hiding (like)
+
+import qualified Ariadne.Logging                    as L
 
 import           Ariadne.Ambiguous
 
@@ -320,17 +323,18 @@ q_Knot_by_id kid = proc () -> do
 newtype AriadneState = AriadneState { conn :: Conn' Db }
 
 newtype AriadneT m a = AriadneT
-  { runAriadneT :: ReaderT AriadneState m a
+  { runAriadneT :: ReaderT AriadneState (LoggingT m) a
   } deriving ( Functor
              , Applicative
              , Monad
              , MonadReader AriadneState
              , MonadIO
              , MonadThrow
+             , MonadLogger
              )
 
 escapeLabyrinth :: AriadneState -> AriadneT m a -> m a
-escapeLabyrinth db a = runReaderT (runAriadneT a) db
+escapeLabyrinth db a = runLoggingT (runReaderT (runAriadneT a) db) L.logger
 
 fetch
   :: forall a m.

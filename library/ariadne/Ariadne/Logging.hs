@@ -1,3 +1,4 @@
+{-# LANGUAGE NoImplicitPrelude #-}
 {-# LANGUAGE OverloadedStrings #-}
 
 module Ariadne.Logging where
@@ -6,7 +7,7 @@ import           Control.Monad.Logger
 import           System.Log.FastLogger
 
 import           Data.Char                                 (toUpper)
-import           Data.Monoid                               (mconcat, (<>))
+import           Data.Monoid                               (mconcat)
 
 import qualified Data.ByteString.Char8                     as S8
 
@@ -17,6 +18,9 @@ import           Data.Time
 
 import           Data.Text.Prettyprint.Doc                 hiding ((<>))
 import           Data.Text.Prettyprint.Doc.Render.Terminal
+
+import           Lib.Prelude                               hiding (group)
+import           Prelude                                   (String,show)
 
 layoutAndRender :: Doc AnsiStyle -> Strict.Text
 layoutAndRender = renderStrict . layoutPretty defaultLayoutOptions
@@ -30,7 +34,8 @@ logger _ _ lvl msg = logger'
     logger' = do
       datestamp <- getDate
       timestamp <- getTime
-      let logStr = toLogStr $
+      let logStr =
+            toLogStr $
             mconcat
               [ toLogStr (timeDate timestamp datestamp)
               , "\n"
@@ -38,11 +43,20 @@ logger _ _ lvl msg = logger'
               , "\n"
               ]
       S8.putStrLn (fromLogStr logStr)
-    timeDate ts ds =
-      layoutAndRender
-        (foldMap (colorize Black) [ts, " ", ds])
+    timeDate ts ds = layoutAndRender (foldMap (colorize Black) [ts, " ", ds])
     logLine =
-      mconcat [Strict.encodeUtf8 (logLevelStr lvl), " ", fromLogStr msg]
+      mconcat
+        [ Strict.encodeUtf8 (logLevelStr lvl)
+        , " "
+        , msg
+       |$ fromLogStr
+       |> Strict.decodeUtf8
+       |> pretty
+       |> hang 9
+       |> layoutPretty defaultLayoutOptions
+       |> renderStrict
+       |> Strict.encodeUtf8
+        ]
     getDate = getDateElement "%F" "%F"
     getTime = getDateElement "%T.%q" "%T.000000"
 
@@ -64,10 +78,10 @@ logLevelStr level = preCode
         colorLevel =
           case level of
             LevelError -> colorize Red
-            LevelWarn -> colorize Yellow
+            LevelWarn  -> colorize Yellow
             LevelDebug -> colorize Green
-            LevelInfo -> colorize Blue
-            _ -> pretty
+            LevelInfo  -> colorize Blue
+            _          -> pretty
 
 execute :: LoggingT m a -> m a
 execute op =

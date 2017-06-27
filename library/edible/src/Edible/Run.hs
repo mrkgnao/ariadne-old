@@ -72,6 +72,8 @@ module Edible.Run
 
 import           Control.Lens
 import           Control.Monad                          (when)
+import           Control.Monad.Logger
+
 import qualified Control.Monad.Catch                    as Cx
 import           Control.Monad.IO.Class
 import qualified Data.ByteString.Char8                  as B8
@@ -79,6 +81,8 @@ import           Data.Int
 import qualified Data.List.NonEmpty                     as NEL
 import qualified Data.Profunctor                        as P
 import qualified Data.Profunctor.Product.Default        as PP
+import           Data.Text                              (Text)
+import qualified Data.Text                              as T
 import           Data.Typeable                          (Typeable)
 import qualified Database.PostgreSQL.Simple             as Pg
 import qualified Database.PostgreSQL.Simple.FromField   as Pg
@@ -107,20 +111,13 @@ import qualified Edible.Values                          as O
 
 
 import           Tisch.Internal.Debug                   (renderSqlQuery')
-import           Tisch.Internal.Kol                     (Kol(..))
-import           Tisch.Internal.Query                   (Query(..))
-import           Tisch.Internal.Table
-    ( Database
-    , HsI
-    , PgR
-    , PgW
-    , RawTable(..)
-    , Table
-    , TableRW
-    , pgWfromHsI
-    , pgWfromPgR
-    , rawTableRW
-    )
+import           Tisch.Internal.Kol                     (Kol (..))
+import           Tisch.Internal.Query                   (Query (..))
+import           Tisch.Internal.Table                   (Database, HsI, PgR,
+                                                         PgW, RawTable (..),
+                                                         Table, TableRW,
+                                                         pgWfromHsI, pgWfromPgR,
+                                                         rawTableRW)
 
 --------------------------------------------------------------------------------
 
@@ -296,17 +293,35 @@ withSavepoint (Conn conn) f = Cx.mask $ \restore -> do
 
 -- | Query and fetch zero or more resulting rows.
 runQuery
- :: (MonadIO m, Cx.MonadThrow m, PP.Default O.QueryRunner v r, Allow 'Fetch ps)
- => Conn d ps -> Query d () v -> m [r] -- ^
-runQuery (Conn conn) = liftIO . O.runQuery conn . unQuery
+  :: ( MonadLogger m
+     , MonadIO m
+     , Cx.MonadThrow m
+     , PP.Default O.Unpackspec v v
+     , PP.Default O.QueryRunner v r
+     , Allow 'Fetch ps
+     )
+  => Conn d ps -> Query d () v -> m [r] -- ^
+runQuery (Conn conn) query = do
+  let q = unQuery query
+  logDebugN (printSql q)
+  liftIO . O.runQuery conn $ q
+
+printSql :: PP.Default O.Unpackspec a a => O.Query a -> Text
+printSql = T.pack . maybe "Empty query" id . O.showSqlForPostgres
 
 -- | Query and fetch zero or one resulting row.
 --
 -- Throws 'ErrNumRows' if there is more than one row in the result.
 runQuery1
- :: forall v d r m ps
-  . (MonadIO m, Cx.MonadThrow m, PP.Default O.QueryRunner v r, Allow 'Fetch ps)
- => Conn d ps -> Query d () v -> m (Maybe r) -- ^
+  :: forall v d r m ps.
+     ( MonadLogger m
+     , MonadIO m
+     , Cx.MonadThrow m
+     , PP.Default O.QueryRunner v r
+     , PP.Default O.Unpackspec v v
+     , Allow 'Fetch ps
+     )
+  => Conn d ps -> Query d () v -> m (Maybe r) -- ^
 runQuery1 pc q = do
     rs <- runQuery pc q
     case rs of

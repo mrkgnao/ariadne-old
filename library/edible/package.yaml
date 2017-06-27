@@ -12,6 +12,7 @@ homepage: TODO
 bug-reports: TODO
 dependencies:
 - Only
+- amalgam
 - aeson
 - attoparsec
 - base

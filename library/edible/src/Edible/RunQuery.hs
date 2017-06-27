@@ -26,20 +26,6 @@ import qualified Edible.Internal.QueryArr as Q
 import qualified Data.Profunctor as P
 import qualified Data.Profunctor.Product.Default as D
 
--- import qualified Control.Exception                    as Ex
--- import           Data.Fixed                           (Fixed (..))
--- import qualified Data.Fixed                           as Fixed
--- import           Data.Int
--- import           Data.Maybe
--- import           Data.Proxy
--- import           Data.Fixed                           (Fixed (..))
--- import qualified Data.Fixed                           as Fixed
--- import qualified Database.PostgreSQL.Simple.FromField as Pg
--- import           GHC.Float                            (float2Double)
--- import           GHC.Real                             (infinity, notANumber)
--- import           GHC.TypeLits                         (type (+), KnownNat, Nat)
--- import qualified GHC.TypeLits                         as GHC
-
 import qualified Edible.Column                        as O
 import qualified Edible.Order                         as O
 import qualified Edible.PGTypes                       as O
@@ -119,7 +105,7 @@ runQueryExplicit :: QueryRunner columns haskells
                  -> PGS.Connection
                  -> Query columns
                  -> IO [haskells]
-runQueryExplicit qr conn q = maybe (return []) (PGS.queryWith_ parser conn) sql
+runQueryExplicit qr conn q = maybe (pure []) (PGS.queryWith_ parser conn) sql
   where (sql, parser) = prepareQuery qr q
 
 runQueryFoldExplicit
