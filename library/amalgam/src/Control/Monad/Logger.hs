@@ -109,24 +109,17 @@ import Control.Monad (liftM, ap, when, void, forever)
 import Control.Monad.Base (MonadBase (liftBase))
 import Control.Monad.Loops (untilM)
 import Control.Monad.Trans.Control (MonadBaseControl (..), MonadTransControl (..))
+import Control.Monad.Trans.Except
 import qualified Control.Monad.Trans.Class as Trans
 
 import Control.Monad.IO.Class (MonadIO (liftIO))
 import Control.Monad.Trans.Resource (MonadResource (liftResourceT), MonadThrow, monadThrow)
-#if MIN_VERSION_resourcet(1,1,0)
 import Control.Monad.Trans.Resource (throwM)
-import Control.Monad.Catch (MonadCatch (..)
-#if MIN_VERSION_exceptions(0,6,0)
-    , MonadMask (..)
-#endif
-    )
-#endif
+import Control.Monad.Catch (MonadCatch (..), MonadMask (..))
 
 import Control.Monad.Trans.Identity ( IdentityT)
 import Control.Monad.Trans.List     ( ListT    )
 import Control.Monad.Trans.Maybe    ( MaybeT   )
-import Control.Monad.Trans.Error    ( ErrorT, Error)
-import Control.Monad.Trans.Except   ( ExceptT  )
 
 import Control.Monad.Trans.Reader   ( ReaderT  )
 import Control.Monad.Trans.Cont     ( ContT  )
@@ -149,7 +142,6 @@ import System.Log.FastLogger
 import System.IO (Handle, IOMode(AppendMode), BufferMode(LineBuffering), openFile, hClose, hSetBuffering, stdout, stderr)
 
 import Control.Monad.Cont.Class   ( MonadCont (..) )
-import Control.Monad.Error.Class  ( MonadError (..) )
 import Control.Monad.RWS.Class    ( MonadRWS )
 import Control.Monad.Reader.Class ( MonadReader (..) )
 import Control.Monad.State.Class  ( MonadState (..) )
@@ -163,9 +155,7 @@ import Prelude hiding (catch)
 
 -- Using System.Log.FastLogger
 
-#if MIN_VERSION_conduit_extra(1,1,0)
 import Data.Conduit.Lazy (MonadActive, monadActive)
-#endif
 
 data LogLevel = LevelDebug | LevelInfo | LevelWarn | LevelError | LevelOther Text
     deriving (Eq, Prelude.Show, Prelude.Read, Ord)
@@ -223,29 +213,55 @@ instance MonadLogger (ST s)      where monadLoggerLog _ _ _ = return ()
 instance MonadLogger (Lazy.ST s) where monadLoggerLog _ _ _ = return ()
 -}
 
-#define DEF monadLoggerLog a b c d = Trans.lift $ monadLoggerLog a b c d
-instance MonadLogger m => MonadLogger (IdentityT m) where DEF
-instance MonadLogger m => MonadLogger (ListT m) where DEF
-instance MonadLogger m => MonadLogger (MaybeT m) where DEF
-instance (MonadLogger m, Error e) => MonadLogger (ErrorT e m) where DEF
-instance MonadLogger m => MonadLogger (ExceptT e m) where DEF
-instance MonadLogger m => MonadLogger (ReaderT r m) where DEF
-instance MonadLogger m => MonadLogger (ContT r m) where DEF
-instance MonadLogger m => MonadLogger (StateT s m) where DEF
-instance (MonadLogger m, Monoid w) => MonadLogger (WriterT w m) where DEF
-instance (MonadLogger m, Monoid w) => MonadLogger (RWST r w s m) where DEF
-instance MonadLogger m => MonadLogger (ResourceT m) where DEF
-instance MonadLogger m => MonadLogger (Pipe l i o u m) where DEF
-instance MonadLogger m => MonadLogger (ConduitM i o m) where DEF
-instance MonadLogger m => MonadLogger (Strict.StateT s m) where DEF
-instance (MonadLogger m, Monoid w) => MonadLogger (Strict.WriterT w m) where DEF
-instance (MonadLogger m, Monoid w) => MonadLogger (Strict.RWST r w s m) where DEF
-#undef DEF
+instance MonadLogger m =>
+         MonadLogger (IdentityT m) where
+  monadLoggerLog a b c d = Trans.lift (monadLoggerLog a b c d)
+instance MonadLogger m =>
+         MonadLogger (ListT m) where
+  monadLoggerLog a b c d = Trans.lift (monadLoggerLog a b c d)
+instance MonadLogger m =>
+         MonadLogger (MaybeT m) where
+  monadLoggerLog a b c d = Trans.lift (monadLoggerLog a b c d)
+instance MonadLogger m =>
+         MonadLogger (ExceptT e m) where
+  monadLoggerLog a b c d = Trans.lift (monadLoggerLog a b c d)
+instance MonadLogger m =>
+         MonadLogger (ReaderT r m) where
+  monadLoggerLog a b c d = Trans.lift (monadLoggerLog a b c d)
+instance MonadLogger m =>
+         MonadLogger (ContT r m) where
+  monadLoggerLog a b c d = Trans.lift (monadLoggerLog a b c d)
+instance MonadLogger m =>
+         MonadLogger (StateT s m) where
+  monadLoggerLog a b c d = Trans.lift (monadLoggerLog a b c d)
+instance (MonadLogger m, Monoid w) =>
+         MonadLogger (WriterT w m) where
+  monadLoggerLog a b c d = Trans.lift (monadLoggerLog a b c d)
+instance (MonadLogger m, Monoid w) =>
+         MonadLogger (RWST r w s m) where
+  monadLoggerLog a b c d = Trans.lift (monadLoggerLog a b c d)
+instance MonadLogger m =>
+         MonadLogger (ResourceT m) where
+  monadLoggerLog a b c d = Trans.lift (monadLoggerLog a b c d)
+instance MonadLogger m =>
+         MonadLogger (Pipe l i o u m) where
+  monadLoggerLog a b c d = Trans.lift (monadLoggerLog a b c d)
+instance MonadLogger m =>
+         MonadLogger (ConduitM i o m) where
+  monadLoggerLog a b c d = Trans.lift (monadLoggerLog a b c d)
+instance MonadLogger m =>
+         MonadLogger (Strict.StateT s m) where
+  monadLoggerLog a b c d = Trans.lift (monadLoggerLog a b c d)
+instance (MonadLogger m, Monoid w) =>
+         MonadLogger (Strict.WriterT w m) where
+  monadLoggerLog a b c d = Trans.lift (monadLoggerLog a b c d)
+instance (MonadLogger m, Monoid w) =>
+         MonadLogger (Strict.RWST r w s m) where
+  monadLoggerLog a b c d = Trans.lift (monadLoggerLog a b c d)
 
 instance MonadLoggerIO m => MonadLoggerIO (IdentityT m)
 instance MonadLoggerIO m => MonadLoggerIO (ListT m)
 instance MonadLoggerIO m => MonadLoggerIO (MaybeT m)
-instance (MonadLoggerIO m, Error e) => MonadLoggerIO (ErrorT e m)
 instance MonadLoggerIO m => MonadLoggerIO (ExceptT e m)
 instance MonadLoggerIO m => MonadLoggerIO (ReaderT r m)
 instance MonadLoggerIO m => MonadLoggerIO (ContT r m)
@@ -624,7 +640,7 @@ runFileLoggingT :: MonadBaseControl IO m => FilePath -> LoggingT m a -> m a
 runFileLoggingT fp log = bracket
     (liftBase $ openFile fp AppendMode)
     (liftBase . hClose)
-    $ \h -> liftBase (hSetBuffering h LineBuffering) >> (runLoggingT log) (defaultOutput h)
+    (\h -> liftBase (hSetBuffering h LineBuffering) >> (runLoggingT log) (defaultOutput h))
 
 -- | Run a block using a @MonadLogger@ instance which prints to stderr.
 --
@@ -695,15 +711,7 @@ filterLogger p (LoggingT f) = LoggingT $ \logger ->
         when (p src level) $ logger loc src level msg
 
 instance MonadCont m => MonadCont (LoggingT m) where
-  callCC f = LoggingT $ \i -> callCC $ \c -> runLoggingT (f (LoggingT . const . c)) i
-
-instance MonadError e m => MonadError e (LoggingT m) where
-  throwError = Trans.lift . throwError
-  catchError r h = LoggingT $ \i -> runLoggingT r i `catchError` \e -> runLoggingT (h e) i
-
-instance MonadError e m => MonadError e (NoLoggingT m) where
-  throwError = Trans.lift . throwError
-  catchError r h = NoLoggingT $ runNoLoggingT r `catchError` \e -> runNoLoggingT (h e)
+  callCC f = LoggingT (\i -> callCC (\c -> runLoggingT (f (LoggingT . const . c)) i))
 
 instance MonadRWS r w s m => MonadRWS r w s (LoggingT m)
 
