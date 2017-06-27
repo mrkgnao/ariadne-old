@@ -9,5 +9,8 @@ packages:
     extra-dep: yes
 extra-deps:
   - Only-0.1
+  - prettyprinter-1.1
+  - prettyprinter-ansi-terminal-1.1
+  - prettyprinter-compat-ansi-wl-pprint-1.0.1
 flags: {}
 extra-package-dbs: []

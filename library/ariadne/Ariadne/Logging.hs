@@ -12,15 +12,17 @@ import qualified Data.ByteString.Char8        as S8
 
 import           Data.Char                    (toLower, toUpper)
 import           Data.Monoid                  (mconcat, (<>))
-import qualified Data.Text                    as T
+import qualified Data.Text.Lazy                    as T
+import qualified Data.Text.Lazy.Encoding                    as T
 import qualified Data.Text.IO                 as T
 
 import           Data.Time
 
 import           System.IO                    (Handle, stderr, stdout)
 
-import           System.Console.ANSI
-import           Text.PrettyPrint.ANSI.Leijen hiding ((<>))
+-- import           System.Console.ANSI
+import           Data.Text.Prettyprint.Doc hiding ((<>))
+import           Data.Text.Prettyprint.Doc.Render.Terminal
 
 import GHC.Stack
 
@@ -34,9 +36,9 @@ logger _ _ lvl msg = logger'
         mconcat [timeDate timestamp datestamp, "\n", logLine, "\n\n"]
     timeDate ts ds =
       mconcat
-        [ toLogStr (show (black (text ts)))
+        [ toLogStr (show (annotate (color Green) (pretty ts)))
         , " "
-        , toLogStr (show (black (text ds)))
+        -- , toLogStr (show (black (text ds)))
         ]
     logLine = mconcat [defaultLogLevelStr lvl, " ", msg]
     getDate = do
@@ -62,17 +64,20 @@ logger _ _ lvl msg = logger'
 defaultLogLevelStr :: LogLevel -> LogStr
 defaultLogLevelStr (LevelOther t) = toLogStr t
 
-defaultLogLevelStr level = toLogStr (S8.pack preCode)
+defaultLogLevelStr level = toLogStr (T.encodeUtf8 preCode)
   where
     basename = map toUpper $ drop 5 $ show level
-    preCode =  show $ fill 8 . colorString $ text ("[" <> basename <> "]")
+    preCode =
+      renderLazy $
+      layoutPretty defaultLayoutOptions $
+      fill 8 . colorString $ pretty ("[" <> basename <> "]")
       where
         colorString =
           case level of
-            LevelError     -> red
-            LevelWarn      -> yellow
-            LevelDebug     -> green
-            LevelInfo      -> blue
+            LevelError -> annotate (color Red)
+            LevelWarn -> annotate (color Yellow)
+            LevelDebug -> annotate (color Green)
+            LevelInfo -> annotate (color Blue)
             _ -> id
 
 execute :: LoggingT m a -> m a

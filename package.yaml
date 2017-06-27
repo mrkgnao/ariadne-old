@@ -36,8 +36,10 @@ library:
   - base
   - edible
   - amalgam
-  - ansi-wl-pprint
   - ansi-terminal
+  - prettyprinter-compat-ansi-wl-pprint
+  - prettyprinter-ansi-terminal
+  - prettyprinter
   - lens
   - lens-aeson
   - time
