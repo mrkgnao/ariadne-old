@@ -3,6 +3,8 @@ packages:
   - '.'
   - location: './library/edible/'
     extra-dep: yes
+  - location: './library/amalgam/'
+    extra-dep: yes
   - location: '../katip/katip/'
     extra-dep: yes
 extra-deps:

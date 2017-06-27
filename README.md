@@ -4,7 +4,11 @@
 
 This repo hosts an in-progress experiment that seeks to construct a useful *exocortex*, a system that augments the mind with non-human capabilities of memory formation and information retrieval, using Haskell, PostgreSQL, and more than a little inspiration from `org-mode`.
 
-It also hosts Edible, a database interface for Haskell forked from [tisch](https://github.com/k0001/tisch), [Opaleye](https://github.com/tomjaguarpaw/haskell-opaleye/), and [postgresql-simple](https://github.com/lpsmith/postgresql-simple).
+It also hosts 
+
+- Edible, a database interface for Haskell forked from [tisch](https://github.com/k0001/tisch), [Opaleye](https://github.com/tomjaguarpaw/haskell-opaleye/), and [postgresql-simple](https://github.com/lpsmith/postgresql-simple).
+
+- Amalgam, a monadic logger forked from [fast-logger](https://www.stackage.org/package/fast-logger) and [monad-logger](https://www.stackage.org/package/monad-logger).
 
 ## Credits
 
