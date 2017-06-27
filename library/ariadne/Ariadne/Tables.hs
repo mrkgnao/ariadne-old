@@ -380,13 +380,18 @@ mkPath s d = do
        (hsi' @"path_source" s)
        (hsi' @"path_target" t))
 
+
+linkSearchLoop :: AriadneT IO ()
+linkSearchLoop = do
+  putText "\nEnter search query: "
+  str <- liftIO getLine
+  fetch (q_Link_by_title str) >>= traverse_ (^. link_title . to putTextLn)
+  linkSearchLoop
+
 runTisch :: IO ()
 runTisch = do
   conn <- connect connInfo
-  escapeLabyrinth
-    (AriadneState conn)
-    (do fetch (q_Fulltext_by_contents "html") >>= traverse_ print
-        fetch (q_Link_by_title "monad") >>= traverse_ (^. link_title . to putText))
+  escapeLabyrinth (AriadneState conn) linkSearchLoop
 
 main :: IO ()
 main = runTisch

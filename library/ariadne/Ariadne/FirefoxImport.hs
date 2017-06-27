@@ -2,7 +2,7 @@
 {-# LANGUAGE OverloadedStrings   #-}
 {-# LANGUAGE ScopedTypeVariables #-}
 {-# LANGUAGE ViewPatterns        #-}
-module FirefoxImport where
+module Ariadne.FirefoxImport where
 
 import           Data.Char            (ord)
 import           Data.Csv

@@ -16,34 +16,26 @@ module Lib.Prelude
   , String.fromString
   , (<||)
   , (||>)
+  , putText
+  , putTextLn
   ) where
 
-import           Control.Arrow    as Exports hiding
-    ( first
-    , second
-    , (<<<)
-    , (>>>)
-    )
+import           Control.Arrow    as Exports hiding (first, second, (<<<),
+                                              (>>>))
 import           Control.Category as Exports
 
-import           Control.Lens     as Exports hiding
-    ( Strict
-    , cons
-    , snoc
-    , uncons
-    , unsnoc
-    , (<.>)
-    , (<|)
-    , (|>)
-    , (.=)
-    )
-import           Protolude        as Exports hiding (from, show, to, (&), (.), Selector)
+import           Control.Lens     as Exports hiding (Strict, cons, snoc, uncons,
+                                              unsnoc, (.=), (<.>), (<|), (|>))
+import           Protolude        as Exports hiding (Selector, from, show, to,
+                                              (&), (.), putText)
 
 import qualified Control.Arrow    as Arrow
 import qualified Control.Lens     as Lens
 import qualified Protolude
 
 import qualified Data.String      as String
+
+import qualified Data.Text        as Text
 
 infixl 1 |$
 
@@ -93,3 +85,9 @@ infixr 5 <||
 
 (<||) :: Cons s s a a => a -> s -> s
 (<||) = (Lens.<|)
+
+putTextLn :: MonadIO m => Text -> m ()
+putTextLn = Text.unpack |> putStrLn
+
+putText :: MonadIO m => Text -> m ()
+putText = Text.unpack |> putStr
