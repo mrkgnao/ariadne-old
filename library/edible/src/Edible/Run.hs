@@ -8,6 +8,7 @@
 {-# LANGUAGE KindSignatures        #-}
 {-# LANGUAGE LambdaCase            #-}
 {-# LANGUAGE MultiParamTypeClasses #-}
+{-# LANGUAGE OverloadedStrings     #-}
 {-# LANGUAGE PolyKinds             #-}
 {-# LANGUAGE RankNTypes            #-}
 {-# LANGUAGE ScopedTypeVariables   #-}
@@ -115,8 +116,8 @@ import           Tisch.Internal.Debug                   (renderSqlQuery')
 import           Tisch.Internal.Kol                     (Kol (..))
 import           Tisch.Internal.Query                   (Query (..))
 import           Tisch.Internal.Record
-import           Tisch.Internal.Table
 import           Tisch.Internal.Singletons
+import           Tisch.Internal.Table
 
 --------------------------------------------------------------------------------
 
@@ -288,6 +289,8 @@ withSavepoint (Conn conn) f = Cx.mask $ \restore -> do
   eab <- restore (f (Conn conn)) `Cx.onException` abort
   eab <$ either (const abort) (const (return ())) eab
 
+type DefaultUnpackspec t = PP.Default O.Unpackspec t t
+
 --------------------------------------------------------------------------------
 
 -- | Query and fetch zero or more resulting rows.
@@ -344,7 +347,7 @@ runInsert
      , TableRW t
      , Database t ~ d
      , MonadLogger m
-     , (PP.Default O.Unpackspec (Record (Map (Column_NameSym0 :&&&$$$ Column_PgRSym0) (Columns t))) (Record (Map (Column_NameSym0 :&&&$$$ Column_PgRSym0) (Columns t))))
+     , DefaultUnpackspec (Record (Columns_NamedPgR t))
      )
   => Conn d ps -> Table t -> [HsI t] -> m () -- ^
 runInsert conn t = runInsertRaw conn (rawTableRW t) . map pgWfromHsI
@@ -361,7 +364,7 @@ runInsert1
      , TableRW t
      , Database t ~ d
      , MonadLogger m
-     , (PP.Default O.Unpackspec (Record (Map (Column_NameSym0 :&&&$$$ Column_PgRSym0) (Columns t))) (Record (Map (Column_NameSym0 :&&&$$$ Column_PgRSym0) (Columns t))))
+     , DefaultUnpackspec (Record (Columns_NamedPgR t))
      )
   => Conn d ps -> Table t -> HsI t -> m () -- ^
 runInsert1 conn t = runInsertRaw1 conn (rawTableRW t) . pgWfromHsI
@@ -376,7 +379,7 @@ runInsertNoCountCheck
      , TableRW t
      , Database t ~ d
      , MonadLogger m
-     , (PP.Default O.Unpackspec (Record (Map (Column_NameSym0 :&&&$$$ Column_PgRSym0) (Columns t))) (Record (Map (Column_NameSym0 :&&&$$$ Column_PgRSym0) (Columns t))))
+     , DefaultUnpackspec (Record (Columns_NamedPgR t))
      )
   => Conn d ps -> Table t -> [HsI t] -> m Int64 -- ^
 runInsertNoCountCheck conn t =
@@ -398,15 +401,22 @@ runInsertRaw conn t = \case
     let nExpected = fromIntegral (length ws) :: Int64
     when (nExpected /= nAffected) $ do
        let sql = O.arrangeInsertManySql (unRawTable t) (NEL.fromList ws)
+       liftIO $ print sql
        Cx.throwM (ErrNumRows nExpected nAffected (Just sql))
 
 -- | Like 'runInsertNoCountCheck', but takes a 'RawTable' instead of a 'Table'.
 runInsertRawNoCountCheck
   :: (MonadIO m, Allow 'Insert ps, MonadLogger m, PP.Default O.Unpackspec v v)
   => Conn d ps -> RawTable d w v -> [w] -> m Int64 -- ^
-runInsertRawNoCountCheck (Conn conn) (RawTable t) = \case
-  [] -> return 0
-  ws -> liftIO (O.runInsertMany conn t ws)
+runInsertRawNoCountCheck (Conn conn) (RawTable t) w =
+  case w of
+    [] -> do
+      logDebugN "0 rows"
+      pure 0
+    ws -> do
+      aff <- liftIO (O.runInsertMany conn t ws)
+      logDebugN (T.pack $ show aff)
+      pure aff
 
 -- | Like 'runInsert1', but takes a 'RawTable' instead of a 'Table'.
 runInsertRaw1

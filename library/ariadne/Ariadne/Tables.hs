@@ -380,6 +380,19 @@ mkKnot = do
         (hsi' @"knot_created_at" WDef)
         (hsi' @"knot_extra_data" WDef)
 
+mkKnot'
+  :: (MonadReader AriadneState m, MonadIO m, MonadThrow m, MonadLogger m)
+  => m ()
+mkKnot' = do
+  c <- asks conn
+  runInsert1 c Knot kt
+  where
+    kt =
+      mkHsI Knot
+        (hsi' @"knot_id" WDef)
+        (hsi' @"knot_created_at" WDef)
+        (hsi' @"knot_extra_data" WDef)
+
 mkPath
   :: (MonadReader AriadneState m, MonadIO m, MonadThrow m, MonadLogger m)
   => KnotId -> KnotId -> m KnotId
@@ -414,7 +427,10 @@ linkSearchLoop = do
 runTisch :: IO ()
 runTisch = do
   conn <- connect connInfo
-  escapeLabyrinth (AriadneState conn) linkSearchLoop
+  escapeLabyrinth
+    (AriadneState conn)
+    (do mkKnot'
+        linkSearchLoop)
 
 updateFulltext :: KnotId -> AriadneT IO ()
 updateFulltext kid = do
