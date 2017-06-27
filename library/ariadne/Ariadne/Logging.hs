@@ -73,7 +73,7 @@ logLevelStr (LevelOther t) = t
 logLevelStr level = preCode
   where
     basename = map toUpper $ drop 5 $ show level
-    preCode = (layoutAndRender . fill 8 . colorLevel) ("[" <> basename <> "]")
+    preCode = (layoutAndRender . fill 8 . annotate bold . colorLevel) ("|" <> basename <> "|")
       where
         colorLevel =
           case level of

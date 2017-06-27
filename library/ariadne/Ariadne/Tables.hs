@@ -393,8 +393,10 @@ linkSearchLoop :: AriadneT IO ()
 linkSearchLoop = do
   putText "\nEnter search query: "
   str <- liftIO getLine
-  fetch (q_Link_by_title str) >>= traverse_ (^. link_title . to putTextLn)
-  linkSearchLoop
+  unless
+    (str == "\\quit")
+    (do fetch (q_Link_by_title str) >>= traverse_ (^. link_title . to putTextLn)
+        linkSearchLoop)
 
 runTisch :: IO ()
 runTisch = do
