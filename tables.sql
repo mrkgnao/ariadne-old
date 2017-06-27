@@ -1,6 +1,6 @@
 drop owned by mrkgnao;
 
-create extension "uuid-ossp";
+create extension if not exists "uuid-ossp";
 
 create table knots
   ( knot_id         uuid

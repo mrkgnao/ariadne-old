@@ -26,18 +26,14 @@ import           Control.Monad.Catch        (MonadThrow)
 import           Control.Monad.IO.Class     (MonadIO, liftIO)
 import           Control.Monad.Reader
 import           Data.Aeson
--- import           Data.Int                   (Int32)
 import           Data.Tagged
 import           Data.Text                  (Text)
 import           Data.Time.Clock            (UTCTime)
 import           Data.UUID
 import qualified Database.PostgreSQL.Simple as PGS
 import           Edible
-import           Tisch.Internal.Fun
+import           Tisch.Internal.Fun as Tisch
 import           Tisch.Internal.Table
-
--- import           Data.Kind                  (Type)
--- import           Data.Proxy
 import           GHC.TypeLits
 
 import           Lib.Prelude                hiding (like)
@@ -272,7 +268,13 @@ q_Link_by_id kid = proc () -> do
 q_Link_by_url :: Text >-> PgR Link
 q_Link_by_url url = proc () -> do
   l <- query Link -< ()
-  restrict -< (l ^. link_url) `like` kol ("%" <> url)
+  restrict -< (l ^. link_url) `like` kol ("%" <> url <> "%")
+  returnA -< l
+
+q_Link_by_title :: Text >-> PgR Link
+q_Link_by_title title = proc () -> do
+  l <- query Link -< ()
+  restrict -< (l ^. link_title) `Tisch.ilike` kol ("%" <> title <> "%")
   returnA -< l
 
 link_id :: ColLens "link_id" a b b => Lens' a b
@@ -280,6 +282,9 @@ link_id = colLens @"link_id"
 
 link_url :: ColLens "link_url" a b b => Lens' a b
 link_url = colLens @"link_url"
+
+link_title :: ColLens "link_title" a b b => Lens' a b
+link_title = colLens @"link_title"
 
 createLink
   :: (MonadReader AriadneState m, MonadIO m, MonadThrow m)
@@ -380,15 +385,8 @@ runTisch = do
   conn <- connect connInfo
   escapeLabyrinth
     (AriadneState conn)
-    (do a <- createLink "http://web.site" "Not very funny"
-        mkKnot >>= mkPath a >>= print
-        mkFulltext a "<html>Very funny website</html>" >>= print
-        fetch (q_Link_by_url "site") >>= print
-        fetch (q_Fulltext_by_contents "html") >>= traverse_ print)
-    -- fetchLink q_Link_all >>= (map (^. link_id) |> traverse_ print)
-    -- fetchLink (q_Link_by_url "http://lol.kol") >>= traverse_ print
-    -- fetchKnot q_Knot_all >>= (length |> print)
-    -- fetchPath q_Path_all >>= (length |> print)
+    (do fetch (q_Fulltext_by_contents "html") >>= traverse_ print
+        fetch (q_Link_by_title "monad") >>= traverse_ (^. link_title . to putText))
 
 main :: IO ()
 main = runTisch

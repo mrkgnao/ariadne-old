@@ -37,7 +37,6 @@ data Bookmark = Bookmark
 instance FromRecord Bookmark
 instance ToRecord Bookmark
 
-
 filename = "/home/mrkgnao/code/haskell/ariadne/bookmarks.tsv"
 
 contents :: IO ByteString
