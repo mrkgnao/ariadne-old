@@ -1,48 +1,9 @@
-# [ariadne][]
+# Ariadne
 
-Thanks for starting a project with Haskeleton! If you haven't heard of it
-before, I suggest reading the introductory blog post. You can find it here:
-<http://taylor.fausak.me/2014/03/04/haskeleton-a-haskell-project-skeleton/>.
+> Ariadne (/æriˈædniː/; Greek: Ἀριάδνη; Latin: Ariadne), in Greek mythology, was the daughter of Minos, King of Crete, Son of Zeus and his queen Pasiphaë, daughter of Helios. She is mostly associated with mazes and labyrinths because of her involvement in the myths of the Minotaur and Theseus. Her father put her in charge of the labyrinth where sacrifices were made as part of reparations (either to Poseidon or to Athena, depending on the version of the myth); later, she helped Theseus overcome the Minotaur and save the potential sacrificial victims. 
 
-Before you get started, there are a few things that this template couldn't
-provide for you. You should:
+This repo hosts an in-progress experiment that seeks to construct a useful *exocortex*, a system that augments the mind with non-human capabilities of memory formation and information retrieval, using Haskell, PostgreSQL, and more than a little inspiration from `org-mode`.
 
--   Add a synopsis to `package.yaml`. It should be a short (one sentence)
-    explanation of your project.
+## Credits
 
--   Add a description to `package.yaml`. This can be whatever you want it to
-    be.
-
--   Add a category to `package.yaml`. A list of categories is available on
-    Hackage at <http://hackage.haskell.org/packages>.
-
--   Rename `library/Example.hs` to whatever you want your top-level module to
-    be called. Typically this is the same as your package name but in
-    `CamelCase` instead of `kebab-case`.
-
-    -   Don't forget to rename the reference to it in
-        `executable/Main.hs`!
-
--   If you are on an older version of Stack (<1.0.4), delete `package.yaml` and
-    remove `/*.cabal` from your `.gitignore`.
-
-Once you've done that, start working on your project with the Stack commands
-you know and love.
-
-``` sh
-# Build the project.
-stack build
-
-# Run the test suite.
-stack test
-
-# Run the benchmarks.
-stack bench
-
-# Generate documentation.
-stack haddock
-```
-
-Thanks again, and happy hacking!
-
-[ariadne]: https://github.com/mrkgnao/ariadne
+I learned of the *exocortex* neologism from Shrutarshi Basu ([@basus](https://twitter.com/basus)).
