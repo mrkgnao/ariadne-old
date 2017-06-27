@@ -25,12 +25,13 @@ import           Text.PrettyPrint.ANSI.Leijen hiding ((<>))
 import GHC.Stack
 
 logger :: Loc -> LogSource -> LogLevel -> LogStr -> IO ()
-logger _ _ lvl msg = do
-  datestamp <- getDate
-  timestamp <- getTime
-  S8.hPutStr stdout . fromLogStr $
-    mconcat [timeDate timestamp datestamp, "\n", logLine, "\n\n"]
+logger _ _ lvl msg = logger'
   where
+    logger' = do
+      datestamp <- getDate
+      timestamp <- getTime
+      S8.hPutStr stdout . fromLogStr $
+        mconcat [timeDate timestamp datestamp, "\n", logLine, "\n\n"]
     timeDate ts ds =
       mconcat
         [ toLogStr (show (black (text ts)))
@@ -38,22 +39,25 @@ logger _ _ lvl msg = do
         , toLogStr (show (black (text ds)))
         ]
     logLine = mconcat [defaultLogLevelStr lvl, " ", msg]
-    dateLength =
-      length $
-      formatTime defaultTimeLocale "%F" (UTCTime (ModifiedJulianDay 0) 0)
     getDate = do
       now <- getZonedTime
       return $ formatTime' now
       where
         formatTime' = take dateLength . formatTime defaultTimeLocale "%F"
-    timeLength =
-      length $
-      formatTime defaultTimeLocale "%T.000000" (UTCTime (ModifiedJulianDay 0) 0)
+        dateLength =
+          length $
+          formatTime defaultTimeLocale "%F" (UTCTime (ModifiedJulianDay 0) 0)
     getTime = do
       now <- getZonedTime
       return $ formatTime' now
       where
         formatTime' = take timeLength . formatTime defaultTimeLocale "%T.%q"
+        timeLength =
+          length $
+          formatTime
+            defaultTimeLocale
+            "%T.000000"
+            (UTCTime (ModifiedJulianDay 0) 0)
 
 defaultLogLevelStr :: LogLevel -> LogStr
 defaultLogLevelStr (LevelOther t) = toLogStr t
