@@ -34,6 +34,7 @@ github: mrkgnao/ariadne
 library:
   dependencies:
   - base
+  - wreq
   - edible
   - amalgam
   - prettyprinter-ansi-terminal

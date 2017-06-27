@@ -27,8 +27,14 @@ import           Control.Monad.IO.Class     (MonadIO, liftIO)
 import           Control.Monad.Logger
 import           Control.Monad.Reader
 import           Data.Aeson
+import qualified Data.ByteString            as BS
 import           Data.Tagged
 import           Data.Text                  (Text)
+import qualified Data.Text                  as T
+import qualified Data.Text.Encoding         as T
+import qualified Data.Text.Encoding.Error   as T
+import qualified Data.Text.Lazy             as TL
+import qualified Data.Text.Lazy.Encoding    as TL
 import           Data.Time.Clock            (UTCTime)
 import           Data.UUID
 import qualified Database.PostgreSQL.Simple as PGS
@@ -39,9 +45,11 @@ import           Tisch.Internal.Table
 
 import           Lib.Prelude                hiding (like)
 
-import qualified Ariadne.Logging                    as L
+import qualified Ariadne.Logging            as L
 
 import           Ariadne.Ambiguous
+
+import qualified Network.Wreq               as W
 
 -- | An uninhabited type-level database tag.
 data Db
@@ -395,13 +403,40 @@ linkSearchLoop = do
   str <- liftIO getLine
   unless
     (str == "\\quit")
-    (do fetch (q_Link_by_title str) >>= traverse_ (^. link_title . to putTextLn)
+    (do fetch @Link (q_Link_by_title str) >>=
+          traverse_
+            (\l ->
+               (do l ^. link_title . to putTextLn
+                   updateFulltext (l ^. link_id)))
         linkSearchLoop)
 
 runTisch :: IO ()
 runTisch = do
   conn <- connect connInfo
   escapeLabyrinth (AriadneState conn) linkSearchLoop
+
+updateFulltext :: KnotId -> AriadneT IO ()
+updateFulltext kid = do
+  link' <- fetch (q_Link_by_id kid)
+  case link' of
+    [lnk] -> do
+      page <- lnk
+           |$ view link_url
+           |> T.unpack
+           |> W.get |> liftIO
+      let
+        pageText = page
+              |$ view W.responseBody
+              |> TL.decodeUtf8With T.ignore
+              |> TL.toStrict
+      logInfoN ("Fetched page: " <> tshow (T.length pageText) <> " bytes")
+    _ -> pure ()
+
+getLink :: IO Text
+getLink = W.get "http://google.com"
+      <&> view W.responseBody
+       |> TL.decodeUtf8With T.ignore
+       |> TL.toStrict
 
 main :: IO ()
 main = runTisch
