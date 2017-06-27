@@ -9,17 +9,11 @@ import           Data.Char                                 (toUpper)
 import           Data.Monoid                               (mconcat, (<>))
 
 import qualified Data.ByteString.Char8                     as S8
-import           Data.Text.Lazy                            (Text)
-import qualified Data.Text.Lazy                            as TL
-import qualified Data.Text.Lazy.Encoding                   as TL
 
 import           Data.Text                                 as Strict (Text)
-import qualified Data.Text                                 as Strict
 import qualified Data.Text.Encoding                        as Strict
 
 import           Data.Time
-
-import           System.IO                                 (stdout)
 
 import           Data.Text.Prettyprint.Doc                 hiding ((<>))
 import           Data.Text.Prettyprint.Doc.Render.Terminal
@@ -27,6 +21,7 @@ import           Data.Text.Prettyprint.Doc.Render.Terminal
 layoutAndRender :: Doc AnsiStyle -> Strict.Text
 layoutAndRender = renderStrict . layoutPretty defaultLayoutOptions
 
+colorize :: Pretty a => Color -> a -> Doc AnsiStyle
 colorize x = annotate (color x) . pretty
 
 logger :: Loc -> LogSource -> LogLevel -> LogStr -> IO ()
@@ -40,17 +35,18 @@ logger _ _ lvl msg = logger'
               [ toLogStr (timeDate timestamp datestamp)
               , "\n"
               , toLogStr logLine
-              , "\n\n"
+              , "\n"
               ]
-      S8.hPutStr stdout (fromLogStr logStr)
+      S8.putStrLn (fromLogStr logStr)
     timeDate ts ds =
       layoutAndRender
-        (mconcat (map (colorize Black) [ts, " ", ds]))
+        (foldMap (colorize Black) [ts, " ", ds])
     logLine =
-      mconcat [Strict.encodeUtf8 (defaultLogLevelStr lvl), " ", fromLogStr msg]
+      mconcat [Strict.encodeUtf8 (logLevelStr lvl), " ", fromLogStr msg]
     getDate = getDateElement "%F" "%F"
     getTime = getDateElement "%T.%q" "%T.000000"
 
+getDateElement :: String -> String -> IO String
 getDateElement a b = formatElt <$> getZonedTime
   where
     formatElt = take dateLength . formatTime defaultTimeLocale a
@@ -58,9 +54,9 @@ getDateElement a b = formatElt <$> getZonedTime
       length
         (formatTime defaultTimeLocale b (UTCTime (ModifiedJulianDay 0) 0))
 
-defaultLogLevelStr :: LogLevel -> Strict.Text
-defaultLogLevelStr (LevelOther t) = t
-defaultLogLevelStr level = preCode
+logLevelStr :: LogLevel -> Strict.Text
+logLevelStr (LevelOther t) = t
+logLevelStr level = preCode
   where
     basename = map toUpper $ drop 5 $ show level
     preCode = (layoutAndRender . fill 8 . colorLevel) ("[" <> basename <> "]")
