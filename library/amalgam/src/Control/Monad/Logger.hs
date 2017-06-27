@@ -161,14 +161,7 @@ import GHC.Stack as GHC
 
 import Prelude hiding (catch)
 
-#if MIN_VERSION_fast_logger(2, 1, 0)
 -- Using System.Log.FastLogger
-#elif MIN_VERSION_bytestring(0, 10, 2)
-import qualified Data.ByteString.Lazy as L
-import Data.ByteString.Builder (toLazyByteString)
-#else
-import Blaze.ByteString.Builder (toByteString)
-#endif
 
 #if MIN_VERSION_conduit_extra(1,1,0)
 import Data.Conduit.Lazy (MonadActive, monadActive)
@@ -577,13 +570,7 @@ defaultLogStrBS :: Loc
 defaultLogStrBS a b c d =
     toBS $ defaultLogStr a b c d
   where
-#if MIN_VERSION_fast_logger(2, 1, 0)
     toBS = fromLogStr
-#elif MIN_VERSION_bytestring(0, 10, 2)
-    toBS = L.toStrict . toLazyByteString . logStrBuilder
-#else
-    toBS = toByteString . logStrBuilder
-#endif
 
 defaultLogLevelStr :: LogLevel -> LogStr
 defaultLogLevelStr level = case level of
@@ -594,13 +581,8 @@ defaultLogStr :: Loc
               -> LogSource
               -> LogLevel
               -> LogStr
-#if MIN_VERSION_fast_logger(0, 2, 0)
               -> LogStr
-#else
-              -> S8.ByteString
-#endif
 defaultLogStr loc src level msg =
-#if MIN_VERSION_fast_logger(0, 2, 0)
     "[" `mappend` defaultLogLevelStr level `mappend`
     (if T.null src
         then mempty
@@ -613,24 +595,6 @@ defaultLogStr loc src level msg =
             " @(" `mappend`
             toLogStr (S8.pack fileLocStr) `mappend`
             ")\n")
-#else
-    S8.concat
-        [ S8.pack "["
-        , case level of
-            LevelOther t -> encodeUtf8 t
-            _ -> encodeUtf8 $ pack $ drop 5 $ show level
-        , if T.null src
-            then S8.empty
-            else encodeUtf8 $ '#' `T.cons` src
-        , S8.pack "] "
-        , case msg of
-            LS s -> encodeUtf8 $ pack s
-            LB b -> b
-        , S8.pack " @("
-        , encodeUtf8 $ pack fileLocStr
-        , S8.pack ")\n"
-        ]
-#endif
   where
     -- taken from file-location package
     -- turn the TH Loc loaction information into a human readable string

@@ -35,6 +35,7 @@ library:
   dependencies:
   - base
   - edible
+  - amalgam
   - lens
   - lens-aeson
   - time

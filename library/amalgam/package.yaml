@@ -1,0 +1,43 @@
+name: amalgam
+version: '2.4.10'
+synopsis: A fast logging system
+description: A fast logging system
+category: System
+author: Kazu Yamamoto <kazu@iij.ad.jp>
+maintainer: Kazu Yamamoto <kazu@iij.ad.jp>
+license: BSD3
+homepage: https://github.com/kazu-yamamoto/logger
+git: git://github.com/kazu-yamamoto/logger.git
+extra-source-files:
+- README.md
+- ChangeLog.md
+dependencies:
+- base >=4.5 && <5
+- array
+- auto-update >=0.1.2
+- blaze-builder
+- bytestring
+- conduit >=1.0 && <1.3
+- conduit-extra >=1.0 && <1.3
+- directory
+- easy-file >=0.2
+- exceptions
+- filepath
+- lifted-base
+- monad-control
+- monad-loops
+- mtl
+- resourcet >=0.4 && <1.2
+- stm
+- stm-chans
+- text
+- text
+- transformers
+- transformers-base
+- transformers-compat >=0.3
+- unix
+- unix-time
+library:
+  ghc-options: -Wall
+  source-dirs: src/
+  cpp-options: -DWITH_CALLSTACK
