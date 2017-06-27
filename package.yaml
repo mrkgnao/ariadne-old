@@ -36,6 +36,8 @@ library:
   - base
   - edible
   - amalgam
+  - ansi-wl-pprint
+  - ansi-terminal
   - lens
   - lens-aeson
   - time

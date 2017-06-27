@@ -1,18 +1,18 @@
-{-# LANGUAGE CPP #-}
-{-# LANGUAGE DefaultSignatures #-}
+{-# LANGUAGE CPP                   #-}
+{-# LANGUAGE DefaultSignatures     #-}
 #if WITH_CALLSTACK
-{-# LANGUAGE ImplicitParams #-}
+{-# LANGUAGE ImplicitParams        #-}
 #endif
 #if WITH_TEMPLATE_HASKELL
-{-# LANGUAGE TemplateHaskell #-}
+{-# LANGUAGE TemplateHaskell       #-}
 #endif
-{-# LANGUAGE TypeFamilies #-}
-{-# LANGUAGE FlexibleContexts #-}
-{-# LANGUAGE FlexibleInstances #-}
+{-# LANGUAGE FlexibleContexts      #-}
+{-# LANGUAGE FlexibleInstances     #-}
 {-# LANGUAGE MultiParamTypeClasses #-}
-{-# LANGUAGE OverloadedStrings #-}
-{-# LANGUAGE UndecidableInstances #-}
-{-# LANGUAGE Trustworthy #-}
+{-# LANGUAGE OverloadedStrings     #-}
+{-# LANGUAGE Trustworthy           #-}
+{-# LANGUAGE TypeFamilies          #-}
+{-# LANGUAGE UndecidableInstances  #-}
 -- |  This module provides the facilities needed for a decoupled logging system.
 --
 -- The 'MonadLogger' class is implemented by monads that give access to a
@@ -95,67 +95,76 @@ module Control.Monad.Logger
     ) where
 
 #if WITH_TEMPLATE_HASKELL
-import Language.Haskell.TH.Syntax (Lift (lift), Q, Exp, Loc (..), qLocation)
+import           Language.Haskell.TH.Syntax        (Exp, Lift (lift), Loc (..),
+                                                    Q, qLocation)
 #endif
 
-import Data.Monoid (Monoid)
+import           Data.Monoid                       (Monoid)
 
-import Control.Applicative (Applicative (..))
-import Control.Concurrent.Chan (Chan(),writeChan,readChan)
-import Control.Concurrent.STM
-import Control.Concurrent.STM.TBChan
-import Control.Exception.Lifted (onException, bracket)
-import Control.Monad (liftM, ap, when, void, forever)
-import Control.Monad.Base (MonadBase (liftBase))
-import Control.Monad.Loops (untilM)
-import Control.Monad.Trans.Control (MonadBaseControl (..), MonadTransControl (..))
-import Control.Monad.Trans.Except
-import qualified Control.Monad.Trans.Class as Trans
+import           Control.Applicative               (Applicative (..))
+import           Control.Concurrent.Chan           (Chan (), readChan,
+                                                    writeChan)
+import           Control.Concurrent.STM
+import           Control.Concurrent.STM.TBChan
+import           Control.Exception.Lifted          (bracket, onException)
+import           Control.Monad                     (ap, forever, liftM, void,
+                                                    when)
+import           Control.Monad.Base                (MonadBase (liftBase))
+import           Control.Monad.Loops               (untilM)
+import qualified Control.Monad.Trans.Class         as Trans
+import           Control.Monad.Trans.Control       (MonadBaseControl (..),
+                                                    MonadTransControl (..))
+import           Control.Monad.Trans.Except
 
-import Control.Monad.IO.Class (MonadIO (liftIO))
-import Control.Monad.Trans.Resource (MonadResource (liftResourceT), MonadThrow, monadThrow)
-import Control.Monad.Trans.Resource (throwM)
-import Control.Monad.Catch (MonadCatch (..), MonadMask (..))
+import           Control.Monad.Catch               (MonadCatch (..),
+                                                    MonadMask (..))
+import           Control.Monad.IO.Class            (MonadIO (liftIO))
+import           Control.Monad.Trans.Resource      (MonadResource (liftResourceT),
+                                                    MonadThrow, monadThrow)
+import           Control.Monad.Trans.Resource      (throwM)
 
-import Control.Monad.Trans.Identity ( IdentityT)
-import Control.Monad.Trans.List     ( ListT    )
-import Control.Monad.Trans.Maybe    ( MaybeT   )
+import           Control.Monad.Trans.Identity      (IdentityT)
+import           Control.Monad.Trans.List          (ListT)
+import           Control.Monad.Trans.Maybe         (MaybeT)
 
-import Control.Monad.Trans.Reader   ( ReaderT  )
-import Control.Monad.Trans.Cont     ( ContT  )
-import Control.Monad.Trans.State    ( StateT   )
-import Control.Monad.Trans.Writer   ( WriterT  )
-import Control.Monad.Trans.RWS      ( RWST     )
-import Control.Monad.Trans.Resource ( ResourceT)
-import Data.Conduit.Internal        ( Pipe, ConduitM )
+import           Control.Monad.Trans.Cont          (ContT)
+import           Control.Monad.Trans.Reader        (ReaderT)
+import           Control.Monad.Trans.Resource      (ResourceT)
+import           Control.Monad.Trans.RWS           (RWST)
+import           Control.Monad.Trans.State         (StateT)
+import           Control.Monad.Trans.Writer        (WriterT)
+import           Data.Conduit.Internal             (ConduitM, Pipe)
 
-import qualified Control.Monad.Trans.RWS.Strict    as Strict ( RWST   )
-import qualified Control.Monad.Trans.State.Strict  as Strict ( StateT )
-import qualified Control.Monad.Trans.Writer.Strict as Strict ( WriterT )
+import qualified Control.Monad.Trans.RWS.Strict    as Strict (RWST)
+import qualified Control.Monad.Trans.State.Strict  as Strict (StateT)
+import qualified Control.Monad.Trans.Writer.Strict as Strict (WriterT)
 
-import Data.Text (Text, pack, unpack)
-import qualified Data.Text as T
-import qualified Data.ByteString.Char8 as S8
+import qualified Data.ByteString.Char8             as S8
+import           Data.Text                         (Text, pack, unpack)
+import qualified Data.Text                         as T
 
-import Data.Monoid (mappend, mempty)
-import System.Log.FastLogger
-import System.IO (Handle, IOMode(AppendMode), BufferMode(LineBuffering), openFile, hClose, hSetBuffering, stdout, stderr)
+import           Data.Monoid                       (mappend, mempty)
+import           System.IO                         (BufferMode (LineBuffering),
+                                                    Handle, IOMode (AppendMode),
+                                                    hClose, hSetBuffering,
+                                                    openFile, stderr, stdout)
+import           System.Log.FastLogger
 
-import Control.Monad.Cont.Class   ( MonadCont (..) )
-import Control.Monad.RWS.Class    ( MonadRWS )
-import Control.Monad.Reader.Class ( MonadReader (..) )
-import Control.Monad.State.Class  ( MonadState (..) )
-import Control.Monad.Writer.Class ( MonadWriter (..) )
+import           Control.Monad.Cont.Class          (MonadCont (..))
+import           Control.Monad.Reader.Class        (MonadReader (..))
+import           Control.Monad.RWS.Class           (MonadRWS)
+import           Control.Monad.State.Class         (MonadState (..))
+import           Control.Monad.Writer.Class        (MonadWriter (..))
 
 #if WITH_CALLSTACK
-import GHC.Stack as GHC
+import           GHC.Stack                         as GHC
 #endif
 
-import Prelude hiding (catch)
+import           Prelude                           hiding (catch)
 
 -- Using System.Log.FastLogger
 
-import Data.Conduit.Lazy (MonadActive, monadActive)
+import           Data.Conduit.Lazy                 (MonadActive, monadActive)
 
 data LogLevel = LevelDebug | LevelInfo | LevelWarn | LevelError | LevelOther Text
     deriving (Eq, Prelude.Show, Prelude.Read, Ord)
@@ -165,30 +174,37 @@ type LogSource = Text
 #if WITH_TEMPLATE_HASKELL
 
 instance Lift LogLevel where
-    lift LevelDebug = [|LevelDebug|]
-    lift LevelInfo  = [|LevelInfo|]
-    lift LevelWarn  = [|LevelWarn|]
-    lift LevelError = [|LevelError|]
+    lift LevelDebug     = [|LevelDebug|]
+    lift LevelInfo      = [|LevelInfo|]
+    lift LevelWarn      = [|LevelWarn|]
+    lift LevelError     = [|LevelError|]
     lift (LevelOther x) = [|LevelOther $ pack $(lift $ unpack x)|]
 
 #else
 
 data Loc
   = Loc { loc_filename :: String
-    , loc_package  :: String
-    , loc_module   :: String
-    , loc_start    :: CharPos
-    , loc_end      :: CharPos }
+    , loc_package      :: String
+    , loc_module       :: String
+    , loc_start        :: CharPos
+    , loc_end          :: CharPos }
 type CharPos = (Int, Int)
 
 #endif
 
 -- | A @Monad@ which has the ability to log messages in some manner.
-class Monad m => MonadLogger m where
-    monadLoggerLog :: ToLogStr msg => Loc -> LogSource -> LogLevel -> msg -> m ()
-    default monadLoggerLog :: (MonadLogger m', Trans.MonadTrans t, MonadLogger (t m'), ToLogStr msg, m ~ t m')
-                           => Loc -> LogSource -> LogLevel -> msg -> m ()
-    monadLoggerLog loc src lvl msg = Trans.lift $ monadLoggerLog loc src lvl msg
+class Monad m =>
+      MonadLogger m where
+  monadLoggerLog
+    :: ToLogStr msg
+    => Loc -> LogSource -> LogLevel -> msg -> m ()
+  default monadLoggerLog :: ( MonadLogger m'
+                            , Trans.MonadTrans t
+                            , MonadLogger (t m')
+                            , ToLogStr msg
+                            , m ~ t m') =>
+    Loc -> LogSource -> LogLevel -> msg -> m ()
+  monadLoggerLog loc src lvl msg = Trans.lift $ monadLoggerLog loc src lvl msg
 
 -- | An extension of @MonadLogger@ for the common case where the logging action
 -- is a simple @IO@ action. The advantage of using this typeclass is that the
@@ -756,7 +772,7 @@ defaultLoc = Loc "<unknown>" "<unknown>" "<unknown>" (0,0) (0,0)
 
 isDefaultLoc :: Loc -> Bool
 isDefaultLoc (Loc "<unknown>" "<unknown>" "<unknown>" (0,0) (0,0)) = True
-isDefaultLoc _ = False
+isDefaultLoc _                                                     = False
 
 -- |
 --
