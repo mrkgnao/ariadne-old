@@ -217,7 +217,7 @@ q_Fulltext_by_contents cts = proc () -> do
   returnA -< l
 
 mkFulltext'
-  :: (MonadReader AriadneState m, MonadIO m, MonadThrow m)
+  :: (MonadReader AriadneState m, MonadIO m, MonadThrow m, MonadLogger m)
   => Text -> m KnotId
 mkFulltext' s = do
   t <- mkKnot
@@ -290,7 +290,7 @@ link_title :: ColLens "link_title" a b b => Lens' a b
 link_title = colLens @"link_title"
 
 createLink
-  :: (MonadReader AriadneState m, MonadIO m, MonadThrow m)
+  :: (MonadReader AriadneState m, MonadIO m, MonadThrow m, MonadLogger m)
   => Text -> Text -> m KnotId
 createLink url title = do
   s <- mkKnot
@@ -338,11 +338,13 @@ escapeLabyrinth db a = runLoggingT (runReaderT (runAriadneT a) db) L.logger
 
 fetch
   :: forall a m.
-     (MonadIO m, MonadThrow m, MonadReader AriadneState m, _)
+     (MonadIO m, MonadThrow m, MonadReader AriadneState m, MonadLogger m, _)
   => Query Db () (PgR a) -> m [HsR a]
 fetch q = do
   c <- asks conn
-  runQuery c q
+  recs :: [HsR a] <- runQuery c q
+  logInfoN ("Fetched " <> sshow (length recs) <> " record(s)")
+  pure recs
 
 connInfo :: PGS.ConnectInfo
 connInfo =
@@ -356,11 +358,13 @@ hsi' :: forall (c :: Symbol) x. x -> Tagged c x
 hsi' = hsi (C @c)
 
 mkKnot
-  :: (MonadReader AriadneState m, MonadIO m, MonadThrow m)
+  :: (MonadReader AriadneState m, MonadIO m, MonadThrow m, MonadLogger m)
   => m KnotId
 mkKnot = do
   c <- asks conn
-  runInsertReturning1 c Knot (^. knot_id) kt
+  kid <- runInsertReturning1 c Knot (^. knot_id) kt
+  logDebugN ("Created knot with id " <> sshow kid)
+  pure kid
   where
     kt =
       mkHsI Knot
@@ -369,7 +373,7 @@ mkKnot = do
         (hsi' @"knot_extra_data" WDef)
 
 mkPath
-  :: (MonadReader AriadneState m, MonadIO m, MonadThrow m)
+  :: (MonadReader AriadneState m, MonadIO m, MonadThrow m, MonadLogger m)
   => KnotId -> KnotId -> m KnotId
 mkPath s d = do
   t <- mkKnot
