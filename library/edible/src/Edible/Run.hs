@@ -94,7 +94,7 @@ import qualified Edible.Aggregate                       as O
 import qualified Edible.Binary                          as O
 import qualified Edible.Column                          as O
 import qualified Edible.Constant                        as O
-import qualified Edible.Distinct                        as O
+import qualified Edible.Operators                        as O
 import qualified Edible.FunctionalJoin                  as O
 import qualified Edible.Internal.RunQuery               as OI
 import qualified Edible.Internal.Unpackspec             as OI

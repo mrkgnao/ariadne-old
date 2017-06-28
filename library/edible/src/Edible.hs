@@ -225,16 +225,16 @@ module Edible
  , unsaferCastKol
  ) where
 
-import           Edible.Internal.Aggregation
-import           Edible.Internal.Fun
 import           Edible.Internal.Kol
 import           Edible.Internal.Koln
 import           Edible.Internal.Query
 import           Edible.Internal.Table
+import           Edible.Operators
+import           Edible.Aggregate
 
+import qualified Edible.Order          as E
+import qualified Edible.PGTypes        as E
 import           Edible.Run
-import qualified Edible.Order               as E
-import qualified Edible.PGTypes             as E
 
 -- import qualified Edible.Aggregate           as E
 -- import qualified Edible.Binary              as E
