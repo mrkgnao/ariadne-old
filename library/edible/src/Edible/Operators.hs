@@ -1,4 +1,4 @@
-{-# LANGUAGE Arrows #-}
+{-# LANGUAGE Arrows           #-}
 {-# LANGUAGE FlexibleContexts #-}
 
 -- | Operators on 'Column's.  Please note that numeric 'Column' types
@@ -6,27 +6,30 @@
 
 module Edible.Operators (module Edible.Operators) where
 
-import qualified Control.Arrow as A
-import qualified Data.Foldable as F
-import qualified Data.List.NonEmpty as NEL
+import qualified Control.Arrow                       as A
+import qualified Data.Foldable                       as F
+import qualified Data.List.NonEmpty                  as NEL
 
-import           Edible.Internal.Column (Column(Column), unsafeCase_,
-                                          unsafeIfThenElse, unsafeGt)
-import qualified Edible.Internal.Column as C
-import           Edible.Internal.QueryArr (QueryArr(QueryArr), Query, runSimpleQueryArr)
-import qualified Edible.Internal.PrimQuery as PQ
-import qualified Edible.Internal.Operators as O
-import           Edible.Internal.Helpers   ((.:))
-import qualified Edible.Order as Ord
-import qualified Edible.PGTypes as T
+import           Edible.Internal.Column              (Column (Column),
+                                                      unsafeCase_, unsafeGt,
+                                                      unsafeIfThenElse)
+import qualified Edible.Internal.Column              as C
+import           Edible.Internal.Helpers             ((.:))
+import qualified Edible.Internal.Operators           as O
+import qualified Edible.Internal.PrimQuery           as PQ
+import           Edible.Internal.QueryArr            (Query,
+                                                      QueryArr (QueryArr),
+                                                      runSimpleQueryArr)
+import qualified Edible.Order                        as Ord
+import qualified Edible.PGTypes                      as T
 
-import qualified Edible.Column   as Column
-import qualified Edible.Distinct as Distinct
-import qualified Edible.Join     as Join
+import qualified Edible.Column                       as Column
+import qualified Edible.Distinct                     as Distinct
+import qualified Edible.Join                         as Join
 
 import qualified Edible.Internal.HaskellDB.PrimQuery as HPQ
 
-import qualified Data.Profunctor.Product.Default as D
+import qualified Data.Profunctor.Product.Default     as D
 
 -- * Restriction operators
 
@@ -37,13 +40,13 @@ restrict :: QueryArr (Column T.PGBool) ()
 restrict = QueryArr f where
   f (Column predicate, primQ, t0) = ((), PQ.restrict predicate primQ, t0)
 
-{-| Add a @WHERE EXSITS@ clause to the current query. -}
+{-| Add a @WHERE EXISTS@ clause to the current query. -}
 exists :: QueryArr a b -> QueryArr a ()
 exists criteria = QueryArr f where
   f (a, primQ, t0) = ((), PQ.exists primQ existsQ, t1) where
     (_, existsQ, t1) = runSimpleQueryArr criteria (a, t0)
 
-{-| Add a @WHERE EXSITS@ clause to the current query. -}
+{-| Add a @WHERE EXISTS@ clause to the current query. -}
 notExists :: QueryArr a b -> QueryArr a ()
 notExists criteria = QueryArr f where
   f (a, primQ, t0) = ((), PQ.notExists primQ existsQ, t1) where
