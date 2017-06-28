@@ -4,11 +4,15 @@
 
 This repo hosts an in-progress experiment that seeks to construct a useful *exocortex*, a system that augments the mind with non-human capabilities of memory formation and information retrieval, using Haskell, PostgreSQL, and more than a little inspiration from `org-mode`.
 
-It also hosts 
+It also hosts the Edible and Amalgam projects, which will possibly be split into their own repos later.
 
-- Edible, a database interface for Haskell forked from [tisch](https://github.com/k0001/tisch), [Opaleye](https://github.com/tomjaguarpaw/haskell-opaleye/), and [postgresql-simple](https://github.com/lpsmith/postgresql-simple).
+## Edible
 
-- Amalgam, a monadic logger forked from [fast-logger](https://www.stackage.org/package/fast-logger) and [monad-logger](https://www.stackage.org/package/monad-logger).
+Edible is a database interface for Haskell forked from [tisch](https://github.com/k0001/tisch), [Opaleye](https://github.com/tomjaguarpaw/haskell-opaleye/), and [postgresql-simple](https://github.com/lpsmith/postgresql-simple). The goal is to remove the redundancies between the first two libraries and "inline" as much code and library logic as possible, staying as close to Tisch as possible.
+
+## Amalgam
+
+Amalgam is a logging monad transformer. It's intended to be a thin layer over a fork of [fast-logger](https://www.stackage.org/package/fast-logger) and [monad-logger](https://www.stackage.org/package/monad-logger), providing concurrent and pretty terminal logging.
 
 ## Credits
 
