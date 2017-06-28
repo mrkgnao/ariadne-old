@@ -33,8 +33,8 @@ import           Control.Applicative (pure)
 import           Data.Profunctor     (lmap)
 import qualified Data.Profunctor as P
 
-import qualified Edible.Internal.Aggregate as A
-import           Edible.Internal.Aggregate (Aggregator, orderAggregate)
+import qualified Edible.Internal.Aggregation as A
+import           Edible.Internal.Aggregation (Aggregator, orderAggregate)
 import qualified Edible.Internal.Column as IC
 import qualified Edible.Internal.QueryArr as Q
 import qualified Edible.Internal.HaskellDB.PrimQuery as HPQ

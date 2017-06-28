@@ -1,13 +1,14 @@
 {-# LANGUAGE DataKinds               #-}
 {-# LANGUAGE FlexibleInstances       #-}
 {-# LANGUAGE MultiParamTypeClasses   #-}
+{-# LANGUAGE TupleSections           #-}
 {-# LANGUAGE TypeFamilies            #-}
 {-# LANGUAGE TypeOperators           #-}
 {-# LANGUAGE UndecidableSuperClasses #-}
 {-# OPTIONS_GHC -Wno-redundant-constraints #-}
 
 module Edible.Internal.Aggregation
-  ( E.Aggregator
+  ( Aggregator
   , orderAggregator
   , aggregate
   , groupBy
@@ -38,7 +39,7 @@ module Edible.Internal.Aggregation
   ) where
 
 import qualified Data.Profunctor                     as P
-import qualified Edible.Aggregate                    as E
+-- import qualified Edible.Aggregate                    as E
 import qualified Edible.Internal.Aggregate           as OI
 import qualified Edible.Internal.Column              as OI
 import qualified Edible.Internal.HaskellDB.PrimQuery as HDB
@@ -48,12 +49,126 @@ import           GHC.TypeLits                        (type (+), CmpNat,
                                                       KnownNat)
 
 
-import           Edible.Internal.Fun                  (PgEq, PgIntegral, PgNum,
+import           Edible.Internal.Fun                 (PgEq, PgIntegral, PgNum,
                                                       PgOrd)
-import           Edible.Internal.Kol                  (Kol (..), PGArrayn,
+import           Edible.Internal.Kol                 (Kol (..), PGArrayn,
                                                       PgTyped (..))
-import           Edible.Internal.Koln                 (Koln (..))
-import           Edible.Internal.Query                (Query (..))
+import           Edible.Internal.Koln                (Koln (..))
+import           Edible.Internal.QueryTypes               (Query (..))
+
+import           Control.Applicative (Applicative, pure, (<*>))
+
+import qualified Data.Profunctor as P
+import qualified Data.Profunctor.Product as PP
+
+import qualified Edible.Internal.PackMap as PM
+import qualified Edible.Internal.PrimQuery as PQ
+import qualified Edible.Internal.Tag as T
+import qualified Edible.Internal.Column as C
+import qualified Edible.Internal.Order as O
+
+import qualified Edible.Internal.HaskellDB.PrimQuery as HPQ
+
+
+{-|
+An 'Aggregator' takes a collection of rows of type @a@, groups
+them, and transforms each group into a single row of type @b@. This
+corresponds to aggregators using @GROUP BY@ in SQL.
+
+You should combine basic 'Aggregator's into 'Aggregator's on compound
+types by using the operations in "Data.Profunctor.Product".
+
+An 'Aggregator' corresponds closely to a 'Control.Foldl.Fold' from the
+@foldl@ package.  Whereas an 'Aggregator' @a@ @b@ takes each group of
+type @a@ to a single row of type @b@, a 'Control.Foldl.Fold' @a@ @b@
+takes a list of @a@ and returns a single row of type @b@.
+-}
+newtype Aggregator a b =
+  Aggregator (PM.PackMap (Maybe (HPQ.AggrOp, [HPQ.OrderExpr], HPQ.AggrDistinct), HPQ.PrimExpr) HPQ.PrimExpr a b)
+
+makeAggr' :: Maybe HPQ.AggrOp -> Aggregator (C.Column a) (C.Column b)
+makeAggr' m =
+  Aggregator
+    (PM.PackMap
+       (\f (C.Column e) -> fmap C.Column (f (fmap (, [], HPQ.AggrAll) m, e))))
+
+makeAggr :: HPQ.AggrOp -> Aggregator (C.Column a) (C.Column b)
+makeAggr = makeAggr' . Just
+
+-- | Order the values within each aggregation in `Aggregator` using
+-- the given ordering. This is only relevant for aggregations that
+-- depend on the order they get their elements, like
+-- `Edible.Aggregate.arrayAgg` and `Edible.Aggregate.stringAgg`.
+--
+-- You can either apply it to an aggregation of multiple columns, in
+-- which case it will apply to all aggregation functions in there, or you
+-- can apply it to a single column, and then compose the aggregations
+-- afterwards. Examples:
+--
+-- > x :: Aggregator (Column a, Column b) (Column (PGArray a), Column (PGArray a))
+-- > x = (,) <$> orderAggregate (asc snd) (lmap fst arrayAggGrouped)
+-- >         <*> orderAggregate (desc snd) (lmap fst arrayAggGrouped)
+--
+-- This will generate:
+--
+-- @
+-- SELECT array_agg(a ORDER BY b ASC), array_agg(a ORDER BY b DESC)
+-- FROM (SELECT a, b FROM ...)
+-- @
+--
+-- Or:
+--
+-- > x :: Aggregator (Column a, Column b) (Column (PGArray a), Column (PGArray b))
+-- > x = orderAggregate (asc snd) $ p2 (arrayAggGrouped, arrayAggGrouped)
+--
+-- This will generate:
+--
+-- @
+-- SELECT array_agg(a ORDER BY b ASC), array_agg(b ORDER BY b ASC)
+-- FROM (SELECT a, b FROM ...)
+-- @
+
+orderAggregate :: O.Order a -> Aggregator a b -> Aggregator a b
+orderAggregate o (Aggregator (PM.PackMap pm)) =
+  Aggregator (PM.PackMap (\f c -> pm (f . P.first' (fmap ((\f' (a,b,c') -> (a,f' b,c')) (const $ O.orderExprs c o)))) c))
+
+runAggregator :: Applicative f => Aggregator a b
+              -> ((Maybe (HPQ.AggrOp, [HPQ.OrderExpr], HPQ.AggrDistinct), HPQ.PrimExpr) -> f HPQ.PrimExpr)
+              -> a -> f b
+runAggregator (Aggregator a) = PM.traversePM a
+
+aggregateU :: Aggregator a b
+           -> (a, PQ.PrimQuery, T.Tag) -> (b, PQ.PrimQuery, T.Tag)
+aggregateU agg (c0, primQ, t0) = (c1, primQ', T.next t0)
+  where (c1, projPEs) =
+          PM.run (runAggregator agg (extractAggregateFields t0) c0)
+
+        primQ' = PQ.Aggregate projPEs primQ
+
+extractAggregateFields :: T.Tag -> (Maybe (HPQ.AggrOp, [HPQ.OrderExpr], HPQ.AggrDistinct), HPQ.PrimExpr)
+      -> PM.PM [(HPQ.Symbol, (Maybe (HPQ.AggrOp, [HPQ.OrderExpr], HPQ.AggrDistinct), HPQ.PrimExpr))] HPQ.PrimExpr
+extractAggregateFields = PM.extractAttr "result"
+
+-- { Boilerplate instances
+
+instance Functor (Aggregator a) where
+  fmap f (Aggregator g) = Aggregator (fmap f g)
+
+instance Applicative (Aggregator a) where
+  pure = Aggregator . pure
+  Aggregator f <*> Aggregator x = Aggregator (f <*> x)
+
+instance P.Profunctor Aggregator where
+  dimap f g (Aggregator q) = Aggregator (P.dimap f g q)
+
+instance PP.ProductProfunctor Aggregator where
+  empty = PP.defaultEmpty
+  (***!) = PP.defaultProfunctorProduct
+
+instance PP.SumProfunctor Aggregator where
+  Aggregator x1 +++! Aggregator x2 = Aggregator (x1 PP.+++! x2)
+
+-- }
 
 --------------------------------------------------------------------------------
 
@@ -66,7 +181,7 @@ import           Edible.Internal.Query                (Query (..))
 -- single column, and then compose the aggregations afterwards. Examples:
 --
 -- @
--- x :: 'E.Aggregator' ('Kol' a, 'Kol' b) ('Kol' ('E.PGArray' a), 'Kol' ('E.PGArray' a))
+-- x :: 'Aggregator' ('Kol' a, 'Kol' b) ('Kol' ('E.PGArray' a), 'Kol' ('E.PGArray' a))
 -- x = (,) <$> 'orderAggregator' ('Edible.asc' 'snd')  ('P.lmap' 'fst' 'arraygg')
 --         <*> 'orderAggregator' ('Edible.descl 'snd') ('P.lmap' 'fst' 'arraygg')
 -- @
@@ -82,7 +197,7 @@ import           Edible.Internal.Query                (Query (..))
 -- Or:
 --
 -- @
--- x :: 'E.Aggregator' ('Kol' a, 'Kol' b) ('Kol' ('E.PGArray' a), 'Kol' ('E.PGArray' a))
+-- x :: 'Aggregator' ('Kol' a, 'Kol' b) ('Kol' ('E.PGArray' a), 'Kol' ('E.PGArray' a))
 -- x = 'orderAggregator' ('Edible.asc' 'snd') $ 'Edible.Internal.Profunctors.ppa' ('arraygg', 'arraygg')
 -- @
 --
@@ -91,7 +206,7 @@ import           Edible.Internal.Query                (Query (..))
 -- > SELECT array_agg(a ORDER BY b ASC),
 -- >        array_agg(b ORDER BY b ASC)
 -- > FROM (SELECT a, b FROM ...)
-orderAggregator :: PgOrd a => E.Order a -> E.Aggregator a b -> E.Aggregator a b
+orderAggregator :: PgOrd a => E.Order a -> Aggregator a b -> Aggregator a b
 orderAggregator = OI.orderAggregate
 
 --------------------------------------------------------------------------------
@@ -113,13 +228,13 @@ orderAggregator = OI.orderAggregate
     Query d x a -> QueryArr d x b@, as such a function would allow violation of
     SQL's scoping rules and lead to invalid queries.
 -}
-aggregate :: E.Aggregator a b -> Query d () a -> Query d () b
+aggregate :: Aggregator a b -> Query d () a -> Query d () b
 aggregate f = Query . E.aggregate f . unQuery
 
 --------------------------------------------------------------------------------
 
 -- | Group the aggregation by equality.
-groupBy :: PgEq a => E.Aggregator (Kol a) (Kol a)
+groupBy :: PgEq a => Aggregator (Kol a) (Kol a)
 groupBy = P.dimap unKol Kol E.groupBy
 
 -- | Instances of 'AggSum' can be used with 'sumgg'.
@@ -134,19 +249,19 @@ instance AggSum E.PGFloat4 E.PGFloat8
 instance AggSum E.PGInt8 (E.PGNumeric 0)
 
 -- | Add the values in input columns.
-sumgg :: AggSum a b => E.Aggregator (Kol a) (Kol b)
+sumgg :: AggSum a b => Aggregator (Kol a) (Kol b)
 sumgg = unsafeMakeAggr HDB.AggrSum
 
 -- | Count the number of non-@NULL@ input values.
 --
 -- See also: 'countRows', 'countngg'.
-countgg :: E.Aggregator (Kol a) (Kol E.PGInt8)
+countgg :: Aggregator (Kol a) (Kol E.PGInt8)
 countgg = P.dimap unKol Kol E.count
 
 -- | Count the number of input values, whether they are @NULL@ or not.
 --
 -- See also: 'countRows', 'countgg'.
-countngg :: E.Aggregator (Koln a) (Kol E.PGInt8)
+countngg :: Aggregator (Koln a) (Kol E.PGInt8)
 countngg = P.rmap Kol E.countStar
 
 -- | Count the number of rows in a 'Query'.
@@ -178,57 +293,57 @@ instance KnownNat s => AggAvg E.PGInt8 (E.PGNumeric s)
 instance (KnownNat s, KnownNat s', CmpNat s (s' + 1) ~ 'GT) => AggAvg (E.PGNumeric s) (E.PGNumeric s')
 
 -- | The average (arithmetic mean) of all input values
-avggg :: AggAvg a b => E.Aggregator (Kol a) (Kol b)
+avggg :: AggAvg a b => Aggregator (Kol a) (Kol b)
 avggg = unsafeMakeAggr HDB.AggrAvg
 
 -- | Bitwise AND of all input values.
-bwandgg :: PgIntegral a => E.Aggregator (Kol a) (Kol a)
+bwandgg :: PgIntegral a => Aggregator (Kol a) (Kol a)
 bwandgg = unsafeMakeAggr (HDB.AggrOther "bit_and")
 
 -- | Bitwise OR of all input values.
-bworgg :: PgIntegral a => E.Aggregator (Kol a) (Kol a)
+bworgg :: PgIntegral a => Aggregator (Kol a) (Kol a)
 bworgg = unsafeMakeAggr (HDB.AggrOther "bit_or")
 
 -- | Logical AND of all input values.
-landgg :: E.Aggregator (Kol E.PGBool) (Kol E.PGBool)
+landgg :: Aggregator (Kol E.PGBool) (Kol E.PGBool)
 landgg = unsafeMakeAggr HDB.AggrBoolAnd
 
 -- | Logical OR of all input values.
-lorgg :: E.Aggregator (Kol E.PGBool) (Kol E.PGBool)
+lorgg :: Aggregator (Kol E.PGBool) (Kol E.PGBool)
 lorgg = unsafeMakeAggr HDB.AggrBoolOr
 
 -- | Maximum value of all input values.
-maxgg :: PgOrd a => E.Aggregator (Kol a) (Kol a)
+maxgg :: PgOrd a => Aggregator (Kol a) (Kol a)
 maxgg = unsafeMakeAggr HDB.AggrMax
 
 -- | Minimum value of all input values.
-mingg :: PgOrd a => E.Aggregator (Kol a) (Kol a)
+mingg :: PgOrd a => Aggregator (Kol a) (Kol a)
 mingg = unsafeMakeAggr HDB.AggrMin
 
 -- | Collect all non-@NULL@ input values into a 'E.PGArray'.
-arraygg :: PgTyped a => E.Aggregator (Kol a) (Kol (E.PGArray a))
+arraygg :: PgTyped a => Aggregator (Kol a) (Kol (E.PGArray a))
 arraygg = unsafeMakeAggr HDB.AggrArr
 
 -- | Collect all nullable input values into a 'E.PGArrayn'.
-arrayngg :: PgTyped a => E.Aggregator (Koln a) (Kol (PGArrayn a))
+arrayngg :: PgTyped a => Aggregator (Koln a) (Kol (PGArrayn a))
 arrayngg = P.dimap unKoln Kol (OI.makeAggr HDB.AggrArr)
 
 -- | Aggregates values as a 'E.PGJson' array.
-jsonarraygg :: E.Aggregator (Kol a) (Kol E.PGJson)
+jsonarraygg :: Aggregator (Kol a) (Kol E.PGJson)
 jsonarraygg = unsafeMakeAggr (HDB.AggrOther "json_agg")
 
 -- | Aggregates values as a 'E.PGJsonb' array.
-jsonbarraygg :: E.Aggregator (Kol a) (Kol E.PGJsonb)
+jsonbarraygg :: Aggregator (Kol a) (Kol E.PGJsonb)
 jsonbarraygg = unsafeMakeAggr (HDB.AggrOther "jsonb_agg")
 
 -- | Aggregates 'E.PGText' values by concatenating them using the given
 -- separator.
-textgg :: Kol E.PGText -> E.Aggregator (Kol E.PGText) (Kol E.PGText)
+textgg :: Kol E.PGText -> Aggregator (Kol E.PGText) (Kol E.PGText)
 textgg = unsafeMakeAggr . HDB.AggrStringAggr . OI.unColumn . unKol
 
 -- | Aggregates 'E.PGBytea' values by concatenating them using the given
 -- separator.
-byteagg :: Kol E.PGBytea -> E.Aggregator (Kol E.PGBytea) (Kol E.PGBytea)
+byteagg :: Kol E.PGBytea -> Aggregator (Kol E.PGBytea) (Kol E.PGBytea)
 byteagg = unsafeMakeAggr . HDB.AggrStringAggr . OI.unColumn . unKol
 
 -- | Instances of 'AggStdDev' can be used with 'stddevgg',
@@ -250,25 +365,25 @@ instance KnownNat s => AggStdDev E.PGInt8 (E.PGNumeric s)
 instance (KnownNat s, KnownNat s', CmpNat s (s' + 1) ~ 'GT) => AggStdDev (E.PGNumeric s) (E.PGNumeric s')
 
 -- | Sample standard deviation of the input values.
-stddevgg :: AggStdDev a b => E.Aggregator (Kol a) (Kol b)
+stddevgg :: AggStdDev a b => Aggregator (Kol a) (Kol b)
 stddevgg = unsafeMakeAggr HDB.AggrStdDev
 
 -- | Population standard deviation of the input values.
-stddevpopgg :: AggStdDev a b => E.Aggregator (Kol a) (Kol b)
+stddevpopgg :: AggStdDev a b => Aggregator (Kol a) (Kol b)
 stddevpopgg = unsafeMakeAggr HDB.AggrStdDevP
 
 -- | Sample variance of the input values (square of the sample standard
 -- deviation 'stdevgg').
-variancegg :: AggStdDev a b => E.Aggregator (Kol a) (Kol b)
+variancegg :: AggStdDev a b => Aggregator (Kol a) (Kol b)
 variancegg = unsafeMakeAggr HDB.AggrVar
 
 -- | Population variance of the input values (square of the population standard
 -- deviation 'stdevoppgg').
-variancepopgg :: AggStdDev a b => E.Aggregator (Kol a) (Kol b)
+variancepopgg :: AggStdDev a b => Aggregator (Kol a) (Kol b)
 variancepopgg = unsafeMakeAggr HDB.AggrVarP
 
 --------------------------------------------------------------------------------
 
-unsafeMakeAggr :: PgTyped b => HDB.AggrOp -> E.Aggregator (Kol a) (Kol b)
+unsafeMakeAggr :: PgTyped b => HDB.AggrOp -> Aggregator (Kol a) (Kol b)
 unsafeMakeAggr x = P.dimap unKol Kol (OI.makeAggr x)
 {-# INLINE unsafeMakeAggr #-}

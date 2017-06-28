@@ -59,19 +59,9 @@ import           Edible.Internal.Koln                (Koln (..), isNull)
 import           Edible.Internal.Table               (Database, PgR,
                                                       RawTable (..), Table,
                                                       TableR, rawTableRO)
+import           Edible.QueryTypes                   (Query (..))
 import           Edible.RunQuery                     (unsafeUnNullableColumn)
 
---------------------------------------------------------------------------------
-
--- | A wrapper around @opaleye@'s 'O.QuerryArr' adding a placeholder @t@, which
--- shall mention the 'Database' associated with the query.
---
--- Note that, contrary to @opaleye@, we don't make a distinction between
--- 'O.QueryArr' and 'O.Query', as we think that hurts comprehension. We always
--- use our 'Query' type instead, which behaves as @opaleye@'s 'O.QueryArr', not
--- as @opaleye@'s 'O.Query'.
-newtype Query (d :: k) a b = Query { unQuery :: O.QueryArr a b }
- deriving (Functor, Applicative, Category, Arrow, Profunctor, ProductProfunctor)
 
 -- | Query all of the rows in a 'Table.
 --

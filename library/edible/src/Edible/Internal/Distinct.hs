@@ -45,3 +45,7 @@ instance PP.SumProfunctor Distinctspec where
   Distinctspec x1 +++! Distinctspec x2 = Distinctspec (x1 PP.+++! x2)
 
 -- }
+
+distinct :: Default Distinctspec columns columns =>
+            Query columns -> Query columns
+distinct = distinctExplicit def

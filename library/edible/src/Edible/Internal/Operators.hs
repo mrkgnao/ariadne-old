@@ -1,22 +1,26 @@
 {-# LANGUAGE ExistentialQuantification #-}
-{-# LANGUAGE FlexibleContexts, FlexibleInstances, MultiParamTypeClasses #-}
-{-# LANGUAGE ScopedTypeVariables #-}
+{-# LANGUAGE FlexibleContexts          #-}
+{-# LANGUAGE FlexibleInstances         #-}
+{-# LANGUAGE MultiParamTypeClasses     #-}
+{-# LANGUAGE ScopedTypeVariables       #-}
 
 module Edible.Internal.Operators where
 
-import           Edible.Internal.Column (Column)
-import qualified Edible.Internal.Column as C
-import qualified Edible.Internal.PrimQuery as PQ
+import           Edible.Internal.Column              (Column)
+import qualified Edible.Internal.Column              as C
 import qualified Edible.Internal.HaskellDB.PrimQuery as HPQ
-import qualified Edible.Internal.QueryArr as QA
-import qualified Edible.Internal.TableMaker as TM
-import qualified Edible.Internal.Table as Table
-import qualified Edible.Internal.Tag as Tag
-import qualified Edible.PGTypes as T
+import qualified Edible.Internal.PrimQuery           as PQ
+import qualified Edible.Internal.QueryArr            as QA
+import qualified Edible.Internal.Table               as Table
+import qualified Edible.Internal.TableMaker          as TM
+import qualified Edible.Internal.Tag                 as Tag
+import qualified Edible.PGTypes                      as T
 
-import           Data.Profunctor (Profunctor, dimap, lmap, rmap)
-import           Data.Profunctor.Product (ProductProfunctor, empty, (***!))
-import qualified Data.Profunctor.Product.Default as D
+import           Data.Profunctor                     (Profunctor, dimap, lmap,
+                                                      rmap)
+import           Data.Profunctor.Product             (ProductProfunctor, empty,
+                                                      (***!))
+import qualified Data.Profunctor.Product.Default     as D
 
 infix 4 .==
 (.==) :: forall columns. D.Default EqPP columns columns

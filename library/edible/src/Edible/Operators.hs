@@ -24,7 +24,7 @@ import qualified Edible.Order                        as Ord
 import qualified Edible.PGTypes                      as T
 
 import qualified Edible.Column                       as Column
-import qualified Edible.Distinct                     as Distinct
+import qualified Edible.Internal.Distinct            as Distinct
 import qualified Edible.Join                         as Join
 
 import qualified Edible.Internal.HaskellDB.PrimQuery as HPQ
