@@ -68,26 +68,26 @@ module Edible
  , bindKoln
  , altKoln
    -- * Querying
- , Query
- , query
- , innerJoin
- , leftJoin
+ , Query.Query
+ , Query.query
+ , Query.innerJoin
+ , Query.leftJoin
  , restrict
- , restrictf
+ , Query.restrictf
  , distinct
- , limit
- , offset
+ , Query.limit
+ , Query.offset
    -- * Selecting
  , col
    -- * Ordering
  , E.Order
- , orderBy
- , asc
- , ascNullsFirst
- , ascNullsLast
- , desc
- , descNullsFirst
- , descNullsLast
+ , Query.orderBy
+ , Query.asc
+ , Query.ascNullsFirst
+ , Query.ascNullsLast
+ , Query.desc
+ , Query.descNullsFirst
+ , Query.descNullsLast
    -- * Operators
  , lnot
  , lor
@@ -97,7 +97,7 @@ module Edible
  , PgEq
  , eq
  , member
- , memberq
+ , Query.memberq
    -- ** Comparisons
  , PgOrd
  , lt
@@ -152,7 +152,7 @@ module Edible
  , reReplace
  , reReplaceg
  , reMatch
- , reMatches
+ , Query.reMatches
  , reSplit
    -- * Aggregation
    --
@@ -225,12 +225,12 @@ module Edible
  , unsaferCastKol
  ) where
 
+import           Edible.Aggregate
 import           Edible.Internal.Kol
 import           Edible.Internal.Koln
-import           Edible.Internal.Query
+import qualified Edible.Internal.Query as Query
 import           Edible.Internal.Table
 import           Edible.Operators
-import           Edible.Aggregate
 
 import qualified Edible.Order          as E
 import qualified Edible.PGTypes        as E
