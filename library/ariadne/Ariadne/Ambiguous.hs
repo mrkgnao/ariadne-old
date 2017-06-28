@@ -7,7 +7,7 @@ module Ariadne.Ambiguous
   ) where
 
 import Edible (col)
-import Tisch.Internal.Table (ColLens)
+import Edible.Internal.Table (ColLens)
 
 import Control.Lens (Lens')
 import Data.Proxy (Proxy(..))

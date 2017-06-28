@@ -40,8 +40,7 @@ import           Data.UUID
 import qualified Database.PostgreSQL.Simple as PGS
 import           Edible
 import           GHC.TypeLits
-import           Tisch.Internal.Fun         as Tisch
-import           Tisch.Internal.Table
+import           Edible.Internal.Table
 
 import           Lib.Prelude                hiding (like)
 

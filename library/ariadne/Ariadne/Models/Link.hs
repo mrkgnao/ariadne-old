@@ -40,10 +40,8 @@ import           Data.UUID
 import qualified Database.PostgreSQL.Simple as PGS
 import           Edible
 import           GHC.TypeLits
-import           Tisch.Internal.Fun         as Tisch
-import           Tisch.Internal.Table
 
-import           Lib.Prelude                hiding (like)
+import           Lib.Prelude                hiding (like, ilike)
 
 import           Ariadne.Ambiguous
 import           Ariadne.Database
@@ -94,7 +92,7 @@ q_Link_by_url url = proc () -> do
 q_Link_by_title :: Text >-> PgR Link
 q_Link_by_title title = proc () -> do
   l <- query Link -< ()
-  restrict -< (l ^. link_title) `Tisch.ilike` kol ("%" <> title <> "%")
+  restrict -< (l ^. link_title) `ilike` kol ("%" <> title <> "%")
   returnA -< l
 
 link_id :: ColLens "link_id" a b b => Lens' a b

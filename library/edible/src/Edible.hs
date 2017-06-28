@@ -72,9 +72,11 @@ module Edible
  , Query.query
  , Query.innerJoin
  , Query.leftJoin
- , restrict
+ , Query.restrict
+ , restrictA
  , Query.restrictf
- , distinct
+ , Query.distinct
+ , distinctA
  , Query.limit
  , Query.offset
    -- * Selecting
@@ -223,6 +225,9 @@ module Edible
  , unsafeCoerceKol
  , unsaferCoerceKol
  , unsaferCastKol
+ , ColLens
+ , like
+ , ilike
  ) where
 
 import           Edible.Aggregate

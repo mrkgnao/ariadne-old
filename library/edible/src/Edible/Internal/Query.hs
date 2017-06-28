@@ -14,9 +14,9 @@
 module Edible.Internal.Query
  ( Query(..)
  , query
- -- , restrict
+ , restrict
  , restrictf
- -- , distinct
+ , distinct
  , memberq
  , innerJoin
  , leftJoin
@@ -93,7 +93,7 @@ query = Query . O.queryTable . unRawTable . rawTableRO
 -- 'fromKoln' ('kol' 'False') :: 'Koln' 'O.PGBool' -> 'Kol' 'O.PGBool'
 -- @
 restrict :: Query d (Kol O.PGBool) ()
-restrict = Query O.restrict <<^ unKol
+restrict = Query O.restrictA <<^ unKol
 
 -- | This is a 'filter'-like version of 'restrict': Only values that satisfy the
 -- predicate are kept.

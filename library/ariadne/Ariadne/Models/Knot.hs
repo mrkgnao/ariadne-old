@@ -36,10 +36,9 @@ import qualified Data.Text.Lazy.Encoding    as TL
 import           Data.Time.Clock            (UTCTime)
 import           Data.UUID
 import qualified Database.PostgreSQL.Simple as PGS
-import           Edible
 import           GHC.TypeLits
-import           Tisch.Internal.Fun         as Tisch
-import           Tisch.Internal.Table
+import           Edible
+import           Edible.Internal.Table
 
 import           Lib.Prelude                hiding (like)
 

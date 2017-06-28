@@ -663,17 +663,17 @@ instance PP.SumProfunctor Distinctspec where
 -- instead implement it as SQL's DISTINCT but implementing it in terms
 -- of something else that we already have is easier at this point.
 
-distinct :: Default Distinctspec columns columns =>
+distinctA :: Default Distinctspec columns columns =>
             Query columns -> Query columns
-distinct = distinctExplicit def
+distinctA = distinctExplicit def
 
 -- * Restriction operators
 
 {-| Restrict query results to a particular condition.  Corresponds to
 the guard method of the MonadPlus class.  You would typically use
 'restrict' if you want to use 'A.Arrow' notation.  -}
-restrict :: QueryArr (Column T.PGBool) ()
-restrict = QueryArr f where
+restrictA :: QueryArr (Column T.PGBool) ()
+restrictA = QueryArr f where
   f (Column predicate, primQ, t0) = ((), PQ.restrict predicate primQ, t0)
 
 {-| Add a @WHERE EXISTS@ clause to the current query. -}
@@ -694,7 +694,7 @@ holds.  This is the 'QueryArr' equivalent of 'Prelude.filter' from the
 \"point free\" style.-}
 keepWhen :: (a -> Column T.PGBool) -> QueryArr a a
 keepWhen p = proc a -> do
-  restrict  -< p a
+  restrictA  -< p a
   A.returnA -< a
 
 -- * Equality operators
@@ -847,7 +847,7 @@ inQuery c q = qj'
         -- or a single row with 'NULL'
         qj :: Query (Column T.PGInt4, Column (C.Nullable T.PGInt4))
         qj = Join.leftJoin (A.arr (const 1))
-                           (distinct q')
+                           (distinctA q')
                            (uncurry (.==))
 
         -- Check whether it is 'NULL'
