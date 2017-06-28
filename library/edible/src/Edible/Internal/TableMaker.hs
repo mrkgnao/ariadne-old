@@ -1,17 +1,19 @@
-{-# LANGUAGE MultiParamTypeClasses, FlexibleInstances #-}
+{-# LANGUAGE FlexibleInstances     #-}
+{-# LANGUAGE MultiParamTypeClasses #-}
 
 module Edible.Internal.TableMaker where
 
-import qualified Edible.Column as C
-import qualified Edible.Internal.Column as IC
-import qualified Edible.Internal.PackMap as PM
+import qualified Edible.Column                       as C
+import qualified Edible.Internal.Column              as IC
+import qualified Edible.Internal.PackMap             as PM
 
-import           Data.Profunctor (Profunctor, dimap)
-import           Data.Profunctor.Product (ProductProfunctor, empty, (***!))
-import qualified Data.Profunctor.Product as PP
-import           Data.Profunctor.Product.Default (Default, def)
+import           Data.Profunctor                     (Profunctor, dimap)
+import           Data.Profunctor.Product             (ProductProfunctor, empty,
+                                                      (***!))
+import qualified Data.Profunctor.Product             as PP
+import           Data.Profunctor.Product.Default     (Default, def)
 
-import           Control.Applicative (Applicative, pure, (<*>))
+import           Control.Applicative                 (Applicative, pure, (<*>))
 
 import qualified Edible.Internal.HaskellDB.PrimQuery as HPQ
 

@@ -1,21 +1,21 @@
 module Edible.Internal.QueryArr where
 
-import           Prelude hiding (id)
+import           Prelude                             hiding (id)
 
-import qualified Edible.Internal.Unpackspec as U
-import qualified Edible.Internal.Tag as Tag
-import           Edible.Internal.Tag (Tag)
-import qualified Edible.Internal.PrimQuery as PQ
+import qualified Edible.Internal.PrimQuery           as PQ
+import           Edible.Internal.Tag                 (Tag)
+import qualified Edible.Internal.Tag                 as Tag
+import qualified Edible.Internal.Unpackspec          as U
 
 import qualified Edible.Internal.HaskellDB.PrimQuery as HPQ
 
-import qualified Control.Arrow as Arr
-import           Control.Arrow ((&&&), (***), arr)
-import qualified Control.Category as C
-import           Control.Category ((<<<), id)
-import           Control.Applicative (Applicative, pure, (<*>))
-import qualified Data.Profunctor as P
-import qualified Data.Profunctor.Product as PP
+import           Control.Applicative                 (Applicative, pure, (<*>))
+import           Control.Arrow                       (arr, (&&&), (***))
+import qualified Control.Arrow                       as Arr
+import           Control.Category                    (id, (<<<))
+import qualified Control.Category                    as C
+import qualified Data.Profunctor                     as P
+import qualified Data.Profunctor.Product             as PP
 
 -- | @QueryArr a b@ is analogous to a Haskell function @a -> [b]@.
 

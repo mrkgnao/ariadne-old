@@ -2,16 +2,18 @@
 
 module Edible.Internal.PackMap where
 
-import qualified Edible.Internal.Tag as T
+import qualified Edible.Internal.Tag                 as T
 
 import qualified Edible.Internal.HaskellDB.PrimQuery as HPQ
 
-import           Control.Applicative (Applicative, pure, (<*>), liftA2)
-import qualified Control.Monad.Trans.State as State
-import           Data.Profunctor (Profunctor, dimap)
-import           Data.Profunctor.Product (ProductProfunctor, empty, (***!))
-import qualified Data.Profunctor.Product as PP
-import qualified Data.Functor.Identity as I
+import           Control.Applicative                 (Applicative, liftA2, pure,
+                                                      (<*>))
+import qualified Control.Monad.Trans.State           as State
+import qualified Data.Functor.Identity               as I
+import           Data.Profunctor                     (Profunctor, dimap)
+import           Data.Profunctor.Product             (ProductProfunctor, empty,
+                                                      (***!))
+import qualified Data.Profunctor.Product             as PP
 
 -- This is rather like a Control.Lens.Traversal with the type
 -- parameters switched but I'm not sure if it should be required to

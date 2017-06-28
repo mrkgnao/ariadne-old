@@ -58,7 +58,7 @@ module Edible.Table (module Edible.Table,
                       -- * Other
                       View,
                       Writer,
-                      T.Table(T.Table, T.TableWithSchema),
+                      T.OTable(T.OTable, T.OTableWithSchema),
                       TableProperties) where
 
 import           Edible.Internal.Column (Column(Column))
@@ -86,7 +86,7 @@ import qualified Edible.Internal.HaskellDB.PrimQuery as HPQ
 -- queryTable :: Table w (Foo (Column a) (Column b) (Column c)) -> Query (Foo (Column a) (Column b) (Column c))
 -- @
 queryTable :: D.Default TM.ColumnMaker columns columns =>
-              Table a columns -> Q.Query columns
+              T.OTable a columns -> Q.Query columns
 queryTable = queryTableExplicit D.def
 
 -- | 'required' is for columns which are not 'optional'.  You must
@@ -106,7 +106,7 @@ optional columnName = T.TableProperties
 -- * Explicit versions
 
 queryTableExplicit :: TM.ColumnMaker tablecolumns columns ->
-                     Table a tablecolumns -> Q.Query columns
+                     T.OTable a tablecolumns -> Q.Query columns
 queryTableExplicit cm table = Q.simpleQueryArr f where
   f ((), t0) = (retwires, primQ, Tag.next t0) where
     (retwires, primQ) = T.queryTable cm table t0

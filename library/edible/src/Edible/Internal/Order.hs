@@ -1,21 +1,21 @@
 module Edible.Internal.Order where
 
-import           Data.Function (on)
+import           Data.Function                        (on)
 
-import qualified Data.List.NonEmpty as NL
+import qualified Data.List.NonEmpty                   as NL
 
-import qualified Edible.Column as C
-import qualified Edible.Internal.Column as IC
-import qualified Edible.Internal.Tag as T
-import qualified Edible.Internal.PrimQuery as PQ
+import qualified Edible.Column                        as C
+import qualified Edible.Internal.Column               as IC
+import qualified Edible.Internal.PrimQuery            as PQ
+import qualified Edible.Internal.Tag                  as T
 
-import qualified Edible.Internal.HaskellDB.PrimQuery as HPQ
-import qualified Data.Functor.Contravariant as C
+import qualified Data.Functor.Contravariant           as C
 import qualified Data.Functor.Contravariant.Divisible as Divisible
-import qualified Data.Profunctor as P
-import qualified Data.Monoid as M
-import qualified Data.Semigroup as S
-import qualified Data.Void as Void
+import qualified Data.Monoid                          as M
+import qualified Data.Profunctor                      as P
+import qualified Data.Semigroup                       as S
+import qualified Data.Void                            as Void
+import qualified Edible.Internal.HaskellDB.PrimQuery  as HPQ
 
 {-|
 An `Order` @a@ represents a sort order and direction for the elements

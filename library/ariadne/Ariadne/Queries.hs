@@ -58,23 +58,3 @@ import           Ariadne.AriadneT
 import qualified Network.Wreq               as W
 
 
-mkFulltext'
-  :: (MonadReader AriadneState m, MonadIO m, MonadThrow m, MonadLogger m)
-  => Text -> m KnotId
-mkFulltext' s = do
-  t <- mkKnot
-  mkFulltext t s
-
-mkFulltext
-  :: (MonadReader AriadneState m, MonadIO m, MonadThrow m)
-  => KnotId -> Text -> m KnotId
-mkFulltext t s = do
-  c <- asks conn
-  runInsertReturning1
-    c
-    Fulltext
-    (^. fulltext_id)
-    (mkHsI
-       Fulltext
-       (hsi' @"fulltext_id" t)
-       (hsi' @"fulltext_contents" s))

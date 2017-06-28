@@ -3,7 +3,7 @@
 {-# LANGUAGE MultiParamTypeClasses #-}
 {-# LANGUAGE PolyKinds             #-}
 
-module Tisch.Internal.Profunctors
+module Edible.Internal.Profunctors
   ( ProductProfunctorAdaptor(ppa)
   , def_Tagged_MaybeTagged
   ) where

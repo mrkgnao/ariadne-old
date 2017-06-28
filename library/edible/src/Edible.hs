@@ -1,7 +1,7 @@
 -- This is the entry point for the @tisch@ library.
 --
--- This module re-exports much, but not all of the @Tisch.Run@ and
--- @Tisch.Internal.*@ modules. If you are looking for some tool that you
+-- This module re-exports much, but not all of the @Edible.Run@ and
+-- @Edible.Internal.*@ modules. If you are looking for some tool that you
 -- can't find here, please refer to those modules instead.
 --
 -- This module doesn't export any infix operator, and likely never will.
@@ -225,12 +225,12 @@ module Edible
  , unsaferCastKol
  ) where
 
-import           Tisch.Internal.Aggregation
-import           Tisch.Internal.Fun
-import           Tisch.Internal.Kol
-import           Tisch.Internal.Koln
-import           Tisch.Internal.Query
-import           Tisch.Internal.Table
+import           Edible.Internal.Aggregation
+import           Edible.Internal.Fun
+import           Edible.Internal.Kol
+import           Edible.Internal.Koln
+import           Edible.Internal.Query
+import           Edible.Internal.Table
 
 import           Edible.Run
 import qualified Edible.Order               as E
@@ -254,7 +254,7 @@ import qualified Edible.PGTypes             as E
 
 -- $runningQueries
 --
--- The "Tisch.Run" module exports lower-level variants of these @runXxx@
+-- The "Edible.Run" module exports lower-level variants of these @runXxx@
 -- functions, in case you need those.
 
 

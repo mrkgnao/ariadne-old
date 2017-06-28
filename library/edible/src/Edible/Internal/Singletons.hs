@@ -5,7 +5,7 @@
 {-# LANGUAGE TypeOperators        #-}
 {-# LANGUAGE UndecidableInstances #-}
 
-module Tisch.Internal.Singletons
+module Edible.Internal.Singletons
  ( (:&&&)
  , (:&&&$)
  , (:&&&$$)

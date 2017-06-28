@@ -48,7 +48,6 @@ import           Control.Applicative                  ((<$>))
 import           Data.Fixed                           (Fixed (..))
 import qualified Data.Fixed                           as Fixed
 import           Data.Scientific                      (Scientific)
-import qualified Data.Scientific                      as Scientific
 import           Data.Typeable                        (Typeable)
 import           Database.PostgreSQL.Simple.FromField (ResultError (Incompatible, UnexpectedNull),
                                                        returnError, typeInfo)

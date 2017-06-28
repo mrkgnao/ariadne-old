@@ -112,12 +112,12 @@ import qualified Edible.Values                          as O
 
 
 import           Data.Singletons.Prelude.Base           (Map)
-import           Tisch.Internal.Debug                   (renderSqlQuery')
-import           Tisch.Internal.Kol                     (Kol (..))
-import           Tisch.Internal.Query                   (Query (..))
-import           Tisch.Internal.Record
-import           Tisch.Internal.Singletons
-import           Tisch.Internal.Table
+import           Edible.Internal.Debug                   (renderSqlQuery')
+import           Edible.Internal.Kol                     (Kol (..))
+import           Edible.Internal.Query                   (Query (..))
+import           Edible.Internal.Record
+import           Edible.Internal.Singletons
+import           Edible.Internal.Table
 
 --------------------------------------------------------------------------------
 
@@ -179,7 +179,7 @@ type family Forbid (p :: k) (ps :: [Perm]) :: Constraint where
   Forbid ('[] :: [Perm]) ps = ()
   Forbid ((p ': ps) :: [Perm]) qs = (Forbid p qs, Forbid ps qs)
   Forbid (p :: Perm) (p ': ps) =
-     "Tisch.Run.Forbid" ~
+     "Edible.Run.Forbid" ~
      "Forbid: The forbidden permission is allowed"
   Forbid (p :: Perm) (q ': ps) = Forbid p ps
   Forbid (p :: Perm) '[] = ()
@@ -401,7 +401,7 @@ runInsertRaw conn t = \case
     let nExpected = fromIntegral (length ws) :: Int64
     when (nExpected /= nAffected) $ do
        let sql = O.arrangeInsertManySql (unRawTable t) (NEL.fromList ws)
-       liftIO $ print sql
+       -- liftIO $ print sql
        Cx.throwM (ErrNumRows nExpected nAffected (Just sql))
 
 -- | Like 'runInsertNoCountCheck', but takes a 'RawTable' instead of a 'Table'.
@@ -415,7 +415,7 @@ runInsertRawNoCountCheck (Conn conn) (RawTable t) w =
       pure 0
     ws -> do
       aff <- liftIO (O.runInsertMany conn t ws)
-      logDebugN (T.pack $ show aff)
+      logDebugN (T.pack (show aff))
       pure aff
 
 -- | Like 'runInsert1', but takes a 'RawTable' instead of a 'Table'.

@@ -22,6 +22,7 @@ import           GHC.Generics
 import           Control.Monad
 import           System.IO            as S
 
+import qualified Ariadne.AriadneT     as A
 import qualified Ariadne.Tables       as A
 import           Edible
 

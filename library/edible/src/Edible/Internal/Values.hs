@@ -1,21 +1,23 @@
-{-# LANGUAGE FlexibleInstances, MultiParamTypeClasses #-}
+{-# LANGUAGE FlexibleInstances     #-}
+{-# LANGUAGE MultiParamTypeClasses #-}
 
 module Edible.Internal.Values where
 
-import           Edible.Internal.Column (Column(Column))
-import qualified Edible.Internal.Unpackspec as U
-import qualified Edible.Internal.Tag as T
-import qualified Edible.Internal.PrimQuery as PQ
-import qualified Edible.Internal.PackMap as PM
+import           Edible.Internal.Column              (Column (Column))
 import qualified Edible.Internal.HaskellDB.PrimQuery as HPQ
+import qualified Edible.Internal.PackMap             as PM
+import qualified Edible.Internal.PrimQuery           as PQ
+import qualified Edible.Internal.Tag                 as T
+import qualified Edible.Internal.Unpackspec          as U
 
-import qualified Data.List.NonEmpty as NEL
-import           Data.Profunctor (Profunctor, dimap, rmap)
-import           Data.Profunctor.Product (ProductProfunctor, empty, (***!))
-import qualified Data.Profunctor.Product as PP
-import           Data.Profunctor.Product.Default (Default, def)
+import qualified Data.List.NonEmpty                  as NEL
+import           Data.Profunctor                     (Profunctor, dimap, rmap)
+import           Data.Profunctor.Product             (ProductProfunctor, empty,
+                                                      (***!))
+import qualified Data.Profunctor.Product             as PP
+import           Data.Profunctor.Product.Default     (Default, def)
 
-import           Control.Applicative (Applicative, pure, (<*>))
+import           Control.Applicative                 (Applicative, pure, (<*>))
 
 -- FIXME: We don't currently handle the case of zero columns.  Need to
 -- emit a dummy column and data.

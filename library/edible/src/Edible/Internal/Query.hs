@@ -11,7 +11,7 @@
 --
 -- This module exports stuff that doesn't really fit into the other internal
 -- modules.
-module Tisch.Internal.Query
+module Edible.Internal.Query
  ( Query(..)
  , query
  , restrict
@@ -44,22 +44,22 @@ import qualified Edible.Internal.HaskellDB.PrimQuery as HDB
 import qualified Edible.Internal.Join                as OI
 import qualified Edible.Internal.Operators           as OI
 
-import qualified Edible.Operators                    as O
-import qualified Edible.Order                        as O
-import qualified Edible.PGTypes                      as O
 import qualified Edible.Distinct                     as O
 import qualified Edible.Join                         as O
 import qualified Edible.Manipulation                 as O
+import qualified Edible.Operators                    as O
+import qualified Edible.Order                        as O
+import qualified Edible.PGTypes                      as O
 import qualified Edible.QueryArr                     as O
 import qualified Edible.Table                        as O
 
-import           Edible.RunQuery (unsafeUnNullableColumn)
-import           Tisch.Internal.Fun                  (PgEq, PgOrd, eq, lnot)
-import           Tisch.Internal.Kol                  (Kol (..))
-import           Tisch.Internal.Koln                 (Koln (..), isNull)
-import           Tisch.Internal.Table                (Database, PgR,
+import           Edible.Internal.Fun                 (PgEq, PgOrd, eq, lnot)
+import           Edible.Internal.Kol                 (Kol (..))
+import           Edible.Internal.Koln                (Koln (..), isNull)
+import           Edible.Internal.Table               (Database, PgR,
                                                       RawTable (..), Table,
                                                       TableR, rawTableRO)
+import           Edible.RunQuery                     (unsafeUnNullableColumn)
 
 --------------------------------------------------------------------------------
 

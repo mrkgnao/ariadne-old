@@ -6,7 +6,7 @@
 {-# LANGUAGE UndecidableSuperClasses #-}
 {-# OPTIONS_GHC -Wno-redundant-constraints #-}
 
-module Tisch.Internal.Aggregation
+module Edible.Internal.Aggregation
   ( E.Aggregator
   , orderAggregator
   , aggregate
@@ -48,12 +48,12 @@ import           GHC.TypeLits                        (type (+), CmpNat,
                                                       KnownNat)
 
 
-import           Tisch.Internal.Fun                  (PgEq, PgIntegral, PgNum,
+import           Edible.Internal.Fun                  (PgEq, PgIntegral, PgNum,
                                                       PgOrd)
-import           Tisch.Internal.Kol                  (Kol (..), PGArrayn,
+import           Edible.Internal.Kol                  (Kol (..), PGArrayn,
                                                       PgTyped (..))
-import           Tisch.Internal.Koln                 (Koln (..))
-import           Tisch.Internal.Query                (Query (..))
+import           Edible.Internal.Koln                 (Koln (..))
+import           Edible.Internal.Query                (Query (..))
 
 --------------------------------------------------------------------------------
 
@@ -67,8 +67,8 @@ import           Tisch.Internal.Query                (Query (..))
 --
 -- @
 -- x :: 'E.Aggregator' ('Kol' a, 'Kol' b) ('Kol' ('E.PGArray' a), 'Kol' ('E.PGArray' a))
--- x = (,) <$> 'orderAggregator' ('Tisch.asc' 'snd')  ('P.lmap' 'fst' 'arraygg')
---         <*> 'orderAggregator' ('Tisch.descl 'snd') ('P.lmap' 'fst' 'arraygg')
+-- x = (,) <$> 'orderAggregator' ('Edible.asc' 'snd')  ('P.lmap' 'fst' 'arraygg')
+--         <*> 'orderAggregator' ('Edible.descl 'snd') ('P.lmap' 'fst' 'arraygg')
 -- @
 --
 -- This will generate:
@@ -83,7 +83,7 @@ import           Tisch.Internal.Query                (Query (..))
 --
 -- @
 -- x :: 'E.Aggregator' ('Kol' a, 'Kol' b) ('Kol' ('E.PGArray' a), 'Kol' ('E.PGArray' a))
--- x = 'orderAggregator' ('Tisch.asc' 'snd') $ 'Tisch.Internal.Profunctors.ppa' ('arraygg', 'arraygg')
+-- x = 'orderAggregator' ('Edible.asc' 'snd') $ 'Edible.Internal.Profunctors.ppa' ('arraygg', 'arraygg')
 -- @
 --
 -- This will generate:

@@ -16,7 +16,7 @@
 {-# OPTIONS_GHC -Wno-redundant-constraints #-}
 
 -- | This is an internal module. You are very discouraged from using it directly.
-module Tisch.Internal.Kol
+module Edible.Internal.Kol
  ( PGArrayn
  , PgPrimType(..)
  , PgTyped(..)
@@ -59,17 +59,17 @@ import           Data.Word
 import qualified Database.PostgreSQL.Simple.FromField as Pg
 import qualified Database.PostgreSQL.Simple.Types     as Pg
 import           GHC.Exts                             (Constraint)
-import  GHC.TypeLits                         as GHC
+import           GHC.TypeLits                         as GHC
 
+import qualified Edible.Column                        as O
 import qualified Edible.Internal.Column               as OI
 import qualified Edible.Internal.HaskellDB.PrimQuery  as HDB
 import qualified Edible.Internal.RunQuery             as OI
-import qualified Edible.RunQuery                      as O
-import qualified Edible.Column                        as O
+import           Edible.PGTypes                       (PGNumericScale, pgFixed,
+                                                       pgFloat4, pgFloat8,
+                                                       pgInt2, pgScientific)
 import qualified Edible.PGTypes                       as O
-import           Edible.PGTypes                       (pgFloat4, pgFloat8, pgFixed,
-                                                       pgInt2, PGRawNumeric, PGNumeric,
-                                                       PGNumericScale, pgScientific)
+import qualified Edible.RunQuery                      as O
 
 -------------------------------------------------------------------------------
 
@@ -135,7 +135,7 @@ instance PgPrimType (O.PGNumeric scale) where pgPrimTypeName _ = "numeric"
 instance
   ( GHC.TypeError
       ('GHC.Text "Edible.PGRawNumeric is not supported," 'GHC.:$$:
-       'GHC.Text "Use Tisch.PGRawNumeric instead.")
+       'GHC.Text "Use Edible.PGRawNumeric instead.")
   ) => PgPrimType O.PGRawNumeric where pgPrimTypeName = undefined
 
 
@@ -186,7 +186,7 @@ class (PgPrimType (PgType a), PgTyped (PgType a), PgType a ~ PgType (PgType a))
   --   instance 'O.QueryRunnerColumnDefault' 'O.PGInt4' UserId
   --   @
   --
-  --   You might find 'Tisch.Run.qrcWrapped' useful for simple cases like
+  --   You might find 'Edible.Run.qrcWrapped' useful for simple cases like
   --   @UserId@.
   --
   --   Notice that the instance mentions 'O.PGInt4' directly, not our 'PgTyped'

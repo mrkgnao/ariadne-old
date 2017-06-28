@@ -2,7 +2,7 @@
 {-# LANGUAGE PolyKinds           #-}
 {-# LANGUAGE ScopedTypeVariables #-}
 
-module Tisch.Internal.Debug
+module Edible.Internal.Debug
  ( renderSqlQuery
  , renderSqlQuery'
  ) where
@@ -11,7 +11,7 @@ import qualified Data.Profunctor.Product.Default as PP
 import qualified Edible.Internal.Unpackspec      as OI
 import qualified Edible.Sql                      as O
 
-import           Tisch.Internal.Query            (Query (..))
+import           Edible.Internal.Query            (Query (..))
 
 --------------------------------------------------------------------------------
 

@@ -11,7 +11,7 @@
 {-# OPTIONS_GHC -Wno-orphans #-}
 
 -- | This is an internal module. You are very discouraged from using it directly.
-module Tisch.Internal.Fun
+module Edible.Internal.Fun
  ( PgNum
  , PgIntegral
  , PgFractional
@@ -94,13 +94,13 @@ import qualified Edible.PGTypes                      as O
 
 import           Edible.RunQuery               (SomeColumn (..),
                                                       unsafeFunExpr)
-import           Tisch.Internal.Kol                  (CastKol, Kol (..),
+import           Edible.Internal.Kol                  (CastKol, Kol (..),
                                                       PgTyped (..), ToKol (..),
                                                       kolArray, liftKol1,
                                                       liftKol2, liftKol3,
                                                       unsaferCastKol,
                                                       unsaferCoerceKol)
-import           Tisch.Internal.Koln                 (Koln (..))
+import           Edible.Internal.Koln                 (Koln (..))
 
 -------------------------------------------------------------------------------
 -- Semigroups, Monoids

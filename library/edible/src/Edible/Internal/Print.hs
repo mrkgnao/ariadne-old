@@ -1,25 +1,20 @@
 module Edible.Internal.Print where
 
-import           Prelude hiding (product)
+import           Prelude                             hiding (product)
 
-import qualified Edible.Internal.Sql as Sql
-import           Edible.Internal.Sql (Select(SelectFrom,
-                                              Table,
-                                              RelExpr,
-                                              SelectJoin,
-                                              SelectValues,
-                                              SelectBinary,
-                                              SelectLabel,
-                                              SelectExists),
-                                       From, Join, Values, Binary, Label, Exists)
+import           Edible.Internal.Sql                 (Binary, Exists, From,
+                                                      Join, Label,
+                                                      Select (RelExpr, SelectBinary, SelectExists, SelectFrom, SelectJoin, SelectLabel, SelectValues, Table),
+                                                      Values)
+import qualified Edible.Internal.Sql                 as Sql
 
-import qualified Edible.Internal.HaskellDB.Sql as HSql
+import qualified Edible.Internal.HaskellDB.Sql       as HSql
 import qualified Edible.Internal.HaskellDB.Sql.Print as HPrint
 
-import           Text.PrettyPrint.HughesPJ (Doc, ($$), (<+>), text, empty,
-                                            parens)
-import qualified Data.List.NonEmpty as NEL
-import qualified Data.Text          as ST
+import qualified Data.List.NonEmpty                  as NEL
+import qualified Data.Text                           as ST
+import           Text.PrettyPrint.HughesPJ           (Doc, empty, parens, text,
+                                                      ($$), (<+>))
 
 type TableAlias = String
 
@@ -81,14 +76,14 @@ ppSelectExists v =
   $$ text "FROM"
   $$ ppTable (tableAlias 1 (Sql.existsTable v))
   $$ case Sql.existsBool v of
-       True -> text "WHERE EXISTS"
+       True  -> text "WHERE EXISTS"
        False -> text "WHERE NOT EXISTS"
   $$ parens (ppSql (Sql.existsCriteria v))
 
 ppJoinType :: Sql.JoinType -> Doc
-ppJoinType Sql.LeftJoin = text "LEFT OUTER JOIN"
+ppJoinType Sql.LeftJoin  = text "LEFT OUTER JOIN"
 ppJoinType Sql.RightJoin = text "RIGHT OUTER JOIN"
-ppJoinType Sql.FullJoin = text "FULL OUTER JOIN"
+ppJoinType Sql.FullJoin  = text "FULL OUTER JOIN"
 
 ppAttrs :: Sql.SelectAttrs -> Doc
 ppAttrs Sql.Star                 = text "*"
@@ -125,11 +120,11 @@ ppGroupBy Nothing   = empty
 ppGroupBy (Just xs) = HPrint.ppGroupBy (NEL.toList xs)
 
 ppLimit :: Maybe Int -> Doc
-ppLimit Nothing = empty
+ppLimit Nothing  = empty
 ppLimit (Just n) = text ("LIMIT " ++ show n)
 
 ppOffset :: Maybe Int -> Doc
-ppOffset Nothing = empty
+ppOffset Nothing  = empty
 ppOffset (Just n) = text ("OFFSET " ++ show n)
 
 ppValues :: [[HSql.SqlExpr]] -> Doc

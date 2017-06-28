@@ -1,16 +1,18 @@
-{-# LANGUAGE MultiParamTypeClasses, FlexibleInstances #-}
+{-# LANGUAGE FlexibleInstances     #-}
+{-# LANGUAGE MultiParamTypeClasses #-}
 
 module Edible.Internal.Unpackspec where
 
-import qualified Edible.Internal.PackMap as PM
-import qualified Edible.Internal.Column as IC
-import qualified Edible.Column as C
+import qualified Edible.Column                       as C
+import qualified Edible.Internal.Column              as IC
+import qualified Edible.Internal.PackMap             as PM
 
-import           Control.Applicative (Applicative, pure, (<*>))
-import           Data.Profunctor (Profunctor, dimap)
-import           Data.Profunctor.Product (ProductProfunctor, empty, (***!))
-import qualified Data.Profunctor.Product as PP
-import qualified Data.Profunctor.Product.Default as D
+import           Control.Applicative                 (Applicative, pure, (<*>))
+import           Data.Profunctor                     (Profunctor, dimap)
+import           Data.Profunctor.Product             (ProductProfunctor, empty,
+                                                      (***!))
+import qualified Data.Profunctor.Product             as PP
+import qualified Data.Profunctor.Product.Default     as D
 
 import qualified Edible.Internal.HaskellDB.PrimQuery as HPQ
 

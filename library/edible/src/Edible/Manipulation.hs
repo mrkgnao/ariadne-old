@@ -52,7 +52,7 @@ import qualified Data.List.NonEmpty as NEL
 -- | Insert rows into a table
 runInsertMany :: PGS.Connection
               -- ^
-              -> T.Table columns columns'
+              -> T.OTable columns columns'
               -- ^ Table to insert into
               -> [columns]
               -- ^ Rows to insert
@@ -72,7 +72,7 @@ runInsertMany conn table columns = case NEL.nonEmpty columns of
 runInsertManyReturning :: (D.Default RQ.QueryRunner columnsReturned haskells)
                        => PGS.Connection
                        -- ^
-                       -> T.Table columnsW columnsR
+                       -> T.OTable columnsW columnsR
                        -- ^ Table to insert into
                        -> [columnsW]
                        -- ^ Rows to insert
@@ -89,7 +89,7 @@ runInsertManyReturning = runInsertManyReturningExplicit D.def
 -- confused by this because they assume it means that the column is to
 -- be left unchanged.
 runUpdate :: PGS.Connection
-          -> T.Table columnsW columnsR
+          -> T.OTable columnsW columnsR
           -- ^ Table to update
           -> (columnsR -> columnsW)
           -- ^ Update function to apply to chosen rows
@@ -116,7 +116,7 @@ runUpdate conn = PGS.execute_ conn . fromString .:. arrangeUpdateSql
 runUpdateReturning :: (D.Default RQ.QueryRunner columnsReturned haskells)
                    => PGS.Connection
                    -- ^
-                   -> T.Table columnsW columnsR
+                   -> T.OTable columnsW columnsR
                    -- ^ Table to update
                    -> (columnsR -> columnsW)
                    -- ^ Update function to apply to chosen rows
@@ -134,7 +134,7 @@ runUpdateReturning = runUpdateReturningExplicit D.def
 -- | Delete rows from a table
 runDelete :: PGS.Connection
           -- ^
-          -> T.Table a columnsR
+          -> T.OTable a columnsR
           -- ^ Table to delete rows from
           -> (columnsR -> Column PGBool)
           -- ^ Predicate function @f@ to choose which rows to delete.
@@ -152,7 +152,7 @@ runDelete conn = PGS.execute_ conn . fromString .: arrangeDeleteSql
 -- 'QueryRunner'.
 runInsertReturningExplicit :: RQ.QueryRunner columnsReturned haskells
                            -> PGS.Connection
-                           -> T.Table columnsW columnsR
+                           -> T.OTable columnsW columnsR
                            -> columnsW
                            -> (columnsR -> columnsReturned)
                            -> IO [haskells]
@@ -165,7 +165,7 @@ runInsertReturningExplicit qr conn t =
 -- 'QueryRunner'.
 runInsertManyReturningExplicit :: RQ.QueryRunner columnsReturned haskells
                                -> PGS.Connection
-                               -> T.Table columnsW columnsR
+                               -> T.OTable columnsW columnsR
                                -> [columnsW]
                                -> (columnsR -> columnsReturned)
                                -> IO [haskells]
@@ -177,7 +177,7 @@ runInsertManyReturningExplicit qr conn t columns r =
                         (arrangeInsertManyReturningSql u t columns' r))
   where IRQ.QueryRunner u _ _ = qr
         parser = IRQ.prepareRowParser qr (r v)
-        TI.Table _ (TI.TableProperties _ (TI.View v)) = t
+        TI.OTable _ (TI.TableProperties _ (TI.View v)) = t
         -- This method of getting hold of the return type feels a bit
         -- suspect.  I haven't checked it for validity.
 
@@ -187,7 +187,7 @@ runInsertManyReturningExplicit qr conn t columns r =
 -- 'QueryRunner'.
 runUpdateReturningExplicit :: RQ.QueryRunner columnsReturned haskells
                            -> PGS.Connection
-                           -> T.Table columnsW columnsR
+                           -> T.OTable columnsW columnsR
                            -> (columnsR -> columnsW)
                            -> (columnsR -> Column PGBool)
                            -> (columnsR -> columnsReturned)
@@ -197,7 +197,7 @@ runUpdateReturningExplicit qr conn t update cond r =
                  (fromString (arrangeUpdateReturningSql u t update cond r))
   where IRQ.QueryRunner u _ _ = qr
         parser = IRQ.prepareRowParser qr (r v)
-        TI.Table _ (TI.TableProperties _ (TI.View v)) = t
+        TI.OTable _ (TI.TableProperties _ (TI.View v)) = t
 
 -- * Deprecated versions
 
@@ -205,7 +205,7 @@ runUpdateReturningExplicit qr conn t update cond r =
 --
 -- This will be deprecated in version 0.6.  Use 'runInsertMany'
 -- instead.
-runInsert :: PGS.Connection -> T.Table columns columns' -> columns -> IO Int64
+runInsert :: PGS.Connection -> T.OTable columns columns' -> columns -> IO Int64
 runInsert conn = PGS.execute_ conn . fromString .: arrangeInsertSql
 
 -- | @runInsertReturning@'s use of the 'D.Default' typeclass means that the
@@ -217,7 +217,7 @@ runInsert conn = PGS.execute_ conn . fromString .: arrangeInsertSql
 -- 'runInsertManyReturning' instead.
 runInsertReturning :: (D.Default RQ.QueryRunner columnsReturned haskells)
                    => PGS.Connection
-                   -> T.Table columnsW columnsR
+                   -> T.OTable columnsW columnsR
                    -> columnsW
                    -> (columnsR -> columnsReturned)
                    -> IO [haskells]
@@ -225,17 +225,17 @@ runInsertReturning = runInsertReturningExplicit D.def
 
 -- | For internal use only.  Do not use.  Will be deprecated in
 -- version 0.6.
-arrangeInsert :: T.Table columns a -> columns -> HSql.SqlInsert
+arrangeInsert :: T.OTable columns a -> columns -> HSql.SqlInsert
 arrangeInsert t c = arrangeInsertMany t (return c)
 
 -- | For internal use only.  Do not use.  Will be deprecated in
 -- version 0.6.
-arrangeInsertSql :: T.Table columns a -> columns -> String
+arrangeInsertSql :: T.OTable columns a -> columns -> String
 arrangeInsertSql = show . HPrint.ppInsert .: arrangeInsert
 
 -- | For internal use only.  Do not use.  Will be deprecated in
 -- version 0.6.
-arrangeInsertMany :: T.Table columns a -> NEL.NonEmpty columns -> HSql.SqlInsert
+arrangeInsertMany :: T.OTable columns a -> NEL.NonEmpty columns -> HSql.SqlInsert
 arrangeInsertMany table columns = insert
   where writer = TI.tablePropertiesWriter (TI.tableProperties table)
         (columnExprs, columnNames) = TI.runWriter' writer columns
@@ -245,12 +245,12 @@ arrangeInsertMany table columns = insert
 
 -- | For internal use only.  Do not use.  Will be deprecated in
 -- version 0.6.
-arrangeInsertManySql :: T.Table columns a -> NEL.NonEmpty columns -> String
+arrangeInsertManySql :: T.OTable columns a -> NEL.NonEmpty columns -> String
 arrangeInsertManySql = show . HPrint.ppInsert .: arrangeInsertMany
 
 -- | For internal use only.  Do not use.  Will be deprecated in
 -- version 0.6.
-arrangeUpdate :: T.Table columnsW columnsR
+arrangeUpdate :: T.OTable columnsW columnsR
               -> (columnsR -> columnsW) -> (columnsR -> Column PGBool)
               -> HSql.SqlUpdate
 arrangeUpdate table update cond =
@@ -263,14 +263,14 @@ arrangeUpdate table update cond =
 
 -- | For internal use only.  Do not use.  Will be deprecated in
 -- version 0.6.
-arrangeUpdateSql :: T.Table columnsW columnsR
+arrangeUpdateSql :: T.OTable columnsW columnsR
               -> (columnsR -> columnsW) -> (columnsR -> Column PGBool)
               -> String
 arrangeUpdateSql = show . HPrint.ppUpdate .:. arrangeUpdate
 
 -- | For internal use only.  Do not use.  Will be deprecated in
 -- version 0.6.
-arrangeDelete :: T.Table a columnsR -> (columnsR -> Column PGBool) -> HSql.SqlDelete
+arrangeDelete :: T.OTable a columnsR -> (columnsR -> Column PGBool) -> HSql.SqlDelete
 arrangeDelete table cond =
   SG.sqlDelete SD.defaultSqlGenerator (PQ.tiToSqlTable (TI.tableIdentifier table)) [condExpr]
   where Column condExpr = cond tableCols
@@ -278,13 +278,13 @@ arrangeDelete table cond =
 
 -- | For internal use only.  Do not use.  Will be deprecated in
 -- version 0.6.
-arrangeDeleteSql :: T.Table a columnsR -> (columnsR -> Column PGBool) -> String
+arrangeDeleteSql :: T.OTable a columnsR -> (columnsR -> Column PGBool) -> String
 arrangeDeleteSql = show . HPrint.ppDelete .: arrangeDelete
 
 -- | For internal use only.  Do not use.  Will be deprecated in
 -- version 0.6.
 arrangeInsertManyReturning :: U.Unpackspec columnsReturned ignored
-                           -> T.Table columnsW columnsR
+                           -> T.OTable columnsW columnsR
                            -> NEL.NonEmpty columnsW
                            -> (columnsR -> columnsReturned)
                            -> Sql.Returning HSql.SqlInsert
@@ -298,7 +298,7 @@ arrangeInsertManyReturning unpackspec table columns returningf =
 -- | For internal use only.  Do not use.  Will be deprecated in
 -- version 0.6.
 arrangeInsertManyReturningSql :: U.Unpackspec columnsReturned ignored
-                              -> T.Table columnsW columnsR
+                              -> T.OTable columnsW columnsR
                               -> NEL.NonEmpty columnsW
                               -> (columnsR -> columnsReturned)
                               -> String
@@ -308,7 +308,7 @@ arrangeInsertManyReturningSql =
 -- | For internal use only.  Do not use.  Will be deprecated in
 -- version 0.6.
 arrangeUpdateReturning :: U.Unpackspec columnsReturned ignored
-                       -> T.Table columnsW columnsR
+                       -> T.OTable columnsW columnsR
                        -> (columnsR -> columnsW)
                        -> (columnsR -> Column PGBool)
                        -> (columnsR -> columnsReturned)
@@ -323,7 +323,7 @@ arrangeUpdateReturning unpackspec table updatef cond returningf =
 -- | For internal use only.  Do not use.  Will be deprecated in
 -- version 0.6.
 arrangeUpdateReturningSql :: U.Unpackspec columnsReturned ignored
-                          -> T.Table columnsW columnsR
+                          -> T.OTable columnsW columnsR
                           -> (columnsR -> columnsW)
                           -> (columnsR -> Column PGBool)
                           -> (columnsR -> columnsReturned)

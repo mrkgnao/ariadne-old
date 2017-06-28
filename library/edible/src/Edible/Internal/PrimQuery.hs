@@ -1,11 +1,11 @@
 module Edible.Internal.PrimQuery where
 
-import           Prelude hiding (product)
+import           Prelude                             hiding (product)
 
-import qualified Data.List.NonEmpty as NEL
-import qualified Edible.Internal.HaskellDB.Sql as HSql
-import qualified Edible.Internal.HaskellDB.PrimQuery as HPQ
+import qualified Data.List.NonEmpty                  as NEL
 import           Edible.Internal.HaskellDB.PrimQuery (Symbol)
+import qualified Edible.Internal.HaskellDB.PrimQuery as HPQ
+import qualified Edible.Internal.HaskellDB.Sql       as HSql
 
 data LimitOp = LimitOp Int | OffsetOp Int | LimitOffsetOp Int Int
              deriving Show

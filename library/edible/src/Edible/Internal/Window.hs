@@ -1,5 +1,5 @@
 -- | TODO: This is a work in progress.
-module Tisch.Internal.Window
+module Edible.Internal.Window
  ( winRowNum
  , winRank
  , winRankDense
@@ -13,11 +13,11 @@ module Tisch.Internal.Window
  , winNth
  ) where
 
-import           Edible.RunQuery (SomeColumn (..), unsafeFunExpr)
-import           Tisch.Internal.Kol    (Kol (..), PgTyped)
-import           Tisch.Internal.Koln   (Koln (..))
+import           Edible.RunQuery     (SomeColumn (..), unsafeFunExpr)
+import           Edible.Internal.Kol  (Kol (..), PgTyped)
+import           Edible.Internal.Koln (Koln (..))
 
-import qualified Edible.PGTypes        as O
+import qualified Edible.PGTypes      as O
 
 --------------------------------------------------------------------------------
 
@@ -69,7 +69,7 @@ winBucket (Kol x) = Kol (unsafeFunExpr "ntile" [SomeColumn x])
 
 -- | Window function. 'winLag' value offset@ returns @value@ evaluated
 -- at the row that is @offset@ rows /after/ the current row within the partition.
--- If there is no such row, returns @Tisch.nul@ instead. @offset@ is evaluated
+-- If there is no such row, returns @Edible.nul@ instead. @offset@ is evaluated
 -- with respect to the current row.
 --
 -- Sql function name: @lag()@.
@@ -84,7 +84,7 @@ winLag (Kol v) (Kol o) = Koln (unsafeFunExpr "lag" [SomeColumn v, SomeColumn o])
 
 -- | Window function. 'winLead' value offset@ returns @value@ evaluated
 -- at the row that is @offset@ rows /after/ the current row within the partition.
--- If there is no such row, returns @Tisch.nul@ instead. @offset@ is evaluated
+-- If there is no such row, returns @Edible.nul@ instead. @offset@ is evaluated
 -- with respect to the current row.
 --
 -- Sql function name: @lead()@.

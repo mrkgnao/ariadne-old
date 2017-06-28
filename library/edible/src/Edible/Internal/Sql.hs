@@ -1,22 +1,22 @@
 module Edible.Internal.Sql where
 
-import           Prelude hiding (product)
+import           Prelude                                hiding (product)
 
-import qualified Edible.Internal.PrimQuery as PQ
+import qualified Edible.Internal.PrimQuery              as PQ
 
-import qualified Edible.Internal.HaskellDB.PrimQuery as HPQ
-import           Edible.Internal.HaskellDB.PrimQuery (Symbol(Symbol))
-import qualified Edible.Internal.HaskellDB.Sql as HSql
-import qualified Edible.Internal.HaskellDB.Sql.Default as SD
-import qualified Edible.Internal.HaskellDB.Sql.Print as SP
+import           Edible.Internal.HaskellDB.PrimQuery    (Symbol (Symbol))
+import qualified Edible.Internal.HaskellDB.PrimQuery    as HPQ
+import qualified Edible.Internal.HaskellDB.Sql          as HSql
+import qualified Edible.Internal.HaskellDB.Sql.Default  as SD
 import qualified Edible.Internal.HaskellDB.Sql.Generate as SG
-import qualified Edible.Internal.Tag as T
+import qualified Edible.Internal.HaskellDB.Sql.Print    as SP
+import qualified Edible.Internal.Tag                    as T
 
-import qualified Data.List.NonEmpty as NEL
-import qualified Data.Maybe as M
-import qualified Data.Void as V
+import qualified Data.List.NonEmpty                     as NEL
+import qualified Data.Maybe                             as M
+import qualified Data.Void                              as V
 
-import qualified Control.Arrow as Arr
+import qualified Control.Arrow                          as Arr
 
 data Select = SelectFrom From
             | Table HSql.SqlTable
@@ -36,20 +36,20 @@ data SelectAttrs =
   deriving Show
 
 data From = From {
-  attrs     :: SelectAttrs,
-  tables    :: [Select],
-  criteria  :: [HSql.SqlExpr],
-  groupBy   :: Maybe (NEL.NonEmpty HSql.SqlExpr),
-  orderBy   :: [(HSql.SqlExpr, HSql.SqlOrder)],
-  limit     :: Maybe Int,
-  offset    :: Maybe Int
+  attrs    :: SelectAttrs,
+  tables   :: [Select],
+  criteria :: [HSql.SqlExpr],
+  groupBy  :: Maybe (NEL.NonEmpty HSql.SqlExpr),
+  orderBy  :: [(HSql.SqlExpr, HSql.SqlOrder)],
+  limit    :: Maybe Int,
+  offset   :: Maybe Int
   }
           deriving Show
 
 data Join = Join {
-  jJoinType   :: JoinType,
-  jTables     :: (Select, Select),
-  jCond       :: HSql.SqlExpr
+  jJoinType :: JoinType,
+  jTables   :: (Select, Select),
+  jCond     :: HSql.SqlExpr
   }
                 deriving Show
 
@@ -59,7 +59,7 @@ data Values = Values {
 } deriving Show
 
 data Binary = Binary {
-  bOp :: BinOp,
+  bOp      :: BinOp,
   bSelect1 :: Select,
   bSelect2 :: Select
 } deriving Show
@@ -75,8 +75,8 @@ data Label = Label {
 data Returning a = Returning a (NEL.NonEmpty HSql.SqlExpr)
 
 data Exists = Exists
-  { existsBool :: Bool
-  , existsTable :: Select
+  { existsBool     :: Bool
+  , existsTable    :: Select
   , existsCriteria :: Select
   } deriving Show
 
@@ -206,9 +206,9 @@ binary op pes (select1, select2) = SelectBinary Binary {
   where mkColumn e = sqlBinding . Arr.second e
 
 joinType :: PQ.JoinType -> JoinType
-joinType PQ.LeftJoin = LeftJoin
+joinType PQ.LeftJoin  = LeftJoin
 joinType PQ.RightJoin = RightJoin
-joinType PQ.FullJoin = FullJoin
+joinType PQ.FullJoin  = FullJoin
 
 binOp :: PQ.BinOp -> BinOp
 binOp o = case o of

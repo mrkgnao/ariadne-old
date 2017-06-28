@@ -12,7 +12,7 @@
 {-# OPTIONS_GHC -Wno-orphans #-}
 
 -- | This is an internal module. You are very discouraged from using it directly.
-module Tisch.Internal.Koln
+module Edible.Internal.Koln
   ( Koln(..)
   , koln
   , nul
@@ -41,7 +41,7 @@ import qualified Edible.Column                       as O
 import qualified Edible.PGTypes                      as O
 import qualified Edible.RunQuery                     as O
 
-import           Tisch.Internal.Kol                  (Kol (..), PGArrayn,
+import           Edible.Internal.Kol                  (Kol (..), PGArrayn,
                                                       PgTyped (..), ToKol (..),
                                                       pgPrimTypeName)
 
@@ -164,7 +164,7 @@ instance
                                          (O.Column (O.Nullable (PgType b))))
   {-# INLINE def #-}
 
--- | OVERLAPPABLE. Orphan in "Tisch.Internal.Koln".
+-- | OVERLAPPABLE. Orphan in "Edible.Internal.Koln".
 instance {-# OVERLAPPABLE #-}
     ( O.QueryRunnerColumnDefault pg hs
     ) => O.QueryRunnerColumnDefault pg (Maybe hs) where

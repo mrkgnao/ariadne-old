@@ -162,19 +162,18 @@ runTisch = do
         linkSearchLoop)
 
 updateFulltext :: KnotId -> AriadneT IO ()
-updateFulltext kid = do
-  link' <- fetch (q_Link_by_id kid)
-  case link' of
+updateFulltext kid =
+  fetch (q_Link_by_id kid) >>= \case
     [lnk] -> do
-      page <- lnk
-           |$ view link_url
-           |> T.unpack
-           |> W.get |> liftIO
+      let l = lnk |$ view link_url
+      logDebugN ("Fetching " <> l)
+      page <- l |$ T.unpack
+                    |> W.get |> liftIO
       let
         pageText = page
-              |$ view W.responseBody
-              |> TL.decodeUtf8With T.ignore
-              |> TL.toStrict
+                |$ view W.responseBody
+                |> TL.decodeUtf8With T.ignore
+                |> TL.toStrict
       logInfoN ("Fetched page: " <> tshow (T.length pageText) <> " bytes")
     _ -> pure ()
 
@@ -186,3 +185,24 @@ getLink = W.get "http://google.com"
 
 main :: IO ()
 main = runTisch
+
+mkFulltext'
+  :: (MonadReader AriadneState m, MonadIO m, MonadThrow m, MonadLogger m)
+  => Text -> m KnotId
+mkFulltext' s = do
+  t <- mkKnot
+  mkFulltext t s
+
+mkFulltext
+  :: (MonadReader AriadneState m, MonadIO m, MonadThrow m)
+  => KnotId -> Text -> m KnotId
+mkFulltext t s = do
+  c <- asks conn
+  runInsertReturning1
+    c
+    Fulltext
+    (^. fulltext_id)
+    (mkHsI
+       Fulltext
+       (hsi' @"fulltext_id" t)
+       (hsi' @"fulltext_contents" s))
