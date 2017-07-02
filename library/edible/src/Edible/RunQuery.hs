@@ -27,13 +27,13 @@ import qualified Data.Profunctor as P
 import qualified Data.Profunctor.Product.Default as D
 
 import qualified Edible.Column                        as O
-import qualified Edible.Order                         as O
-import qualified Edible.PGTypes                       as O
+
+
 
 import qualified Edible.Internal.Column               as OI
 import qualified Edible.Internal.HaskellDB.PrimQuery  as HDB
-import qualified Edible.Internal.PGTypes              as OI
-import qualified Edible.Internal.RunQuery             as OI
+
+
 
 -- * Running 'Query's
 

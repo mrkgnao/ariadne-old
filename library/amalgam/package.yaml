@@ -38,6 +38,6 @@ dependencies:
 - unix
 - unix-time
 library:
-  ghc-options: -Wall
+  ghc-options: []
   source-dirs: src/
   cpp-options: -DWITH_CALLSTACK

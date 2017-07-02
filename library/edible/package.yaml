@@ -45,7 +45,7 @@ dependencies:
 - void
 library:
   source-dirs: src
-  ghc-options: -Wall
+  ghc-options: []
   default-extensions:
     - DoAndIfThenElse
     - BangPatterns

@@ -167,7 +167,7 @@ updateFulltext kid =
       let l = lnk |$ view link_url
       logDebugN ("Fetching " <> l)
       page <- l |$ T.unpack
-                    |> W.get |> liftIO
+                |> W.get |> liftIO
       let
         pageText = page
                 |$ view W.responseBody

@@ -73,6 +73,37 @@ create table quotes
                 not null
   );
 
+create table card
+  ( card_id    uuid
+               primary key
+               constraint card__knot
+               references knots (knot_id)
+  , front_text text
+               not null
+  , back_text  text
+               not null
+  );
+
+create table memories
+  ( memory_id   uuid
+                primary key
+                constraint memory__knot
+                references knots (knot_id)
+  , easiness_factor
+                double precision
+                not null
+                default 2.5
+  , repetition_interval
+                double precision
+                not null
+  , repetition_count
+                integer
+                not null
+                default 0
+  , next_due    timestamp
+                not null
+  );
+
 create extension pg_trgm;
 
 insert into knots(knot_extra_data)
